@@ -15,7 +15,7 @@ screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The last seed")
 
 def get_enemy_slot(tree, enemy_size):
-    """Devuelve una posición natural y dispersa alrededor del árbol"""
+    
     angle = random.uniform(0, 360)   # ángulo aleatorio
     radius = random.randint(20, 40)  # radio aleatorio
     rad = math.radians(angle)

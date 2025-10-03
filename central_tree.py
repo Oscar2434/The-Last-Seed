@@ -10,7 +10,7 @@ class CentralTree:
         self.health = constants.TREE_HEALTH
 
         # Cargar sprite del árbol central
-        image_path = os.path.join('assets', 'images', 'objects', 'tree.png')
+        image_path = os.path.join('assets', 'images', 'objects', 'treeC.png')
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
 
