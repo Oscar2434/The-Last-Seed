@@ -18,7 +18,7 @@ class Character:
          self.moving = False 
          self.facing_left = False
          self.animations = self.load_animatios()
-         self.carrying_resource = None   # puede cargar un recurso
+         self.carrying_resource = None   
 
     def load_animatios(self):
         animations = {}
@@ -74,13 +74,13 @@ class Character:
          new_x = self.x + dx
          new_y = self.y + dy
 
-         # Colisiones con los árboles normales
+         #Colisiones con los árboles normales
          for tree in world.trees:
              if self.check_collision(new_x, new_y, tree):
                  self.moving = False
                  return
 
-         # 🔹 Colisión con el árbol central
+         #Colisión con el árbol central
          if hasattr(world, "central_tree") and world.central_tree:
              if self.check_collision(new_x, new_y, world.central_tree):
                  self.moving = False

@@ -8,34 +8,34 @@ import config
 pygame.init() #Inicializar pygame
 
 pygame.mixer.init()
-pygame.mixer.music.load('music/prueba1.mp3')  # Ruta al archivo de música
-pygame.mixer.music.play(-1)# Reproducir la música en bucle infinito
+pygame.mixer.music.load('music/prueba1.mp3')  #Ruta al archivo de música
+pygame.mixer.music.play(-1)#Reproducir la música 
 
-# ventana
+#ventana
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")
 
-# imágenes
+#imágenes
 background = pygame.image.load("imagenes\portada.png")
 button_config = pygame.image.load("imagenes\confi.png")
 button_play = pygame.image.load("imagenes\Play.png")
 button_exit = pygame.image.load("imagenes\Exit.png")
 
-# Redimensionar la imagen de fondo al tamaño de las imagenes
+#escalar imágenes
 background = pygame.transform.scale(background, (constants.WIDTH, constants.HEIGHT))
 button_play = pygame.transform.scale(button_play, ( 300, 100))
 button_config = pygame.transform.scale(button_config, ( 120, 100))
 button_exit = pygame.transform.scale(button_exit, ( 200, 100))
 
-# botones 
-    # play
+#botones 
+    #play
 play_button = Button( 780 // 2 - button_play.get_width() // 2, 500 // 2 - button_play.get_height() // 2, button_play, 1)
-    # config
+    #config
 config_button = Button( 150 // 2 - button_config.get_width() // 2, 800 // 2 - button_config.get_height() // 2, button_config, 1)
-    # salir
+    #salir
 exit_button = Button( 780 // 2 - button_exit.get_width() // 2, 800// 2 - button_exit.get_height() // 2, button_exit, 1)
 
-# Bucle
+#Bucle
 def menu():
     run = True
     while run:

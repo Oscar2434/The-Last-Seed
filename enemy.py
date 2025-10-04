@@ -23,7 +23,7 @@ class Lumberjack:
         self.attacking = False
 
         # Cargar spritesheet
-        image_path = os.path.join('assets', 'images', 'character', 'image19.png')
+        image_path = os.path.join('assets', 'images', 'character', 'leñador7.png')
         self.sprite = pygame.image.load(image_path).convert_alpha()
 
         # Animaciones
@@ -31,27 +31,23 @@ class Lumberjack:
 
     def load_animations(self):
         animations = {}
-        total_states = 6  # 4 caminar + 2 ataque
+        total_states = 6  # 4 direcciones + 2 ataques
         for state in range(total_states):
             frames = []
             for frame in range(constants.SPRITES):
-                # 🔹 Recorte exacto usando Rect
                 rect = pygame.Rect(
                     frame * constants.LUMBERJACK_F_SIZE,
                     state * constants.LUMBERJACK_F_SIZE,
                     constants.LUMBERJACK_F_SIZE,
                     constants.LUMBERJACK_F_SIZE
                 )
-
-                # Crear superficie limpia con alpha
                 surface = pygame.Surface((constants.LUMBERJACK_F_SIZE, constants.LUMBERJACK_F_SIZE), pygame.SRCALPHA)
                 surface.blit(self.sprite, (0, 0), rect)
 
-                # 🔹 Escalar si el tamaño en pantalla es distinto al del frame
+                # Escalar si el tamaño en pantalla es distinto al del frame
                 if constants.LUMBERJACK_SIZE != constants.LUMBERJACK_F_SIZE:
                     surface = pygame.transform.scale(surface,
                                                      (constants.LUMBERJACK_SIZE, constants.LUMBERJACK_SIZE))
-
                 frames.append(surface)
             animations[state] = frames
         return animations
@@ -64,7 +60,7 @@ class Lumberjack:
                 self.animation_frame = (self.animation_frame + 1) % constants.SPRITES
 
     def move_towards(self, tree):
-        if self.attacking:  
+        if self.attacking:  # si ya está atacando, no se mueve
             return  
 
         enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
@@ -108,7 +104,10 @@ class Lumberjack:
         enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
         tree_rect = pygame.Rect(tree.x, tree.y, tree.size, tree.size)
 
-        if enemy_rect.colliderect(tree_rect):
+        # 🔹 Consideramos como contacto si ya llegó a su target_pos
+        at_target = abs(self.x - self.target_pos[0]) < 5 and abs(self.y - self.target_pos[1]) < 5
+
+        if enemy_rect.colliderect(tree_rect) or at_target:
             self.attacking = True
             if self.timer <= 0:
                 # Elegir animación de ataque según lado

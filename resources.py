@@ -9,7 +9,7 @@ class Resource:
         self.size = 20
         self.collected = False
 
-        # Cargar sprite del recurso de curación
+        #Cargar sprite del recurso de curación
         image_path = os.path.join('assets', 'images', 'objects', 'seed.png')
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.size, self.size))

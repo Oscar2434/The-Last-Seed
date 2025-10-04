@@ -9,7 +9,7 @@ class CentralTree:
         self.size = 80
         self.health = constants.TREE_HEALTH
 
-        # Cargar sprite del árbol central
+        #Cargar sprite del árbol central
         image_path = os.path.join('assets', 'images', 'objects', 'treeC.png')
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
@@ -27,7 +27,7 @@ class CentralTree:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
-        # Barra de vida encima del árbol
+        #Barra de vida encima del árbol
         bar_width = self.size
         bar_height = 8
         fill = (self.health / constants.TREE_HEALTH) * bar_width
