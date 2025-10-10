@@ -5,22 +5,16 @@ from button import Button
 
 pygame.init()
 
-
-lenguaje = False # false = español, true = ingles
-music = True # false = sin muisica, true = con musica
-
 # ventana
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-if lenguaje: 
-    pygame.display.set_caption("configuration")
-else: 
-    pygame.display.set_caption("Configuración")
+pygame.display.set_caption("nivels")
+
 # imágenes
 Fondo = pygame.image.load("imagenes/portada.png")  # Cambia el nombre si es necesario
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
 
 # Bucle de configuración
-def config_menu():
+def niveles():
     run = True
     while run:
         screen.blit(Fondo, (0, 0))
@@ -37,4 +31,4 @@ def config_menu():
         pygame.display.update()  # Actualiza la pantalla
 
 if __name__ == "__main__":
-    config_menu()
+    niveles()
