@@ -9,6 +9,8 @@ from resources import Resource
 import random
 import math
 import os
+import menu
+import config
 
 pygame.init()
 
