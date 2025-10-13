@@ -17,9 +17,10 @@ Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
 
 # Botón de Play
 if config.lenguaje:
-    button_play = pygame.image.load("imagenes/Play.png")  # Usa la imagen proporcionada
+    button_play = pygame.image.load("imagenes\Play.png")  # Usa la imagen proporcionada
 else:
     button_play = pygame.image.load("imagenes\Jugar.png")  # Usa la imagen proporcionada
+
 button_play = pygame.transform.scale(button_play, (300, 100))  # Escala la imagen
 play_button = Button(780 // 2 - button_play.get_width() // 2, 700 // 2 - button_play.get_height() // 2, button_play, 1)
 
