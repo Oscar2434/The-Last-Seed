@@ -31,7 +31,7 @@ class Lumberjack:
 
     def load_animations(self):
         animations = {}
-        total_states = 6  # 4 direcciones + 2 ataques
+        total_states = 6  # Número total de estados (4 direcciones + 2 ataques)
         for state in range(total_states):
             frames = []
             for frame in range(constants.SPRITES):
@@ -44,7 +44,7 @@ class Lumberjack:
                 surface = pygame.Surface((constants.LUMBERJACK_F_SIZE, constants.LUMBERJACK_F_SIZE), pygame.SRCALPHA)
                 surface.blit(self.sprite, (0, 0), rect)
 
-                # Escalar si el tamaño en pantalla es distinto al del frame
+                # Redimensionar si es necesario
                 if constants.LUMBERJACK_SIZE != constants.LUMBERJACK_F_SIZE:
                     surface = pygame.transform.scale(surface,
                                                      (constants.LUMBERJACK_SIZE, constants.LUMBERJACK_SIZE))
@@ -60,7 +60,7 @@ class Lumberjack:
                 self.animation_frame = (self.animation_frame + 1) % constants.SPRITES
 
     def move_towards(self, tree):
-        if self.attacking:  # si ya está atacando, no se mueve
+        if self.attacking:  #No moverse si está atacando
             return  
 
         enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
@@ -104,13 +104,13 @@ class Lumberjack:
         enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
         tree_rect = pygame.Rect(tree.x, tree.y, tree.size, tree.size)
 
-        # 🔹 Consideramos como contacto si ya llegó a su target_pos
+        #Verificar si está en contacto con el árbol o cerca de la posición objetivo
         at_target = abs(self.x - self.target_pos[0]) < 5 and abs(self.y - self.target_pos[1]) < 5
 
         if enemy_rect.colliderect(tree_rect) or at_target:
             self.attacking = True
             if self.timer <= 0:
-                # Elegir animación de ataque según lado
+                #Elegir animación de ataque según lado
                 if self.x < tree.x:
                     self.current_state = constants.LUMBERJACK_ATTACK_RIGHT
                 else:
