@@ -8,7 +8,7 @@ class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
-         image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
+         image_path = os.path.join('assets', 'images', 'character', 'nino.png')
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
          self.animation_frame = 0
