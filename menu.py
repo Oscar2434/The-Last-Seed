@@ -5,7 +5,7 @@ from button import Button
 import main
 import config
 import nivels
-
+#prueba
 pygame.init() #Inicializar pygame
 
 if config.music: #Reproducir las instruciones para que se reprodusca la musica del juego si la variable music que se encuentra en config es true que es verdadero
