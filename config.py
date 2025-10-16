@@ -6,7 +6,7 @@ from button import Button
 pygame.init()
 
 lenguaje = True  # false = español, true = ingles
-music = True  # false = sin música, true = con música
+music = False  # false = sin música, true = con música
 
 # ventana
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
