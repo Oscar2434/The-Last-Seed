@@ -17,15 +17,15 @@ Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
 
 # imagen que depende el idioma del juego para los botones
 if config.lenguaje:
-    button_nivel_1 = pygame.image.load("imagenes\Play.png")  # Usa la imagen proporcionada
-    button_nivel_2 = pygame.image.load("imagenes\Play.png")  # Usa la imagen proporcionada
+    button_nivel_1 = pygame.image.load("assets/images/effects/nivel 1.png")  # Usa la imagen proporcionada
+    button_nivel_2 = pygame.image.load("assets/images/effects/nivel 2.png")  # Usa la imagen proporcionada
 else:
-    button_nivel_1 = pygame.image.load("imagenes\Jugar.png")  # Usa la imagen proporcionada
-    button_nivel_2 = pygame.image.load("imagenes\Jugar.png")  # Usa la imagen proporcionada
+    button_nivel_1 = pygame.image.load("assets/images/effects/nivel 1.png")  # Usa la imagen proporcionada
+    button_nivel_2 = pygame.image.load("assets/images/effects/nivel 2.png")  # Usa la imagen proporcionada
 # botones de niveles
-button_nivel_1 = pygame.transform.scale(button_nivel_1, (300, 100))  # Escala la imagen
+button_nivel_1 = pygame.transform.scale(button_nivel_1, (322, 161))  # Escala la imagen
 button_nivel_1 = Button(480 // 2 - button_nivel_1.get_width() // 2, 700 // 2 - button_nivel_1.get_height() // 2, button_nivel_1, 1)
-button_nivel_2 = pygame.transform.scale(button_nivel_2, (300, 100))  # Escala la imagen
+button_nivel_2 = pygame.transform.scale(button_nivel_2, (322, 161))  # Escala la imagen
 button_nivel_2 = Button(1080 // 2 - button_nivel_2.get_width() // 2, 700 // 2 - button_nivel_2.get_height() // 2, button_nivel_2, 1)
 
 # Bucle de configuración
