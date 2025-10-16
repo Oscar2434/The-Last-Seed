@@ -6,7 +6,7 @@ PERSONAJE = 60
 LUMBERJACK_SIZE = 50
 GRASS = 64 
 TREES = 64 
-ROCK = 15 
+ROCK = 23 
 #Animaciones 
 SPRITES = 3
 DOWN = 0 
