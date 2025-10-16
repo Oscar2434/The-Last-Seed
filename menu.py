@@ -25,6 +25,7 @@ button_config = pygame.image.load("imagenes\confi.png")
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
 button_config = pygame.transform.scale(button_config, ( 120, 100))
 
+
 #botones 
     #config
 config_button = Button( 150 // 2 - button_config.get_width() // 2, 800 // 2 - button_config.get_height() // 2, button_config, 1)
