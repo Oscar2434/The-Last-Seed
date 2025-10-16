@@ -5,7 +5,7 @@ from button import Button
 import main
 import config
 import nivels
-
+#prueba
 pygame.init() #Inicializar pygame
 
 if config.music: #Reproducir las instruciones para que se reprodusca la musica del juego si la variable music que se encuentra en config es true que es verdadero
@@ -24,6 +24,7 @@ button_config = pygame.image.load("imagenes\confi.png")
 #escalar imágenes
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
 button_config = pygame.transform.scale(button_config, ( 120, 100))
+
 
 #botones 
     #config
