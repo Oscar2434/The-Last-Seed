@@ -12,7 +12,6 @@ import os
 import menu
 import config
 
-
 pygame.init()
 
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
