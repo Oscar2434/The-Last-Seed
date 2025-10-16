@@ -15,13 +15,18 @@ pygame.display.set_caption("nivels")
 Fondo = pygame.image.load("imagenes/portada.png")  # Cambia el nombre si es necesario
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
 
-# Botón de Play
+# imagen que depende el idioma del juego para los botones
 if config.lenguaje:
-    button_play = pygame.image.load("imagenes/Play.png")  # Usa la imagen proporcionada
+    button_nivel_1 = pygame.image.load("assets/images/effects/nivel 1.png")  # Usa la imagen proporcionada
+    button_nivel_2 = pygame.image.load("assets/images/effects/nivel 2.png")  # Usa la imagen proporcionada
 else:
-    button_play = pygame.image.load("imagenes\Jugar.png")  # Usa la imagen proporcionada
-button_play = pygame.transform.scale(button_play, (300, 100))  # Escala la imagen
-play_button = Button(780 // 2 - button_play.get_width() // 2, 700 // 2 - button_play.get_height() // 2, button_play, 1)
+    button_nivel_1 = pygame.image.load("assets/images/effects/nivel 1.png")  # Usa la imagen proporcionada
+    button_nivel_2 = pygame.image.load("assets/images/effects/nivel 2.png")  # Usa la imagen proporcionada
+# botones de niveles
+button_nivel_1 = pygame.transform.scale(button_nivel_1, (322, 161))  # Escala la imagen
+button_nivel_1 = Button(480 // 2 - button_nivel_1.get_width() // 2, 700 // 2 - button_nivel_1.get_height() // 2, button_nivel_1, 1)
+button_nivel_2 = pygame.transform.scale(button_nivel_2, (322, 161))  # Escala la imagen
+button_nivel_2 = Button(1080 // 2 - button_nivel_2.get_width() // 2, 700 // 2 - button_nivel_2.get_height() // 2, button_nivel_2, 1)
 
 # Bucle de configuración
 def niveles():
@@ -30,9 +35,12 @@ def niveles():
         screen.blit(Fondo, (0, 0))
         
         # Dibujar el botón de Play
-        if play_button.draw(screen):
+        if button_nivel_1.draw(screen):
             main.main()  # Llama a la función principal del archivo main.py
-
+        
+        if button_nivel_2.draw(screen):
+            import nivel_2
+            nivel_2.main()  # Llama a la función principal del archivo nivel_2.py
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()

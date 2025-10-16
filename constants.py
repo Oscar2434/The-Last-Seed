@@ -15,7 +15,7 @@ UP = 3
 MOVE_DOWN = 3 
 MOVE_RIGHT = 4 
 MOVE_UP = 3
-F_SIZE = 32
+F_SIZE = 64
 DELAY_FPS = 100 
 # Animaciones Leñador
 LUMBERJACK_DOWN = 0
