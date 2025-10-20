@@ -19,7 +19,7 @@ pygame.display.set_caption("The Last Seed")
 
 #imágenes
 Fondo = pygame.image.load("imagenes\portada.png")
-button_config = pygame.image.load("imagenes\confi.png")
+button_config = pygame.image.load("imagenes\confi (1).png")
 
 #escalar imágenes
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
