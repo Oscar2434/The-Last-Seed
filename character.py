@@ -2,13 +2,17 @@ import pygame
 import constants 
 import os
 from constants import *
+import config
 
 #Clase del personaje
 class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
-         image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+         if config.cambio:
+             image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+         else:
+             image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
          self.animation_frame = 0
