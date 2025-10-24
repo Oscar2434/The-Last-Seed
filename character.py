@@ -2,17 +2,13 @@ import pygame
 import constants 
 import os
 from constants import *
-import config
 
 #Clase del personaje
 class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
-         if config.cambio:
-             image_path = os.path.join('assets', 'images', 'character', 'nino.png')
-         else:
-             image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
+         image_path = os.path.join('assets', 'images', 'character', 'nino.png')
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
          self.animation_frame = 0
@@ -81,12 +77,6 @@ class Character:
          #Colisiones con los árboles normales
          for tree in world.trees:
              if self.check_collision(new_x, new_y, tree):
-                 self.moving = False
-                 return
-
-         #Colisión con los muros
-         for wall in world.walls:
-             if self.check_collision(new_x, new_y, wall):
                  self.moving = False
                  return
 
