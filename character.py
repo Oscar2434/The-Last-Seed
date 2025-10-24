@@ -84,6 +84,12 @@ class Character:
                  self.moving = False
                  return
 
+         #Colisión con los muros
+         for wall in world.walls:
+             if self.check_collision(new_x, new_y, wall):
+                 self.moving = False
+                 return
+
          #Colisión con el árbol central
          if hasattr(world, "central_tree") and world.central_tree:
              if self.check_collision(new_x, new_y, world.central_tree):
