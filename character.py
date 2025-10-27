@@ -3,22 +3,21 @@ import constants
 import os
 from constants import *
 
-#Clase del personaje
 class Character:
     def __init__(self, x, y):
-         self.x = x
-         self.y = y
-         image_path = os.path.join('assets', 'images', 'character', 'nino.png')
-         self.sprite = pygame.image.load(image_path).convert_alpha()
-         self.frame_size = F_SIZE
-         self.animation_frame = 0
-         self.animation_timer = 0
-         self.animatios_delay = DELAY_FPS
-         self.current_state = DOWN
-         self.moving = False 
-         self.facing_left = False
-         self.animations = self.load_animatios()
-         self.carrying_resource = None   
+        self.x = x
+        self.y = y
+        image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
+        self.sprite = pygame.image.load(image_path).convert_alpha()
+        self.frame_size = F_SIZE
+        self.animation_frame = 0
+        self.animation_timer = 0
+        self.animatios_delay = DELAY_FPS
+        self.current_state = DOWN
+        self.moving = False 
+        self.facing_left = False
+        self.animations = self.load_animatios()
+        self.carrying_resource = None   # puede cargar un recurso
 
     def load_animatios(self):
         animations = {}
@@ -28,7 +27,7 @@ class Character:
                 surface = pygame.Surface((self.frame_size, self.frame_size), pygame.SRCALPHA)
                 surface.blit(self.sprite, (0, 0), (frame * self.frame_size, state * self.frame_size, self.frame_size, self.frame_size))
                 if constants.PERSONAJE != self.frame_size:
-                   surface = pygame.transform.scale(surface, (constants.PERSONAJE, constants.PERSONAJE))
+                    surface = pygame.transform.scale(surface, (constants.PERSONAJE, constants.PERSONAJE))
                 frames.append(surface)
             animations[state] = frames
         return animations
@@ -49,8 +48,8 @@ class Character:
         screen.blit(current_image, (self.x, self.y))
 
     def move(self, dx, dy, world):
-         self.moving = dx != 0 or dy != 0
-         if self.moving:
+        self.moving = dx != 0 or dy != 0
+        if self.moving:
             if dx > 0:  
                 self.current_state = RIGHT
                 self.facing_left = False
@@ -63,7 +62,7 @@ class Character:
             elif dy < 0:  
                 self.current_state = UP
                 self.facing_left = False
-         else :
+        else:
             if self.current_state in [MOVE_DOWN, DOWN]:
                 self.current_state = DOWN
             elif self.current_state in [MOVE_UP, UP]:
@@ -71,26 +70,26 @@ class Character:
             elif self.current_state in [MOVE_RIGHT, RIGHT]:
                 self.current_state = RIGHT
 
-         new_x = self.x + dx
-         new_y = self.y + dy
+        new_x = self.x + dx
+        new_y = self.y + dy
 
-         #Colisiones con los árboles normales
-         for tree in world.trees:
-             if self.check_collision(new_x, new_y, tree):
-                 self.moving = False
-                 return
+        # Colisiones con los árboles normales
+        for tree in world.trees:
+            if self.check_collision(new_x, new_y, tree):
+                self.moving = False
+                return
 
-         #Colisión con el árbol central
-         if hasattr(world, "central_tree") and world.central_tree:
-             if self.check_collision(new_x, new_y, world.central_tree):
-                 self.moving = False
-                 return
+        # Colisión con el árbol central
+        if hasattr(world, "central_tree") and world.central_tree:
+            if self.check_collision(new_x, new_y, world.central_tree):
+                self.moving = False
+                return
 
-         self.x = new_x
-         self.y = new_y
-         self.x = max(0, min(self.x, constants.WIDTH - constants.PERSONAJE))
-         self.y = max(0, min(self.y, constants.HEIGHT - constants.PERSONAJE))
-         self.update_animation()
+        self.x = new_x
+        self.y = new_y
+        self.x = max(0, min(self.x, constants.WIDTH - constants.PERSONAJE))
+        self.y = max(0, min(self.y, constants.HEIGHT - constants.PERSONAJE))
+        self.update_animation()
 
     def check_collision(self, x, y, obj):
         return (x < obj.x + obj.size*.65 and x + constants.PERSONAJE*.65 > obj.x and 

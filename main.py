@@ -29,7 +29,7 @@ defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIG
 enemy_spawn_counter = 0  
 
 def get_enemy_slot(tree, enemy_size):
-   
+    
     global enemy_spawn_counter
     side = "left" if enemy_spawn_counter % 2 == 0 else "right"
     enemy_spawn_counter += 1  
@@ -58,6 +58,7 @@ def main():
     #Árbol central
     central_tree = CentralTree(constants.WIDTH//2 - 40, constants.HEIGHT//2 - 40)
     game_world.central_tree = central_tree
+    game_world.setup_enemy_slots(constants.LUMBERJACK_SIZE)
 
     #Configuración Nivel 1
     difficulty = "easy"
@@ -95,7 +96,9 @@ def main():
             if spawn_timer <= 0:
                 x = random.choice([0, constants.WIDTH-constants.LUMBERJACK_SIZE])
                 y = random.choice([0, constants.HEIGHT-constants.LUMBERJACK_SIZE])
-                target_pos = get_enemy_slot(central_tree, constants.LUMBERJACK_SIZE)
+                target_pos = game_world.get_next_enemy_slot()
+                if target_pos is None:
+                    target_pos = get_enemy_slot(central_tree, constants.LUMBERJACK_SIZE)
                 lumberjacks.append(Lumberjack(x, y, target_pos))
                 spawn_timer = spawn_delay
             else:
