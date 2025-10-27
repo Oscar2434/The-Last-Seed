@@ -1,16 +1,14 @@
 import pygame
 import sys
 import constants
-from character import Character
+from character_nivel_2 import Character
 from world_nivel2 import World
 import os
-import menu
-import config
 
 pygame.init()
 
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
-pygame.display.set_caption("The last seed")
+pygame.display.set_caption("The last seed - Nivel 2")
 
 # Cargar imágenes de victoria/derrota
 victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'victoria.png')).convert_alpha()
@@ -24,15 +22,21 @@ def main():
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
 
-    # Personaje principal
-    game_character = Character(constants.WIDTH // 2, constants.HEIGHT - 100)
+    # DEBUG: Verificar que se crearon muros
+    print(f"Número de muros creados: {len(game_world.walls)}")
+
+    # Personaje principal - posicionarlo en un área libre del laberinto
+    # Personaje principal - volver a la posición original
+    game_character = Character(constants.WIDTH // 2, constants.HEIGHT - 140)
 
     start_ticks = pygame.time.get_ticks()
     
     # Bucle principal
-    while True:
+    running = True
+    while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                running = False
                 return "quit"
 
         # Movimiento personaje
@@ -66,6 +70,9 @@ def main():
 
         pygame.display.flip()
         clock.tick(60)
+
+    pygame.quit()
+    sys.exit()
 
 if __name__ == "__main__":
     main()

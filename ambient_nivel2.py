@@ -45,10 +45,11 @@ class Wall:
         self.x = x
         self.y = y
         
-        wall_path = os.path.join('assets', 'images', 'objects', 'wall.png')
+        wall_path = os.path.join('assets', 'images', 'objects', 'lave.png')
         self.image = pygame.image.load(wall_path).convert_alpha() 
-        self.image = pygame.transform.scale(self.image, (100, 30))  # Ajusta el tamaño según necesites
-        self.size = self.image.get_width()
+        # ⬇️ USAR EL TAMAÑO REAL SIN ESCALAR ⬇️
+        # self.image = pygame.transform.scale(self.image, (64, 51))  # QUITA ESTA LÍNEA
+        self.size = self.image.get_width()  # Esto será el tamaño real
 
     def draw(self, screen):
-       screen.blit(self.image, (self.x, self.y))
+       screen.blit(self.image, (self.x, self.y))            
