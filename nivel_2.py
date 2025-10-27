@@ -27,7 +27,7 @@ def main():
 
     # Personaje principal - posicionarlo en un área libre del laberinto
     # Personaje principal - volver a la posición original
-    game_character = Character(constants.WIDTH // 2, constants.HEIGHT - 140)
+    game_character = Character( 5, 386)
 
     start_ticks = pygame.time.get_ticks()
     
