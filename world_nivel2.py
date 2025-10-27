@@ -53,11 +53,11 @@ class World:
         for wall in self.walls:
             wall.draw(screen)
             
-            # ⬇️ DEBUG: Dibujar rectángulo de colisión en ROJO ⬇️
+            # ⬇️ DEBUG ACTUALIZADO: Dibujar rectángulo de colisión en ROJO ⬇️
             debug_rect = pygame.Rect(
                 wall.x, 
                 wall.y, 
-                wall.size * 0.7,  # Lo mismo que usa check_collision
-                wall.size * 0.7
+                wall.image.get_width() * 1,  # 80% del ancho visual (nuevo cálculo)
+                wall.image.get_height() * 0.7   # 80% del alto visual (nuevo cálculo)
             )
             pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
