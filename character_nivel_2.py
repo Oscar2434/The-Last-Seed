@@ -3,6 +3,10 @@ import constants
 import os
 from constants import *
 
+gy=18 # Ajuste horizontal de la hitbox
+gx=12 # Ajuste vertical de la hitbox
+ry=0.6 # escalar hitbox y
+rx=0.55 # escalar hitbox x
 #Clase del personaje
 class Character:
     def __init__(self, x, y):
@@ -47,6 +51,15 @@ class Character:
         if self.facing_left:
             current_image = pygame.transform.flip(current_image, True, False)
         screen.blit(current_image, (self.x, self.y))
+        
+        # ⬇️ DEBUG: Dibujar rectángulo de colisión del PERSONAJE en AZUL ⬇️
+        debug_rect = pygame.Rect(
+            self.x + gx,  # ⬅️ AJUSTAR: Mover hitbox 10px a la DERECHA
+            self.y + gy,  # ⬅️ AJUSTAR: Mover hitbox 20px hacia ABAJO
+            constants.PERSONAJE * ry,  # 60% del ancho
+            constants.PERSONAJE * rx   # 60% del alto
+        )
+        pygame.draw.rect(screen, (0, 0, 255), debug_rect, 2)  # Azul, línea de 2px
 
     def move(self, dx, dy, world):
          self.moving = dx != 0 or dy != 0
@@ -98,17 +111,21 @@ class Character:
          self.y = max(0, min(self.y, constants.HEIGHT - constants.PERSONAJE))
          self.update_animation()
 
-    def check_collision(self, x, y, obj):  # ⬅️ ESTE MÉTODO DEBE ESTAR DENTRO DE LA CLASE
+    def check_collision(self, x, y, obj):
         # Si el objeto tiene ancho y alto diferentes
         if hasattr(obj, 'image'):
-            width = obj.image.get_width() * 0.8  # 80% del ancho visual
-            height = obj.image.get_height() * 0.8  # 80% del alto visual
-            return (x < obj.x + width and x + constants.PERSONAJE * 0.8 > obj.x and 
-                    y < obj.y + height and y + constants.PERSONAJE * 0.8 > obj.y)
-        else:
-            # Fallback al método original
-            return (x < obj.x + obj.size * 0.3 and x + constants.PERSONAJE * 0.3 > obj.x and 
-                    y < obj.y + obj.size * 0.1 and y + constants.PERSONAJE * 0.1 > obj.y)
+            width = obj.image.get_width() * 0.9
+              # 60% del ancho visual DEL OBJETO
+            height = obj.image.get_height() * 0.7  # 60% del alto visual DEL OBJETO
+            
+            # ⬇️ AJUSTAR POSICIÓN DE LA HITBOX DEL PERSONAJE ⬇️
+            adjusted_x = x + gx  # ⬅️ Mover hitbox 10px a la DERECHA
+            adjusted_y = y + gy  # ⬅️ Mover hitbox 20px hacia ABAJO
+            
+            return (adjusted_x < obj.x + width and 
+                    adjusted_x + constants.PERSONAJE * rx > obj.x and 
+                    adjusted_y < obj.y + height and 
+                    adjusted_y + constants.PERSONAJE * ry > obj.y)
     
     def check_collect_resource(self, resources):
         for resource in resources:
