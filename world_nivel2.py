@@ -24,6 +24,15 @@ class World:
         
         # LABERINTO SIMPLIFICADO PARA 780x480 - DEJAR ESPACIO PARA SPAWN
         wall_positions = [
+            (102, 110), (166, 110), (230, 110), (614, 110), (550, 110), (486, 110),
+            (102, 230),
+            
+            (102, 190), (230, 190),
+            (102, 230),
+            (102, 270), (166, 270), (230, 270), (294,270),(358, 270),
+            (102, 310),(358, 310),
+            (102, 350), (166, 350), (230, 350), (358, 350), (422, 350), (486, 190), (550, 190), (614, 350),   # Piso inferior
+            (102, 390),
             # Bordes de la pantalla (dejar espacio abajo para spawn)
             (0, 0), (51, 0), (102, 0), (153, 0), (204, 0), (255, 0), (306, 0), (357, 0), (408, 0), (459, 0), (510, 0), (561, 0), (612, 0), (663, 0), (714, 0),  # Techo
             (0, 440), (51, 440), (102, 440), (153, 440), (204, 440), (255, 440), (306, 440), (357, 440), (408, 440), (459, 440), (510, 440), (561, 440), (612, 440), (663, 440), (714, 440),  # Piso más arriba
@@ -46,10 +55,9 @@ class World:
             wall.draw(screen)
             
             # ⬇️ DEBUG ACTUALIZADO: Dibujar rectángulo de colisión en ROJO ⬇️
-            debug_rect = pygame.Rect(
-                wall.x, 
-                wall.y, 
-                wall.image.get_width() * 1,  # 80% del ancho visual (nuevo cálculo)
-                wall.image.get_height() * 0.7   # 80% del alto visual (nuevo cálculo)
-            )
-            pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
+            #debug_rect = pygame.Rect(
+             #   wall.x, 
+              # wall.image.get_width() * 1,  # 80% del ancho visual (nuevo cálculo)
+               # wall.image.get_height() * 0.7   # 80% del alto visual (nuevo cálculo)
+            #)
+            #pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
