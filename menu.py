@@ -2,6 +2,7 @@ import pygame
 import sys
 import constants
 from button import Button
+import main
 import config
 import nivels
 #prueba
@@ -17,13 +18,8 @@ screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")
 
 #imágenes
-<<<<<<< Updated upstream
 Fondo = pygame.image.load("imagenes\portada.png")
-button_config = pygame.image.load("imagenes\confi (1).png")
-=======
-Fondo = pygame.image.load("The-Last-Seed/imagenes/portada.png")
-button_config = pygame.image.load("The-Last-Seed/imagenes/confi.png")
->>>>>>> Stashed changes
+button_config = pygame.image.load("imagenes\confi.png")
 
 #escalar imágenes
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
@@ -40,11 +36,11 @@ def menu():
     while run:
         # Cargar imágenes dinámicamente según el lenguaje
         if config.lenguaje:  # Inglés
-            button_play = pygame.image.load("imagenes/Play.png")
-            button_exit = pygame.image.load("imagenes/Exit.png")
+            button_play = pygame.image.load("imagenes\Play.png")
+            button_exit = pygame.image.load("imagenes\Exit.png")
         else:  # Español
-            button_play = pygame.image.load("imagenes/Jugar.png")
-            button_exit = pygame.image.load("imagenes/Salida.png")
+            button_play = pygame.image.load("imagenes\Jugar.png")
+            button_exit = pygame.image.load("imagenes\Salida.png")
 
         # Escalar imágenes
         button_play = pygame.transform.scale(button_play, (300, 100))
@@ -73,6 +69,9 @@ def menu():
                 sys.exit()
 
         pygame.display.update()  # Actualiza la pantalla
+
+def main_loop():
+    main.main()
 
 if __name__ == "__main__":
     menu()
