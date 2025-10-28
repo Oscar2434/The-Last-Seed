@@ -25,9 +25,9 @@ def config_menu():
     run = True
     while run:
         if lenguaje:
-            button_lenguaje_img = pygame.image.load("imagenes\Exit.png")  # Cambia la imagen si es necesario
+            button_lenguaje_img = pygame.image.load("imagenes/Exit.png")  # Cambia la imagen si es necesario
         else:
-            button_lenguaje_img = pygame.image.load("imagenes\Salida.png")  # Cambia la imagen si es necesario
+            button_lenguaje_img = pygame.image.load("imagenes/Salida.png")  # Cambia la imagen si es necesario
         
         button_lenguaje_img = pygame.transform.scale(button_lenguaje_img, (200, 100))  # Escalar la imagen
         # Crear el botón de lenguaje
