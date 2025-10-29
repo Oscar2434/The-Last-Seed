@@ -22,23 +22,37 @@ class World:
         # Limpiar muros existentes
         self.walls.clear()
         
-        # LABERINTO SIMPLIFICADO PARA 780x480 - DEJAR ESPACIO PARA SPAWN
-        wall_positions = [
+        wall_positions = []
+        
+        # MUROS INTERNOS DEL LABERINTO
+        internal_walls = [
             (102, 110), (166, 110), (230, 110), (614, 110), (550, 110), (486, 110),
-            (102, 230),
-            
-            (102, 190), (230, 190),
-            (102, 230),
-            (102, 270), (166, 270), (230, 270), (294,270),(358, 270),
-            (102, 310),(358, 310),
-            (102, 350), (166, 350), (230, 350), (358, 350), (422, 350), (486, 190), (550, 190), (614, 350),   # Piso inferior
-            (102, 390),
-            # Bordes de la pantalla (dejar espacio abajo para spawn)
-            (0, 0), (51, 0), (102, 0), (153, 0), (204, 0), (255, 0), (306, 0), (357, 0), (408, 0), (459, 0), (510, 0), (561, 0), (612, 0), (663, 0), (714, 0),  # Techo
-            (0, 440), (51, 440), (102, 440), (153, 440), (204, 440), (255, 440), (306, 440), (357, 440), (408, 440), (459, 440), (510, 440), (561, 440), (612, 440), (663, 440), (714, 440),  # Piso más arriba
-            (-30, 0), (-30, 30), (-30, 60), (-30, 90), (-30, 120), (-30, 150), (-30, 180), (-30, 210), (-30, 240), (-30, 270), (-30, 300), (-30, 330), (-30, 360),  # Pared izquierda (más corta)
-            (760, 0), (760, 30), (760, 60), (760, 90), (760, 120), (760, 150), (760, 180), (760, 210), (760, 240), (760, 270), (760, 300), (760, 330), (760, 360), (760, 385)  # Pared derecha (más corta)
+            (102, 230), (102, 190), (230, 190), (102, 270), (166, 270), (230, 270), 
+            (294, 270), (358, 270), (102, 310), (358, 310), (102, 350), (166, 350), 
+            (230, 350), (358, 350), (422, 350), (486, 190), (550, 190), (614, 350),
+            (102, 390)
         ]
+        
+        # BORDES CON BUCLES
+        
+        # Techo (y = 0)
+        for x in range(0, 780, 51):  # Desde 0 hasta 780, cada 51px
+            wall_positions.append((x, 0))
+        
+        # Piso (y = 440)  
+        for x in range(0, 780, 51):
+            wall_positions.append((x, 440))
+        
+        # Pared izquierda (x = -30)
+        for y in range(0, 390, 30):  # Desde 0 hasta 390, cada 30px
+            wall_positions.append((-30, y))
+        
+        # Pared derecha (x = 760)
+        for y in range(0, 420, 30):  # Hasta 420 para cubrir más área
+            wall_positions.append((760, y))
+        
+        # AGREGAR MUROS INTERNOS
+        wall_positions.extend(internal_walls)
         
         # Crear muros en las posiciones definidas
         for x, y in wall_positions:
@@ -53,11 +67,3 @@ class World:
         # Dibujar muros del laberinto
         for wall in self.walls:
             wall.draw(screen)
-            
-            # ⬇️ DEBUG ACTUALIZADO: Dibujar rectángulo de colisión en ROJO ⬇️
-            #debug_rect = pygame.Rect(
-             #   wall.x, 
-              # wall.image.get_width() * 1,  # 80% del ancho visual (nuevo cálculo)
-               # wall.image.get_height() * 0.7   # 80% del alto visual (nuevo cálculo)
-            #)
-            #pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
