@@ -41,10 +41,9 @@
 | Acción | Tecla |
 |--------|-------|
 | **Movimiento** | `↑` `↓` `←` `→` |
-| **Recolectar (Nivel 1)** | `E` |
-| **Recolectar (Nivel 2)** | `ENTER` |
-| **Continuar diálogo** | `ESPACIO` |
-| **Menú** | `ESC` |
+| **Echar agua (Nivel 1)** | `E` |
+| **Recolectar items (Nivel 2)** | `ENTER` |
+| **Saltar dialogo** | `ESPACIO` |
 
 ## 🛠️ Instalación y Ejecución
 
