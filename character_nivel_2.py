@@ -7,6 +7,7 @@ gy=18 # Ajuste horizontal de la hitbox
 gx=12 # Ajuste vertical de la hitbox
 ry=0.6 # escalar hitbox y
 rx=0.55 # escalar hitbox x
+
 #Clase del personaje
 class Character:
     def __init__(self, x, y):
@@ -110,6 +111,9 @@ class Character:
          self.x = max(0, min(self.x, constants.WIDTH - constants.PERSONAJE))
          self.y = max(0, min(self.y, constants.HEIGHT - constants.PERSONAJE))
          self.update_animation()
+         
+         # ACTUALIZAR: Verificar colisión con recursos (pero no recolectar automáticamente)
+         self.near_resource = self.check_near_resource(world.resources)
 
     def check_collision(self, x, y, obj):
         # Si el objeto tiene ancho y alto diferentes
@@ -118,7 +122,7 @@ class Character:
               # 60% del ancho visual DEL OBJETO
             height = obj.image.get_height() * 0.7  # 60% del alto visual DEL OBJETO
             
-            # ⬇️ AJUSTAR POSICIÓN DE LA HITBOX DEL PERSONAJE ⬇️
+            # ⬇️ AJUSTAR POSICIÓN DE LA HITBOX DEL PERSONAJE ⬅️
             adjusted_x = x + gx  # ⬅️ Mover hitbox 10px a la DERECHA
             adjusted_y = y + gy  # ⬅️ Mover hitbox 20px hacia ABAJO
             
@@ -139,3 +143,10 @@ class Character:
         if self.carrying_resource:
             tree.heal(constants.RESOURCE_HEAL)
             self.carrying_resource = None
+
+    def check_near_resource(self, resources):
+        """Verificar si está cerca de un recurso para recoger"""
+        for resource in resources:
+            if not resource.collected and self.check_collision(self.x, self.y, resource):
+                return resource
+        return None
