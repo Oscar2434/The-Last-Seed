@@ -18,51 +18,122 @@ defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'derr
 victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
 defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
 
+def draw_dialog(screen, text):
+    """Dibujar cuadro de diálogo en pantalla"""
+    dialog_rect = pygame.Rect(50, constants.HEIGHT - 150, constants.WIDTH - 100, 120)
+    
+    # Fondo del diálogo
+    pygame.draw.rect(screen, (255, 255, 255), dialog_rect)
+    pygame.draw.rect(screen, (0, 100, 0), dialog_rect, 3)  # Borde verde
+    
+    # Texto del diálogo
+    font = pygame.font.SysFont(None, 24)
+    y_offset = dialog_rect.y + 20
+    for line in text.split('\n'):
+        text_surface = font.render(line, True, (0, 0, 0))
+        screen.blit(text_surface, (dialog_rect.x + 20, y_offset))
+        y_offset += 30
+    
+    # Instrucción para continuar
+    continue_text = font.render("Presiona ESPACIO para continuar...", True, (100, 100, 100))
+    screen.blit(continue_text, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
+
+def draw_inventory(screen, collected_resources):
+    """Dibujar inventario en la esquina superior derecha"""
+    inventory_bg = pygame.Rect(constants.WIDTH - 150, 10, 140, 80)
+    pygame.draw.rect(screen, (240, 240, 240), inventory_bg)
+    pygame.draw.rect(screen, (0, 100, 0), inventory_bg, 2)
+    
+    font = pygame.font.SysFont(None, 20)
+    title = font.render("Inventario:", True, (0, 0, 0))
+    screen.blit(title, (constants.WIDTH - 140, 15))
+    
+    y_offset = 35
+    for resource_type in ["composta", "agua", "semillas"]:
+        count = collected_resources.count(resource_type)
+        status = f"✓ {resource_type}: {count}" if count > 0 else f"- {resource_type}: 0"
+        color = (0, 150, 0) if count > 0 else (100, 100, 100)
+        text = font.render(status, True, color)
+        screen.blit(text, (constants.WIDTH - 140, y_offset))
+        y_offset += 20
+
 def main():
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
-
-    # DEBUG: Verificar que se crearon muros
-    print(f"Número de muros creados: {len(game_world.walls)}")
-
-    # Personaje principal - posicionarlo en un área libre del laberinto
-    # Personaje principal - volver a la posición original
-    game_character = Character( 5, 386)
+    game_character = Character(5, 386)
 
     start_ticks = pygame.time.get_ticks()
     
-    # Bucle principal
+    collected_resources = []
+    current_dialog = None
+    game_paused = False
+    
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 return "quit"
+            
+            # Recolección con ENTER y manejo de diálogos
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN and not game_paused:  # Recolectar recurso
+                    near_resource = game_character.check_near_resource(game_world.resources)
+                    if near_resource and not near_resource.collected:
+                        near_resource.collected = True
+                        collected_resources.append(near_resource.type)
+                        current_dialog = near_resource.get_dialog_text()
+                        game_paused = True  # Pausar juego para mostrar diálogo
+                
+                elif event.key == pygame.K_SPACE and game_paused:  # Continuar después del diálogo
+                    game_paused = False
+                    current_dialog = None
 
-        # Movimiento personaje
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            game_character.move(dx=-5, dy=0, world=game_world)
-        if keys[pygame.K_RIGHT]:
-            game_character.move(dx=5, dy=0, world=game_world)
-        if keys[pygame.K_UP]:
-            game_character.move(dx=0, dy=-5, world=game_world)
-        if keys[pygame.K_DOWN]:
-            game_character.move(dx=0, dy=5, world=game_world)
+        if not game_paused:
+            # Movimiento personaje (solo si no está pausado)
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                game_character.move(dx=-5, dy=0, world=game_world)
+            if keys[pygame.K_RIGHT]:
+                game_character.move(dx=5, dy=0, world=game_world)
+            if keys[pygame.K_UP]:
+                game_character.move(dx=0, dy=-5, world=game_world)
+            if keys[pygame.K_DOWN]:
+                game_character.move(dx=0, dy=5, world=game_world)
 
-        # Dibujar mundo y personaje
+        # Dibujar mundo
         game_world.draw(screen)
+        
+        # Dibujar recursos
+        for resource in game_world.resources:
+            resource.draw(screen)
+        
+        # Dibujar personaje
         game_character.draw(screen)
 
         # Tiempo restante
         seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
         font = pygame.font.SysFont(None, 36)
-        text = font.render(f"Tiempo: {remaining_time}", True, constants.BLACK)
+        text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
         screen.blit(text, (10, 10))
+
+        # Dibujar inventario
+        draw_inventory(screen, collected_resources)
+
+        # Mostrar diálogo si está activo
+        if current_dialog and game_paused:
+            draw_dialog(screen, current_dialog)
 
         # Condición de victoria por tiempo
         if remaining_time == 0:
+            screen.blit(victory_img, (0, 0))
+            pygame.display.flip()
+            pygame.time.delay(3000)
+            return "victory"
+
+        # Condición de victoria por recolectar todos los recursos
+        if len(collected_resources) >= 3:
             screen.blit(victory_img, (0, 0))
             pygame.display.flip()
             pygame.time.delay(3000)
