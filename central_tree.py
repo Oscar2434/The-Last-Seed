@@ -6,7 +6,7 @@ class CentralTree:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.size = 80
+        self.size = 90
         self.health = constants.TREE_HEALTH
 
         #Cargar sprite del árbol central
