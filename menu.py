@@ -10,7 +10,7 @@ pygame.init() #Inicializar pygame
 
 if config.music: #Reproducir las instruciones para que se reprodusca la musica del juego si la variable music que se encuentra en config es true que es verdadero
     pygame.mixer.init()
-    pygame.mixer.music.load('music/prueba1.mp3')  #Ruta al archivo de música
+    pygame.mixer.music.load('music/prueba1.mp3')  #Ru8ta al archivo de música
     pygame.mixer.music.play(-1)#Reproducir la música
 
 #ventana
