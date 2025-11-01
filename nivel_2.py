@@ -39,20 +39,31 @@ def draw_dialog(screen, text):
     screen.blit(continue_text, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
 
 def draw_inventory(screen, collected_resources):
-    """Dibujar inventario en la esquina superior derecha"""
+    """Inventario minimalista y muy transparente"""
     inventory_bg = pygame.Rect(constants.WIDTH - 150, 10, 140, 80)
-    pygame.draw.rect(screen, (240, 240, 240), inventory_bg)
-    pygame.draw.rect(screen, (0, 100, 0), inventory_bg, 2)
     
+    transparent_bg = pygame.Surface((inventory_bg.width, inventory_bg.height), pygame.SRCALPHA)
+    # Muy poca opacidad
+    pygame.draw.rect(transparent_bg, (0, 0, 0, 80), transparent_bg.get_rect())
+    pygame.draw.rect(transparent_bg, (100, 100, 100, 100), transparent_bg.get_rect(), 1)
+    
+    screen.blit(transparent_bg, inventory_bg)
+    
+    # Texto con sombra para mejor legibilidad
     font = pygame.font.SysFont(None, 20)
-    title = font.render("Inventario:", True, (0, 0, 0))
+    
+    # Sombra del título
+    title_shadow = font.render("Inventario:", True, (0, 0, 0, 100))
+    screen.blit(title_shadow, (constants.WIDTH - 139, 16))
+    
+    title = font.render("Inventario:", True, (255, 255, 255))
     screen.blit(title, (constants.WIDTH - 140, 15))
     
     y_offset = 35
     for resource_type in ["composta", "agua", "semillas"]:
         count = collected_resources.count(resource_type)
-        status = f"✓ {resource_type}: {count}" if count > 0 else f"- {resource_type}: 0"
-        color = (0, 150, 0) if count > 0 else (100, 100, 100)
+        status = f"{resource_type}: {count}" if count > 0 else f"{resource_type}: 0"
+        color = (200, 250, 200) if count > 0 else (180, 0, 0)  # Colores claros
         text = font.render(status, True, color)
         screen.blit(text, (constants.WIDTH - 140, y_offset))
         y_offset += 20

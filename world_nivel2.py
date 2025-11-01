@@ -22,9 +22,9 @@ class World:
     def create_resources(self):
         # POSICIONES FIJAS para los 3 recursos en el laberinto
         resource_positions = [
-            (150, 150, "composta"),
-            (400, 300, "agua"),
-            (600, 200, "semillas")
+            (250, 160, "composta"),
+            (170, 320, "agua"),
+            (500, 160, "semillas")
         ]
         
         self.resources.clear()

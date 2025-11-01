@@ -71,15 +71,15 @@ class Resource:
         
         # Cargar imagen según el tipo de recurso
         if resource_type == "composta":
-            image_path = os.path.join('assets', 'images', 'objects', 'banana.png')
+            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
         elif resource_type == "agua":
-            image_path = os.path.join('assets', 'images', 'objects', 'banana.png')
+            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
         elif resource_type == "semillas":
-            image_path = os.path.join('assets', 'images', 'objects', 'banana.png')
+            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
         else:
             # Imagen por defecto si no existe
-            image_path = os.path.join('assets', 'images', 'objects', 'banana.png')
-            
+            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
+
         try:
             self.image = pygame.image.load(image_path).convert_alpha()
             self.image = pygame.transform.scale(self.image, (self.size, self.size))
@@ -95,7 +95,7 @@ class Resource:
     def get_dialog_text(self):
         # Textos educativos para cada recurso
         dialogs = {
-            "composta": "¡Excelente! La composta es abono orgánico que mejora \nel suelo y proporciona nutrientes esenciales \npara el crecimiento de las plantas.",
+            "composta": "¡Excelente! La cascara de platano es un buen abono orgánico para las plantas. \nProporciona nutrientes esenciales para el crecimiento de las plantas.",
             "agua": "¡Perfecto! El agua es vital para la fotosíntesis \ny el transporte de nutrientes en las plantas. \n¡Mantén la hidratación adecuada!",
             "semillas": "¡Genial! Las semillas contienen el potencial \nde vida de nuevas plantas. Con los cuidados \ncorrectos, germinarán y crecerán fuertes."
         }
