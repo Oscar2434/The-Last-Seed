@@ -72,8 +72,6 @@ class Resource:
         # Cargar imagen según el tipo de recurso
         if resource_type == "composta":
             image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
-        elif resource_type == "agua":
-            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
         elif resource_type == "semillas":
             image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
         else:
@@ -96,7 +94,6 @@ class Resource:
         # Textos educativos para cada recurso
         dialogs = {
             "composta": "¡Excelente! La cascara de platano es un buen abono orgánico para las plantas. \nProporciona nutrientes esenciales para el crecimiento de las plantas.",
-            "agua": "¡Perfecto! El agua es vital para la fotosíntesis \ny el transporte de nutrientes en las plantas. \n¡Mantén la hidratación adecuada!",
-            "semillas": "¡Genial! Las semillas contienen el potencial \nde vida de nuevas plantas. Con los cuidados \ncorrectos, germinarán y crecerán fuertes."
+            "semillas": "¡Excelente! La cáscara de huevo es rica en calcio y otros minerales que\nbenefician el suelo y las plantas."
         }
         return dialogs.get(self.type, "Este recurso ayuda a las plantas a crecer.")

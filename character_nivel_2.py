@@ -116,11 +116,25 @@ class Character:
          self.near_resource = self.check_near_resource(world.resources)
 
     def check_collision(self, x, y, obj):
-        # Si el objeto tiene ancho y alto diferentes
+        # MODIFICADO: Verificar si el objeto tiene get_rect() (como los recursos)
+        if hasattr(obj, 'get_rect'):
+            # Usar el rectángulo de colisión del recurso
+            obj_rect = obj.get_rect()
+            
+            # Rectángulo del personaje (ajustado)
+            player_rect = pygame.Rect(
+                x + gx,
+                y + gy,
+                constants.PERSONAJE * rx,
+                constants.PERSONAJE * ry
+            )
+            
+            return player_rect.colliderect(obj_rect)
+        
+        # Si el objeto tiene ancho y alto diferentes (para árboles y muros)
         if hasattr(obj, 'image'):
             width = obj.image.get_width() * 0.9
-              # 60% del ancho visual DEL OBJETO
-            height = obj.image.get_height() * 0.7  # 60% del alto visual DEL OBJETO
+            height = obj.image.get_height() * 0.7
             
             # ⬇️ AJUSTAR POSICIÓN DE LA HITBOX DEL PERSONAJE ⬅️
             adjusted_x = x + gx  # ⬅️ Mover hitbox 10px a la DERECHA
@@ -130,7 +144,9 @@ class Character:
                     adjusted_x + constants.PERSONAJE * rx > obj.x and 
                     adjusted_y < obj.y + height and 
                     adjusted_y + constants.PERSONAJE * ry > obj.y)
-    
+        
+        return False
+
     def check_collect_resource(self, resources):
         for resource in resources:
             if not resource.collected and self.check_collision(self.x, self.y, resource):

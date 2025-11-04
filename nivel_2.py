@@ -115,6 +115,8 @@ def main():
         # Dibujar mundo
         game_world.draw(screen)
         
+
+        
         # Dibujar recursos
         for resource in game_world.resources:
             resource.draw(screen)

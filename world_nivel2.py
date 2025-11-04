@@ -1,6 +1,7 @@
 import constants
 import pygame
 from ambient_nivel2 import Wall, Resource
+from resources_nivel_2 import WaterResource  # Importar la nueva clase
 import os
 
 class World:
@@ -23,16 +24,21 @@ class World:
         # POSICIONES FIJAS para los 3 recursos en el laberinto
         resource_positions = [
             (250, 160, "composta"),
-            (170, 320, "agua"),
+            (170, 300, "agua"),      # Este usará WaterResource
             (500, 160, "semillas")
         ]
         
         self.resources.clear()
         for x, y, resource_type in resource_positions:
-            self.resources.append(Resource(x, y, resource_type))
+            if resource_type == "agua":
+                # Usar WaterResource para el agua animada
+                self.resources.append(WaterResource(x, y))
+            else:
+                # Usar Resource normal para los demás
+                self.resources.append(Resource(x, y, resource_type))
 
     def create_maze(self):
-        # ... (código existente igual) ...
+        # Limpiar muros existentes
         self.walls.clear()
         
         wall_positions = []
