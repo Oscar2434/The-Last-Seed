@@ -13,7 +13,7 @@ class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
-         image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+         image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
          self.animation_frame = 0
@@ -130,13 +130,18 @@ class Character:
         if hasattr(obj, 'image'):
             # Usar las mismas proporciones que se dibujan en nivel_2.py para central_tree
             if hasattr(obj, 'type') and obj.type == "central_tree":
-                width = obj.image.get_width() * 0.9
-                height = obj.image.get_height() * 0.8
+                # Usamos las constantes de hitbox del árbol central
+                x_offset = obj.image.get_width() * constants.CENTRAL_TREE_HITBOX_X
+                y_offset = obj.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y
+                width = obj.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH
+                height = obj.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT
+
+                tree_rect = pygame.Rect(obj.x + x_offset, obj.y + y_offset, width, height)
             else:
                 width = obj.image.get_width() * 0.9
                 height = obj.image.get_height() * 0.7
 
-            tree_rect = pygame.Rect(obj.x, obj.y, width, height)
+                tree_rect = pygame.Rect(obj.x, obj.y, width, height)
 
             player_rect = pygame.Rect(
                 x + gx,

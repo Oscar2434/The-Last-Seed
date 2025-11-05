@@ -60,4 +60,4 @@ class WaterResource:
         return self.rect
 
     def get_dialog_text(self):
-        return "¡Perfecto! El agua es vital para las plantas y transporta sus \nnutrientes por toda la planta. ¡Mantén la hidratación adecuada!"
+        return "¡Perfecto! ¡El agua es importante para las plantas y transporta sus \nnutrientes por toda la planta!"

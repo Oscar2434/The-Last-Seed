@@ -147,18 +147,6 @@ def main():
         # Dibujar mundo
         game_world.draw(screen)
         
-        # DIBUJAR ÁRBOL CENTRAL
-        central_tree.draw(screen)
-
-        # Dibujar hitbox del árbol central en ROJO
-        if hasattr(central_tree, 'image'):
-            tree_rect = pygame.Rect(
-                central_tree.x + central_tree.image.get_width() * 0.35,
-                central_tree.y + central_tree.image.get_height() * 0.35,
-                central_tree.image.get_width() * 0.1,
-                central_tree.image.get_height() * 0.3
-            )
-            pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
 
         # Dibujar recursos
         for resource in game_world.resources:
@@ -166,6 +154,19 @@ def main():
         
         # Dibujar personaje
         game_character.draw(screen)
+
+        # DIBUJAR ÁRBOL CENTRAL
+        central_tree.draw(screen)
+
+        if hasattr(central_tree, 'image'):
+            tree_rect = pygame.Rect(
+                central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X,
+                central_tree.y + central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y,
+                central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH,
+                central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT
+            )
+            pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
+
 
         # Tiempo restante
         seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000

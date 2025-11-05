@@ -51,3 +51,8 @@ LEVEL1_CONFIG = {
         "spawn_delay": 240  # Spawn cada 4 segundos
     }
 }
+# Árbol central (treeC) hitbox
+CENTRAL_TREE_HITBOX_X = 0.3   # Porcentaje de desplazamiento en X
+CENTRAL_TREE_HITBOX_Y = 0.6   # Porcentaje de desplazamiento en Y
+CENTRAL_TREE_HITBOX_WIDTH = 0.4  # Porcentaje del ancho de la imagen
+CENTRAL_TREE_HITBOX_HEIGHT = 0.4 # Porcentaje del alto de la imagen
