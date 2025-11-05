@@ -100,7 +100,7 @@ class Character:
                  self.moving = False
                  return
 
-         #Colisión con el árbol central
+         # ✅ AGREGADO: Colisión con el árbol central del nivel 2
          if hasattr(world, "central_tree") and world.central_tree:
              if self.check_collision(new_x, new_y, world.central_tree):
                  self.moving = False
@@ -116,34 +116,36 @@ class Character:
          self.near_resource = self.check_near_resource(world.resources)
 
     def check_collision(self, x, y, obj):
-        # MODIFICADO: Verificar si el objeto tiene get_rect() (como los recursos)
+        # MODIFICADO: Usar Rect para que la hitbox del personaje coincida con el cuadro rojo del árbol
         if hasattr(obj, 'get_rect'):
-            # Usar el rectángulo de colisión del recurso
             obj_rect = obj.get_rect()
-            
-            # Rectángulo del personaje (ajustado)
             player_rect = pygame.Rect(
                 x + gx,
                 y + gy,
-                constants.PERSONAJE * rx,
-                constants.PERSONAJE * ry
+                constants.PERSONAJE * ry,  # ancho usado en el debug_rect
+                constants.PERSONAJE * rx   # alto usado en el debug_rect
             )
-            
             return player_rect.colliderect(obj_rect)
         
-        # Si el objeto tiene ancho y alto diferentes (para árboles y muros)
         if hasattr(obj, 'image'):
-            width = obj.image.get_width() * 0.9
-            height = obj.image.get_height() * 0.7
-            
-            # ⬇️ AJUSTAR POSICIÓN DE LA HITBOX DEL PERSONAJE ⬅️
-            adjusted_x = x + gx  # ⬅️ Mover hitbox 10px a la DERECHA
-            adjusted_y = y + gy  # ⬅️ Mover hitbox 20px hacia ABAJO
-            
-            return (adjusted_x < obj.x + width and 
-                    adjusted_x + constants.PERSONAJE * rx > obj.x and 
-                    adjusted_y < obj.y + height and 
-                    adjusted_y + constants.PERSONAJE * ry > obj.y)
+            # Usar las mismas proporciones que se dibujan en nivel_2.py para central_tree
+            if hasattr(obj, 'type') and obj.type == "central_tree":
+                width = obj.image.get_width() * 0.9
+                height = obj.image.get_height() * 0.8
+            else:
+                width = obj.image.get_width() * 0.9
+                height = obj.image.get_height() * 0.7
+
+            tree_rect = pygame.Rect(obj.x, obj.y, width, height)
+
+            player_rect = pygame.Rect(
+                x + gx,
+                y + gy,
+                constants.PERSONAJE * ry,
+                constants.PERSONAJE * rx
+            )
+
+            return player_rect.colliderect(tree_rect)
         
         return False
 

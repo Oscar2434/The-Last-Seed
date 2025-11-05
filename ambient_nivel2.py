@@ -41,6 +41,27 @@ class Bush:
     def draw(self, screen):
        screen.blit(self.image, (self.x, self.y))
 
+class CentralTree:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.type = "central_tree"  # ✅ AGREGAR ESTA LÍNEA
+        
+        # Cargar imagen del árbol central
+        tree_path = os.path.join('assets', 'images', 'objects', 'treeC.png')
+        try:
+            self.image = pygame.image.load(tree_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (80, 80))
+        except:
+            # Placeholder si no existe la imagen
+            self.image = pygame.Surface((80, 80), pygame.SRCALPHA)
+            pygame.draw.rect(self.image, (0, 100, 0), (0, 0, 80, 80))
+        
+        self.size = self.image.get_width()
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y))
+
 class Wall:
     def __init__(self, x, y, wall_type="normal"):
         self.x = x
@@ -61,6 +82,8 @@ class Wall:
     def draw(self, screen):
        screen.blit(self.image, (self.x, self.y))
 
+# ✅ ELIMINAR: La clase CentralTree duplicada al final del archivo
+
 class Resource:
     def __init__(self, x, y, resource_type):
         self.x = x
@@ -73,7 +96,7 @@ class Resource:
         if resource_type == "composta":
             image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
         elif resource_type == "semillas":
-            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
+            image_path = os.path.join('assets', 'images', 'Items', 'huevo.png')
         else:
             # Imagen por defecto si no existe
             image_path = os.path.join('assets', 'images', 'Items', 'banana.png')

@@ -3,6 +3,7 @@ import sys
 import constants
 from character_nivel_2 import Character
 from world_nivel2 import World
+from ambient_nivel2 import CentralTree
 import os
 
 pygame.init()
@@ -72,12 +73,19 @@ def main():
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
     game_character = Character(5, 386)
+    
+    # CREAR ÁRBOL CENTRAL
+    central_tree = CentralTree(350, 50)
+    
+    # ✅ AGREGAR: Pasar el árbol central al mundo para las colisiones
+    game_world.set_central_tree(central_tree)
 
     start_ticks = pygame.time.get_ticks()
     
     collected_resources = []
     current_dialog = None
     game_paused = False
+    puede_entregar = False
     
     running = True
     while running:
@@ -86,19 +94,43 @@ def main():
                 running = False
                 return "quit"
             
-            # Recolección con ENTER y manejo de diálogos
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN and not game_paused:  # Recolectar recurso
+                if event.key == pygame.K_RETURN and not game_paused:
                     near_resource = game_character.check_near_resource(game_world.resources)
                     if near_resource and not near_resource.collected:
                         near_resource.collected = True
                         collected_resources.append(near_resource.type)
                         current_dialog = near_resource.get_dialog_text()
-                        game_paused = True  # Pausar juego para mostrar diálogo
+                        game_paused = True
+                        
+                        if len(collected_resources) >= 3:
+                            puede_entregar = True
+                            current_dialog = "¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos."
+                            game_paused = True
                 
-                elif event.key == pygame.K_SPACE and game_paused:  # Continuar después del diálogo
+                elif event.key == pygame.K_e and not game_paused:
+                    # ✅ CORREGIDO: Usar central_tree directamente (no game_world.central_tree)
+                    if game_character.check_collision(game_character.x, game_character.y, central_tree):
+                        if puede_entregar:
+                            screen.blit(victory_img, (0, 0))
+                            pygame.display.flip()
+                            pygame.time.delay(3000)
+                            return "victory"
+                        else:
+                            current_dialog = "El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y semillas primero."
+                            game_paused = True
+                
+                elif event.key == pygame.K_SPACE and game_paused:
                     game_paused = False
                     current_dialog = None
+
+        # ... resto del código igual ...
+
+        # Dibujar mundo
+        game_world.draw(screen)
+        
+        # DIBUJAR ÁRBOL CENTRAL (usar la variable local central_tree)
+        central_tree.draw(screen)
 
         if not game_paused:
             # Movimiento personaje (solo si no está pausado)
@@ -115,8 +147,19 @@ def main():
         # Dibujar mundo
         game_world.draw(screen)
         
+        # DIBUJAR ÁRBOL CENTRAL
+        central_tree.draw(screen)
 
-        
+        # Dibujar hitbox del árbol central en ROJO
+        if hasattr(central_tree, 'image'):
+            tree_rect = pygame.Rect(
+                central_tree.x + central_tree.image.get_width() * 0.35,
+                central_tree.y + central_tree.image.get_height() * 0.35,
+                central_tree.image.get_width() * 0.1,
+                central_tree.image.get_height() * 0.3
+            )
+            pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
+
         # Dibujar recursos
         for resource in game_world.resources:
             resource.draw(screen)
@@ -134,23 +177,20 @@ def main():
         # Dibujar inventario
         draw_inventory(screen, collected_resources)
 
+
+
+
         # Mostrar diálogo si está activo
         if current_dialog and game_paused:
             draw_dialog(screen, current_dialog)
 
-        # Condición de victoria por tiempo
+        # Condición de derrota por tiempo
         if remaining_time == 0:
-            screen.blit(victory_img, (0, 0))
+            screen.blit(defeat_img, (0, 0))
             pygame.display.flip()
             pygame.time.delay(3000)
-            return "victory"
-
-        # Condición de victoria por recolectar todos los recursos
-        if len(collected_resources) >= 3:
-            screen.blit(victory_img, (0, 0))
-            pygame.display.flip()
-            pygame.time.delay(3000)
-            return "victory"
+            return "defeat"
+        
 
         pygame.display.flip()
         clock.tick(60)

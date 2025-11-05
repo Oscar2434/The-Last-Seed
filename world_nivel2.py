@@ -10,13 +10,20 @@ class World:
         self.height = height
         self.walls = []
         self.trees = []
-        self.central_tree = None
+        self.central_tree = None  # Inicializar como None
         self.resources = []
 
         grass_path = os.path.join('assets', 'images', 'objects', 'grass3.png')
         self.grass_image = pygame.image.load(grass_path).convert()
         self.grass_image = pygame.transform.scale(self.grass_image, (constants.GRASS, constants.GRASS))
 
+        self.create_maze()
+        self.create_resources()
+
+    def set_central_tree(self, central_tree):
+        """Método para establecer el árbol central desde nivel_2.py"""
+        self.central_tree = central_tree
+        
         self.create_maze()
         self.create_resources()
 
