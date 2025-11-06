@@ -53,12 +53,19 @@ class World:
         # MUROS INTERNOS DEL LABERINTO
         internal_walls = [
             (102, 110), (166, 110), (230, 110), (614, 110), (550, 110), (486, 110),
-            (102, 230), (102, 190), (230, 190), (102, 270), (166, 270), (230, 270), 
+            (230, 190), (102, 270), (166, 270), (230, 270), 
             (294, 270), (358, 270), (102, 310), (358, 310), (102, 350), (166, 350), 
-            (230, 350), (358, 350), (422, 350), (486, 190), (550, 190), (614, 350),
-            (102, 390)
+            (230, 350), (358, 350), (422, 350), (486, 190), (550, 190), (614, 350)
+            
         ]
-        
+        # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
+        internal_walls_left = [
+             (136, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420), (486, 110)
+        ]
+        internal_walls_right = [
+            (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420), (486, 110)
+        ]
+
         # BORDES CON BUCLES - PAREDES COMPLETAS
         
         # Techo (y = 0) - línea horizontal superior
@@ -85,6 +92,12 @@ class World:
         # Crear muros en las posiciones definidas
         for x, y, wall_type in wall_positions:
             self.walls.append(Wall(x, y, wall_type))
+
+        for wall in internal_walls_left:
+            self.walls.append(Wall(wall[0], wall[1], "left"))
+
+        for wall in internal_walls_right:
+            self.walls.append(Wall(wall[0], wall[1], "right"))
 
     def draw(self, screen):
         # Fondo de pasto
