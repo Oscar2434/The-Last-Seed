@@ -63,26 +63,38 @@ class CentralTree:
         screen.blit(self.image, (self.x, self.y))
 
 class Wall:
-    def __init__(self, x, y, wall_type="normal"):
+    def __init__(self, x, y, wall_type="normal", scale=None):
         self.x = x
         self.y = y
         self.wall_type = wall_type
         
+        # Usar escala de constants si no se proporciona
+        if scale is None:
+            self.scale = constants.WALL_SCALE
+        else:
+            self.scale = scale
+        
         # Elegir imagen según el tipo de pared
         if wall_type == "right":
-            wall_path = os.path.join('assets', 'images', 'objects', 'izquierda.png')
+            wall_path = os.path.join('assets', 'images', 'objects', 'pendiente.png')
         elif wall_type == "left":
-            wall_path = os.path.join('assets', 'images', 'objects', 'derecha.png')
+            wall_path = os.path.join('assets', 'images', 'objects', 'sin_final.png')
         else:
-            wall_path = os.path.join('assets', 'images', 'objects', 'lave.png')
+            wall_path = os.path.join('assets', 'images', 'objects', 'arbusto largo.png')
             
-        self.image = pygame.image.load(wall_path).convert_alpha() 
+        # Cargar y escalar imagen
+        self.original_image = pygame.image.load(wall_path).convert_alpha()
+        original_width = self.original_image.get_width()
+        original_height = self.original_image.get_height()
+        
+        new_width = int(original_width * self.scale)
+        new_height = int(original_height * self.scale)
+        
+        self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
         self.size = self.image.get_width()
 
     def draw(self, screen):
        screen.blit(self.image, (self.x, self.y))
-
-# ✅ ELIMINAR: La clase CentralTree duplicada al final del archivo
 
 class Resource:
     def __init__(self, x, y, resource_type):

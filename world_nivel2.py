@@ -23,9 +23,6 @@ class World:
     def set_central_tree(self, central_tree):
         """Método para establecer el árbol central desde nivel_2.py"""
         self.central_tree = central_tree
-        
-        self.create_maze()
-        self.create_resources()
 
     def create_resources(self):
         # POSICIONES FIJAS para los 3 recursos en el laberinto
@@ -52,18 +49,18 @@ class World:
         
         # MUROS INTERNOS DEL LABERINTO
         internal_walls = [
-            (102, 110), (166, 110), (230, 110), (614, 110), (550, 110), (486, 110),
-            (230, 190), (102, 270), (166, 270), (230, 270), 
-            (294, 270), (358, 270), (102, 310), (358, 310), (102, 350), (166, 350), 
-            (230, 350), (358, 350), (422, 350), (486, 190), (550, 190), (614, 350)
-            
+            (125, 110), (214, 110), (614, 110), (550, 110), (486, 110),
+            (214, 190), (486, 190), (550, 190),  
+            (294, 270), (358, 270), (130, 270), (166, 270), (230, 270),
+            (130, 350), (219, 350), (358, 350), (422, 350), (614, 350)
         ]
+        
         # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
         internal_walls_left = [
-             (136, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420), (486, 110)
+            (300, 110)
         ]
         internal_walls_right = [
-            (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420), (486, 110)
+            (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420)
         ]
 
         # BORDES CON BUCLES - PAREDES COMPLETAS
@@ -79,25 +76,28 @@ class World:
         # PARED DERECHA COMPLETA - desde techo hasta piso
         right_wall_x = 747
         for y in range(0, 480, 30):
-            wall_positions.append((right_wall_x, y, "right"))
+            wall_positions.append((right_wall_x, y, "left"))
+            
         
         # Piso (y = 440) - línea horizontal inferior  
         for x in range(0, 780, 51):
-            wall_positions.append((x, 440, "normal"))
+            wall_positions.append((x, 460, "normal"))
         
         # AGREGAR MUROS INTERNOS
         for wall in internal_walls:
             wall_positions.append((wall[0], wall[1], "normal"))
         
-        # Crear muros en las posiciones definidas
+        # Crear muros en las posiciones definidas CON ESCALA
         for x, y, wall_type in wall_positions:
-            self.walls.append(Wall(x, y, wall_type))
+            self.walls.append(Wall(x, y, wall_type, constants.WALL_SCALE))
 
-        for wall in internal_walls_left:
-            self.walls.append(Wall(wall[0], wall[1], "left"))
+
 
         for wall in internal_walls_right:
-            self.walls.append(Wall(wall[0], wall[1], "right"))
+            self.walls.append(Wall(wall[0], wall[1], "left", constants.WALL_SCALE))
+        
+        for wall in internal_walls_left:
+            self.walls.append(Wall(wall[0], wall[1], "right", constants.WALL_SCALE))
 
     def draw(self, screen):
         # Fondo de pasto
