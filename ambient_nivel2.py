@@ -76,11 +76,18 @@ class Wall:
         
         # Elegir imagen según el tipo de pared
         if wall_type == "right":
-            wall_path = os.path.join('assets', 'images', 'objects', 'pendiente.png')
+            wall_path = os.path.join('assets', 'images', 'Muros', 'pendiente.png')
         elif wall_type == "left":
-            wall_path = os.path.join('assets', 'images', 'objects', 'sin_final.png')
+            wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
+        elif wall_type == "otro":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
+        elif wall_type == "a":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
+
+
+
         else:
-            wall_path = os.path.join('assets', 'images', 'objects', 'arbusto largo.png')
+            wall_path = os.path.join('assets', 'images', 'Muros', 'arbusto largo.png')
             
         # Cargar y escalar imagen
         self.original_image = pygame.image.load(wall_path).convert_alpha()
