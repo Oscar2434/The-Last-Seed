@@ -162,7 +162,7 @@ def main():
             cabeza in cuerpo[:-1]):
             screen.blit(defeat_img, (0, 0))
             pygame.display.flip()
-            pygame.time.delay(2000)
+            pygame.time.delay(3000)
             return
 
         # TIEMPO
