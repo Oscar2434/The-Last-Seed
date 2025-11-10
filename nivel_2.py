@@ -111,22 +111,22 @@ def main():
     start_ticks = pygame.time.get_ticks()
     
     collected_resources = []
-    current_dialog = None
+    dialog_queue = []  # ✅ NUEVO: Cola de diálogos
     game_paused = False
     puede_entregar = False
+    dialog_timer = 0   # ✅ NUEVO: Temporizador para diálogos automáticos
     
     running = True
     while running:
+        current_time = pygame.time.get_ticks()
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 return "quit"
             
             if event.type == pygame.KEYDOWN:
-                # ✅ ELIMINADO: La recolección con ENTER ya no es necesaria
-                
                 if event.key == pygame.K_e and not game_paused:
-                    # ✅ CORREGIDO: Usar hitbox de interacción más grande
                     if check_interaction(game_character, central_tree):
                         if puede_entregar:
                             screen.blit(victory_img, (0, 0))
@@ -134,18 +134,27 @@ def main():
                             pygame.time.delay(3000)
                             return "victory"
                         else:
-                            current_dialog = "El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y algo más que pueda ayudar al arbol."
-                            game_paused = True
+                            # ✅ NUEVO: Usar cola de diálogos
+                            dialog_queue.append("El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y semillas primero.")
+                            if not game_paused:
+                                game_paused = True
+                                dialog_timer = current_time
                 
-                if event.key == pygame.K_SPACE and game_paused:
-                    game_paused = False
-                    current_dialog = None
+                elif event.key == pygame.K_SPACE and game_paused:
+                    # ✅ NUEVO: Manejar cola de diálogos
+                    if dialog_queue:
+                        dialog_queue.pop(0)  # Quitar el diálogo actual
+                        
+                        # Si hay más diálogos en la cola, mostrar el siguiente
+                        if dialog_queue:
+                            dialog_timer = current_time  # Reiniciar temporizador
+                        else:
+                            game_paused = False
+                    else:
+                        game_paused = False
 
         # --- DIBUJADO ---
-        # Dibujar mundo
         game_world.draw(screen)
-        
-        # DIBUJAR ÁRBOL CENTRAL
         central_tree.draw(screen)
 
         # Dibujar recursos
@@ -155,7 +164,7 @@ def main():
         # Dibujar personaje
         game_character.draw(screen)
 
-        # DEBUG: Dibujar hitbox de colisión del árbol central (rojo)
+        # DEBUG: Dibujar hitboxes (opcional)
         if hasattr(central_tree, 'image'):
             tree_rect = pygame.Rect(
                 central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X,
@@ -165,7 +174,6 @@ def main():
             )
             pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
             
-            # NUEVO: Dibujar hitbox de interacción (verde) - solo para debug
             interaction_rect = get_interaction_rect(central_tree)
             pygame.draw.rect(screen, (0, 255, 0), interaction_rect, 2)
 
@@ -181,23 +189,43 @@ def main():
             if keys[pygame.K_DOWN]:
                 game_character.move(dx=0, dy=5, world=game_world)
 
-            # Recolección automática de recursos
+            # ✅ MODIFICADO: Recolección automática con sistema de cola
             for resource in game_world.resources:
                 if not resource.collected and game_character.check_collision(game_character.x, game_character.y, resource):
                     resource.collected = True
-                    collected_resources.append(resource.type)
-                    current_dialog = resource.get_dialog_text()
-                    game_paused = True
                     
-                    # Verificar si ya tiene los 3 recursos
-                    if len(collected_resources) >= 3:
+                    # Añadir el recurso a la lista SOLO después de mostrar el diálogo
+                    temp_resource_type = resource.type
+                    
+                    # Añadir diálogo del recurso a la cola
+                    dialog_queue.append(resource.get_dialog_text())
+                    
+                    # Si es el tercer recurso, añadir el diálogo especial después
+                    if len(collected_resources) == 2:  # Porque aún no hemos añadido este
+                        dialog_queue.append("¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos.")
                         puede_entregar = True
-                        current_dialog = "¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos."
+                    
+                    # Ahora sí añadir el recurso a la lista
+                    collected_resources.append(temp_resource_type)
+                    
+                    # Activar pausa si no está activa
+                    if not game_paused:
                         game_paused = True
-                    break  # Solo procesar un recurso por frame
+                        dialog_timer = current_time
+                    
+                    break
+
+        # ✅ NUEVO: Temporizador para diálogos automáticos (10 segundos)
+        if game_paused and dialog_queue and (current_time - dialog_timer > 10000):  # 10000 ms = 10 segundos
+            dialog_queue.pop(0)  # Quitar diálogo actual por tiempo
+            
+            if dialog_queue:
+                dialog_timer = current_time  # Reiniciar temporizador para el siguiente
+            else:
+                game_paused = False
 
         # Tiempo restante
-        seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
+        seconds_passed = (current_time - start_ticks) // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
         font = pygame.font.SysFont(None, 36)
         text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
@@ -206,9 +234,16 @@ def main():
         # Dibujar inventario
         draw_inventory(screen, collected_resources)
 
-        # Mostrar diálogo si está activo
-        if current_dialog and game_paused:
-            draw_dialog(screen, current_dialog)
+        # ✅ MODIFICADO: Mostrar el primer diálogo de la cola
+        if dialog_queue and game_paused:
+            draw_dialog(screen, dialog_queue[0])
+            
+            # ✅ NUEVO: Mostrar también el tiempo restante para el diálogo
+            time_left = 10 - ((current_time - dialog_timer) // 1000)
+            if time_left < 11:  # Solo mostrar los últimos 5 segundos
+                time_font = pygame.font.SysFont(None, 20)
+                time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
+                screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 170))
 
         # Condición de derrota por tiempo
         if remaining_time == 0:
