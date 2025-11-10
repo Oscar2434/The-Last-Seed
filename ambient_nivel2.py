@@ -135,7 +135,7 @@ class Resource:
     def get_dialog_text(self):
         # Textos educativos para cada recurso
         dialogs = {
-            "composta": "¡Excelente! La cascara de platano es un buen abono orgánico para las plantas. \nProporciona nutrientes esenciales para el crecimiento de las plantas.",
+            "composta": "¡Excelente! La cascara de platano servira como composta para la plantas. \nLa comoposta son nutrientes que ayudaran a las plantas a crecer fuertes.",
             "semillas": "¡Excelente! La cáscara de huevo es rica en calcio y otros minerales que\nbenefician el suelo y las plantas."
         }
         return dialogs.get(self.type, "Este recurso ayuda a las plantas a crecer.")

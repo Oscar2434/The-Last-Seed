@@ -61,7 +61,7 @@ def draw_inventory(screen, collected_resources):
     screen.blit(title, (constants.WIDTH - 140, 15))
     
     y_offset = 35
-    for resource_type in ["composta", "agua", "semillas"]:
+    for resource_type in ["composta", "agua", "Cascara de Huevo"]:
         count = collected_resources.count(resource_type)
         status = f"{resource_type}: {count}" if count > 0 else f"{resource_type}: 0"
         color = (200, 250, 200) if count > 0 else (180, 0, 0)  # Colores claros
@@ -123,21 +123,9 @@ def main():
                 return "quit"
             
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN and not game_paused:
-                    near_resource = game_character.check_near_resource(game_world.resources)
-                    if near_resource and not near_resource.collected:
-                        near_resource.collected = True
-                        collected_resources.append(near_resource.type)
-                        current_dialog = near_resource.get_dialog_text()
-                        game_paused = True
-                        
-                        # Verificar si ya tiene los 3 recursos
-                        if len(collected_resources) >= 3:
-                            puede_entregar = True
-                            current_dialog = "¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos."
-                            game_paused = True
+                # ✅ ELIMINADO: La recolección con ENTER ya no es necesaria
                 
-                elif event.key == pygame.K_e and not game_paused:
+                if event.key == pygame.K_e and not game_paused:
                     # ✅ CORREGIDO: Usar hitbox de interacción más grande
                     if check_interaction(game_character, central_tree):
                         if puede_entregar:
@@ -146,10 +134,10 @@ def main():
                             pygame.time.delay(3000)
                             return "victory"
                         else:
-                            current_dialog = "El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y semillas primero."
+                            current_dialog = "El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y algo más que pueda ayudar al arbol."
                             game_paused = True
                 
-                elif event.key == pygame.K_SPACE and game_paused:
+                if event.key == pygame.K_SPACE and game_paused:
                     game_paused = False
                     current_dialog = None
 
@@ -177,7 +165,7 @@ def main():
             )
             pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
             
-            # ✅ NUEVO: Dibujar hitbox de interacción (verde) - solo para debug
+            # NUEVO: Dibujar hitbox de interacción (verde) - solo para debug
             interaction_rect = get_interaction_rect(central_tree)
             pygame.draw.rect(screen, (0, 255, 0), interaction_rect, 2)
 
@@ -192,6 +180,21 @@ def main():
                 game_character.move(dx=0, dy=-5, world=game_world)
             if keys[pygame.K_DOWN]:
                 game_character.move(dx=0, dy=5, world=game_world)
+
+            # Recolección automática de recursos
+            for resource in game_world.resources:
+                if not resource.collected and game_character.check_collision(game_character.x, game_character.y, resource):
+                    resource.collected = True
+                    collected_resources.append(resource.type)
+                    current_dialog = resource.get_dialog_text()
+                    game_paused = True
+                    
+                    # Verificar si ya tiene los 3 recursos
+                    if len(collected_resources) >= 3:
+                        puede_entregar = True
+                        current_dialog = "¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos."
+                        game_paused = True
+                    break  # Solo procesar un recurso por frame
 
         # Tiempo restante
         seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
