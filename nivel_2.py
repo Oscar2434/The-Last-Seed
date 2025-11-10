@@ -61,7 +61,7 @@ def draw_inventory(screen, collected_resources):
     screen.blit(title, (constants.WIDTH - 140, 15))
     
     y_offset = 35
-    for resource_type in ["composta", "agua", "Cascara de Huevo"]:
+    for resource_type in ["composta", "agua", "semillas"]:
         count = collected_resources.count(resource_type)
         status = f"{resource_type}: {count}" if count > 0 else f"{resource_type}: 0"
         color = (200, 250, 200) if count > 0 else (180, 0, 0)  # Colores claros
