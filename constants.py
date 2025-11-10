@@ -59,3 +59,6 @@ CENTRAL_TREE_HITBOX_HEIGHT = 0.4 # Porcentaje del alto de la imagen
 
 # Escala de los muros (1.0 = tamaño original, 0.5 = mitad del tamaño, 2.0 = doble del tamaño)
 WALL_SCALE = 0.7
+
+# Margen para hitbox de interacción
+INTERACTION_MARGIN = 30

@@ -3,16 +3,17 @@ import constants
 import os
 from constants import *
 
-gy=18 # Ajuste horizontal de la hitbox
-gx=12 # Ajuste vertical de la hitbox
-ry=0.6 # escalar hitbox y
-rx=0.55 # escalar hitbox x
-
 #Clase del personaje
 class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
+         # Variables de hitbox como atributos de la clase
+         self.gy = 18 # Ajuste horizontal de la hitbox
+         self.gx = 12 # Ajuste vertical de la hitbox
+         self.ry = 0.6 # escalar hitbox y
+         self.rx = 0.55 # escalar hitbox x
+         
          image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
@@ -55,10 +56,10 @@ class Character:
         
         # ⬇️ DEBUG: Dibujar rectángulo de colisión del PERSONAJE en AZUL ⬇️
         debug_rect = pygame.Rect(
-            self.x + gx,  # ⬅️ AJUSTAR: Mover hitbox 10px a la DERECHA
-            self.y + gy,  # ⬅️ AJUSTAR: Mover hitbox 20px hacia ABAJO
-            constants.PERSONAJE * ry,  # 60% del ancho
-            constants.PERSONAJE * rx   # 60% del alto
+            self.x + self.gx,  # ⬅️ AJUSTAR: Mover hitbox 10px a la DERECHA
+            self.y + self.gy,  # ⬅️ AJUSTAR: Mover hitbox 20px hacia ABAJO
+            constants.PERSONAJE * self.ry,  # 60% del ancho
+            constants.PERSONAJE * self.rx   # 60% del alto
         )
         pygame.draw.rect(screen, (0, 0, 255), debug_rect, 2)  # Azul, línea de 2px
 
@@ -120,10 +121,10 @@ class Character:
         if hasattr(obj, 'get_rect'):
             obj_rect = obj.get_rect()
             player_rect = pygame.Rect(
-                x + gx,
-                y + gy,
-                constants.PERSONAJE * ry,  # ancho usado en el debug_rect
-                constants.PERSONAJE * rx   # alto usado en el debug_rect
+                x + self.gx,
+                y + self.gy,
+                constants.PERSONAJE * self.ry,  # ancho usado en el debug_rect
+                constants.PERSONAJE * self.rx   # alto usado en el debug_rect
             )
             return player_rect.colliderect(obj_rect)
         
@@ -144,10 +145,10 @@ class Character:
                 tree_rect = pygame.Rect(obj.x, obj.y, width, height)
 
             player_rect = pygame.Rect(
-                x + gx,
-                y + gy,
-                constants.PERSONAJE * ry,
-                constants.PERSONAJE * rx
+                x + self.gx,
+                y + self.gy,
+                constants.PERSONAJE * self.ry,
+                constants.PERSONAJE * self.rx
             )
 
             return player_rect.colliderect(tree_rect)

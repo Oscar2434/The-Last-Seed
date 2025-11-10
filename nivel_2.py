@@ -69,6 +69,36 @@ def draw_inventory(screen, collected_resources):
         screen.blit(text, (constants.WIDTH - 140, y_offset))
         y_offset += 20
 
+def get_interaction_rect(central_tree):
+    """Obtener hitbox de interacción más grande que la de colisión"""
+    if hasattr(central_tree, 'image'):
+        # Hacer la hitbox de interacción más grande que la de colisión
+        interaction_margin = 30  # píxeles adicionales en cada dirección
+        
+        return pygame.Rect(
+            central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X - interaction_margin,
+            central_tree.y + central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y - interaction_margin,
+            central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH + (interaction_margin * 2),
+            central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT + (interaction_margin * 2)
+        )
+    return None
+
+def check_interaction(character, central_tree):
+    """Verificar si el personaje está lo suficientemente cerca para interactuar"""
+    interaction_rect = get_interaction_rect(central_tree)
+    if not interaction_rect:
+        return False
+    
+    # Hitbox del personaje (la misma que usas para colisiones)
+    player_rect = pygame.Rect(
+        character.x + character.gx,
+        character.y + character.gy,
+        constants.PERSONAJE * character.ry,
+        constants.PERSONAJE * character.rx
+    )
+    
+    return player_rect.colliderect(interaction_rect)
+
 def main():
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
@@ -76,8 +106,6 @@ def main():
     
     # CREAR ÁRBOL CENTRAL
     central_tree = CentralTree(350, 50)
-    
-    # ✅ AGREGAR: Pasar el árbol central al mundo para las colisiones
     game_world.set_central_tree(central_tree)
 
     start_ticks = pygame.time.get_ticks()
@@ -103,14 +131,15 @@ def main():
                         current_dialog = near_resource.get_dialog_text()
                         game_paused = True
                         
+                        # Verificar si ya tiene los 3 recursos
                         if len(collected_resources) >= 3:
                             puede_entregar = True
                             current_dialog = "¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos."
                             game_paused = True
                 
                 elif event.key == pygame.K_e and not game_paused:
-                    # ✅ CORREGIDO: Usar central_tree directamente (no game_world.central_tree)
-                    if game_character.check_collision(game_character.x, game_character.y, central_tree):
+                    # ✅ CORREGIDO: Usar hitbox de interacción más grande
+                    if check_interaction(game_character, central_tree):
                         if puede_entregar:
                             screen.blit(victory_img, (0, 0))
                             pygame.display.flip()
@@ -124,16 +153,36 @@ def main():
                     game_paused = False
                     current_dialog = None
 
-        # ... resto del código igual ...
-
+        # --- DIBUJADO ---
         # Dibujar mundo
         game_world.draw(screen)
         
-        # DIBUJAR ÁRBOL CENTRAL (usar la variable local central_tree)
+        # DIBUJAR ÁRBOL CENTRAL
         central_tree.draw(screen)
 
+        # Dibujar recursos
+        for resource in game_world.resources:
+            resource.draw(screen)
+        
+        # Dibujar personaje
+        game_character.draw(screen)
+
+        # DEBUG: Dibujar hitbox de colisión del árbol central (rojo)
+        if hasattr(central_tree, 'image'):
+            tree_rect = pygame.Rect(
+                central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X,
+                central_tree.y + central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y,
+                central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH,
+                central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT
+            )
+            pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
+            
+            # ✅ NUEVO: Dibujar hitbox de interacción (verde) - solo para debug
+            interaction_rect = get_interaction_rect(central_tree)
+            pygame.draw.rect(screen, (0, 255, 0), interaction_rect, 2)
+
+        # Movimiento del personaje (solo si no está pausado)
         if not game_paused:
-            # Movimiento personaje (solo si no está pausado)
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 game_character.move(dx=-5, dy=0, world=game_world)
@@ -143,30 +192,6 @@ def main():
                 game_character.move(dx=0, dy=-5, world=game_world)
             if keys[pygame.K_DOWN]:
                 game_character.move(dx=0, dy=5, world=game_world)
-
-        # Dibujar mundo
-        game_world.draw(screen)
-        
-
-        # Dibujar recursos
-        for resource in game_world.resources:
-            resource.draw(screen)
-        
-        # Dibujar personaje
-        game_character.draw(screen)
-
-        # DIBUJAR ÁRBOL CENTRAL
-        central_tree.draw(screen)
-
-        if hasattr(central_tree, 'image'):
-            tree_rect = pygame.Rect(
-                central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X,
-                central_tree.y + central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y,
-                central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH,
-                central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT
-            )
-            pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
-
 
         # Tiempo restante
         seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
@@ -178,9 +203,6 @@ def main():
         # Dibujar inventario
         draw_inventory(screen, collected_resources)
 
-
-
-
         # Mostrar diálogo si está activo
         if current_dialog and game_paused:
             draw_dialog(screen, current_dialog)
@@ -191,7 +213,6 @@ def main():
             pygame.display.flip()
             pygame.time.delay(3000)
             return "defeat"
-        
 
         pygame.display.flip()
         clock.tick(60)
