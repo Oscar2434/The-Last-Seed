@@ -60,14 +60,24 @@ def draw_inventory(screen, collected_resources):
     title = font.render("Inventario:", True, (255, 255, 255))
     screen.blit(title, (constants.WIDTH - 140, 15))
     
+    # ✅ NUEVO: Mapeo de nombres amigables para los recursos
+    resource_display_names = {
+        "composta": "Cáscara Plátano",
+        "agua": "Agua",
+        "semillas": "Cáscara Huevo"
+    }
+    
     y_offset = 35
+    # ✅ MODIFICADO: Usar el mapeo para mostrar nombres bonitos
     for resource_type in ["composta", "agua", "semillas"]:
         count = collected_resources.count(resource_type)
-        status = f"{resource_type}: {count}" if count > 0 else f"{resource_type}: 0"
+        display_name = resource_display_names.get(resource_type, resource_type)
+        status = f"{display_name}: {count}" if count > 0 else f"{display_name}: 0"
         color = (200, 250, 200) if count > 0 else (180, 0, 0)  # Colores claros
         text = font.render(status, True, color)
         screen.blit(text, (constants.WIDTH - 140, y_offset))
         y_offset += 20
+
 
 def get_interaction_rect(central_tree):
     """Obtener hitbox de interacción más grande que la de colisión"""
@@ -239,8 +249,8 @@ def main():
             draw_dialog(screen, dialog_queue[0])
             
             # ✅ NUEVO: Mostrar también el tiempo restante para el diálogo
-            time_left = 10 - ((current_time - dialog_timer) // 1000)
-            if time_left < 11:  # Solo mostrar los últimos 5 segundos
+            time_left = 12 - ((current_time - dialog_timer) // 1000)
+            if time_left < 13:  # Solo mostrar los últimos 5 segundos
                 time_font = pygame.font.SysFont(None, 20)
                 time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
                 screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 170))
