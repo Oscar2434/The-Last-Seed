@@ -80,9 +80,9 @@ class Wall:
         elif wall_type == "left":
             wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
         elif wall_type == "otro":
-            wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
+            wall_path = os.path.join('assets', 'images', 'Muros', 'horzontal_sin_bordes.png')
         elif wall_type == "a":
-            wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
+            wall_path = os.path.join('assets', 'images', 'Muros', 'arbusto cerrado.png')
 
 
 
