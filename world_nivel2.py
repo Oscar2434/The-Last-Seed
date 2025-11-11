@@ -28,7 +28,7 @@ class World:
         # POSICIONES FIJAS para los 3 recursos en el laberinto
         resource_positions = [
             (250, 130, "composta"),
-            (170, 270, "agua"),      # Este usará WaterResource
+            (170, 260, "agua"),      # Este usará WaterResource
             (710, 425, "semillas")
         ]
         
@@ -49,70 +49,73 @@ class World:
         
         # MUROS INTERNOS DEL LABERINTO
         internal_walls = [
-            (125, 90), (214, 90), (486, 90),
+            (115, 80), (204, 80), (476, 80),
               
-            (294, 240), (358, 240), (130, 240), (166, 240), (230, 240)
+             (120, 220), (156, 220), (220, 220), (284, 220)#, (358, 230)
             
         ]
         internal_walls_2 = [
-            (614, 90),
-            (214, 160), (486, 160), (555, 160),
-            (130, 325), (219, 325), (358, 325), (422, 325), (614, 325)
+            (604, 80),
+            (204, 150), (476, 150), (545, 150),
+            (120, 302), (209, 302), (348, 302), (412, 302), (604, 302)
         ]
         internal_walls_3 = [
-            (160, 325), (370, 325), (550, 90), (540, 160)
+            (150, 302), (360, 302), (540, 80), (530, 150), (689, 80)
         ]
         
         # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
-        internal_walls_left = [
-            (300, 90), (465, 90), 
-            (430, 240)
+        vertical_con_final = [
+            (290, 80), (455, 80), 
+            (350, 220)
         ]
         vertical_walls_sin = [
-            (100, 90), (100, 150), (100, 210), (100, 270), (100, 330), (100, 350)
+            (90, 80), (90, 140), (90, 200), (90, 260), (90, 320), (90, 340)
         ]
         vertical_walls_sin_2 = [
-            (100, 390)
+            (90, 380)
         ]
 
-        # BORDES CON BUCLES - PAREDES COMPLETAS
         # AGREGAR MUROS INTERNOS
         for wall in vertical_walls_sin_2:
-            wall_positions.append((wall[0], wall[1], "left"))
+            wall_positions.append((wall[0], wall[1], "vertical_con_final"))
         for wall in internal_walls:
-            wall_positions.append((wall[0], wall[1], "normal"))
-            
+            wall_positions.append((wall[0], wall[1], "horizontal_sin_final"))
+
+        for wall in internal_walls_2:
+            self.walls.append(Wall(wall[0], wall[1], "horizontal_con_final", constants.WALL_SCALE))
+        for wall in internal_walls_3:
+            self.walls.append(Wall(wall[0], wall[1], "horizontal_sin_final", constants.WALL_SCALE))
+        for wall in vertical_walls_sin:
+            self.walls.append(Wall(wall[0], wall[1], "vertical_sin_final", constants.WALL_SCALE))
+        
+        #------Inicio-------
         # Techo (y = 0) - línea horizontal superior
         for x in range(0, 780, 51):
             wall_positions.append((x, 0, "normal"))
         
         # PARED IZQUIERDA COMPLETA (x = 0) - desde techo hasta piso
         for y in range(0, 350, 30):
-            wall_positions.append((0, y, "left"))
+            wall_positions.append((0, y, "vertical_sin_final"))
         
         # PARED DERECHA COMPLETA - desde techo hasta piso
         right_wall_x = 747
         for y in range(0, 480, 30):
-            wall_positions.append((right_wall_x, y, "left"))
+            wall_positions.append((right_wall_x, y, "vertical_sin_final"))
             
         # Piso (y = 440) - línea horizontal inferior  
         for x in range(0, 780, 51):
             wall_positions.append((x, 460, "normal"))
+        #--------fin de muros--------#
         
         
         
         # Crear muros en las posiciones definidas CON ESCALA
         for x, y, wall_type in wall_positions:
             self.walls.append(Wall(x, y, wall_type, constants.WALL_SCALE))
-
-        for wall in internal_walls_left:
+        for wall in vertical_con_final:
             self.walls.append(Wall(wall[0], wall[1], "vertical_con_final", constants.WALL_SCALE))
-        for wall in internal_walls_2:
-            self.walls.append(Wall(wall[0], wall[1], "horizontal_con_final", constants.WALL_SCALE))
-        for wall in internal_walls_3:
-            self.walls.append(Wall(wall[0], wall[1], "horizontal_sin_final", constants.WALL_SCALE))
-        for wall in vertical_walls_sin:
-            self.walls.append(Wall(wall[0], wall[1], "left", constants.WALL_SCALE))
+
+
         
 
     def draw(self, screen):

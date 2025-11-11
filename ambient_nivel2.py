@@ -77,10 +77,8 @@ class Wall:
         # Elegir imagen según el tipo de pared
         if wall_type == "vertical_con_final":
             wall_path = os.path.join('assets', 'images', 'Muros', 'pendiente.png')
-        elif wall_type == "left":
+        elif wall_type == "vertical_sin_final":
             wall_path = os.path.join('assets', 'images', 'Muros', 'vertical_sin_final.png')
-        elif wall_type == "fin":
-            wall_path = os.path.join('assets', 'images', 'Muros', 'fin.png')
         elif wall_type == "horizontal_con_final":
             wall_path = os.path.join('assets', 'images', 'Muros', 'horizontal_con_final.png')
         elif wall_type == "horizontal_sin_final":   
