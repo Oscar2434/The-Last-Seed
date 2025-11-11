@@ -27,9 +27,9 @@ class World:
     def create_resources(self):
         # POSICIONES FIJAS para los 3 recursos en el laberinto
         resource_positions = [
-            (250, 160, "composta"),
-            (170, 300, "agua"),      # Este usará WaterResource
-            (500, 160, "semillas")
+            (250, 130, "composta"),
+            (170, 270, "agua"),      # Este usará WaterResource
+            (710, 425, "semillas")
         ]
         
         self.resources.clear()
@@ -49,30 +49,30 @@ class World:
         
         # MUROS INTERNOS DEL LABERINTO
         internal_walls = [
-            (125, 120), (214, 120), (486, 120),
+            (125, 90), (214, 90), (486, 90),
               
-            (294, 270), (358, 270), (130, 270), (166, 270), (230, 270)
+            (294, 240), (358, 240), (130, 240), (166, 240), (230, 240)
             
         ]
         internal_walls_2 = [
-            (614, 120),
-            (214, 190), (486, 190), (555, 190),
-            (130, 355), (219, 355), (358, 355), (422, 355), (614, 355)
+            (614, 90),
+            (214, 160), (486, 160), (555, 160),
+            (130, 325), (219, 325), (358, 325), (422, 325), (614, 325)
         ]
         internal_walls_3 = [
-            (160, 355), (370, 355), (550, 120), (540, 190)
+            (160, 325), (370, 325), (550, 90), (540, 160)
         ]
         
         # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
         internal_walls_left = [
-            (300, 120), (465, 120), 
-            (430, 270)
+            (300, 90), (465, 90), 
+            (430, 240)
         ]
         vertical_walls_sin = [
-            (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 380)
+            (100, 90), (100, 150), (100, 210), (100, 270), (100, 330), (100, 350)
         ]
         vertical_walls_sin_2 = [
-            (100, 420)
+            (100, 390)
         ]
 
         # BORDES CON BUCLES - PAREDES COMPLETAS
@@ -95,9 +95,6 @@ class World:
         for y in range(0, 480, 30):
             wall_positions.append((right_wall_x, y, "left"))
             
-        
-        
-
         # Piso (y = 440) - línea horizontal inferior  
         for x in range(0, 780, 51):
             wall_positions.append((x, 460, "normal"))
