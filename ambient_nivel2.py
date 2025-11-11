@@ -79,10 +79,10 @@ class Wall:
             wall_path = os.path.join('assets', 'images', 'Muros', 'pendiente.png')
         elif wall_type == "left":
             wall_path = os.path.join('assets', 'images', 'Muros', 'sin_final.png')
-        elif wall_type == "otro":
-            wall_path = os.path.join('assets', 'images', 'Muros', 'horzontal_sin_bordes.png')
-        elif wall_type == "a":
-            wall_path = os.path.join('assets', 'images', 'Muros', 'arbusto cerrado.png')
+        elif wall_type == "fin":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'fin.png')
+        elif wall_type == "inicio":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'inicio.png')
 
 
 

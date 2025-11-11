@@ -62,6 +62,12 @@ class World:
         internal_walls_right = [
             (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420)
         ]
+        internal_walls_fin = [
+            (150, 161)
+        ]
+        internal_walls_inicio = [
+            (150, 120)
+        ]
 
         # BORDES CON BUCLES - PAREDES COMPLETAS
         # AGREGAR MUROS INTERNOS
