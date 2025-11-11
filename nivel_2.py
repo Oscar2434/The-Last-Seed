@@ -162,17 +162,19 @@ def main():
                             game_paused = False
                     else:
                         game_paused = False
+        
 
         # --- DIBUJADO ---
         game_world.draw(screen)
+        # Dibujar personaje
+        game_character.draw(screen)
         central_tree.draw(screen)
 
         # Dibujar recursos
         for resource in game_world.resources:
             resource.draw(screen)
         
-        # Dibujar personaje
-        game_character.draw(screen)
+
 
         # DEBUG: Dibujar hitboxes (opcional)
         if hasattr(central_tree, 'image'):

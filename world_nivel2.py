@@ -49,28 +49,36 @@ class World:
         
         # MUROS INTERNOS DEL LABERINTO
         internal_walls = [
-            (125, 120), (214, 120), (614, 120), (550, 120), (486, 120),
-            (214, 190), (486, 190), (550, 190),  
+            (125, 120), (214, 120), (486, 120),
+              
             (294, 270), (358, 270), (130, 270), (166, 270), (230, 270)
             
         ]
         internal_walls_2 = [
-            (130, 350), (219, 350), (358, 350), (422, 350), (614, 350)
+            (614, 120),
+            (214, 190), (486, 190), (555, 190),
+            (130, 355), (219, 355), (358, 355), (422, 355), (614, 355)
         ]
         internal_walls_3 = [
-            (366, 355)
+            (160, 355), (370, 355), (550, 120), (540, 190)
         ]
         
         # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
         internal_walls_left = [
-            (300, 120), (465, 120), (430, 270)
+            (300, 120), (465, 120), 
+            (430, 270)
         ]
-        internal_walls_right = [
-            (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420)
+        vertical_walls_sin = [
+            (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 380)
+        ]
+        vertical_walls_sin_2 = [
+            (100, 420)
         ]
 
         # BORDES CON BUCLES - PAREDES COMPLETAS
         # AGREGAR MUROS INTERNOS
+        for wall in vertical_walls_sin_2:
+            wall_positions.append((wall[0], wall[1], "left"))
         for wall in internal_walls:
             wall_positions.append((wall[0], wall[1], "normal"))
             
@@ -106,8 +114,9 @@ class World:
             self.walls.append(Wall(wall[0], wall[1], "horizontal_con_final", constants.WALL_SCALE))
         for wall in internal_walls_3:
             self.walls.append(Wall(wall[0], wall[1], "horizontal_sin_final", constants.WALL_SCALE))
-        for wall in internal_walls_right:
+        for wall in vertical_walls_sin:
             self.walls.append(Wall(wall[0], wall[1], "left", constants.WALL_SCALE))
+        
 
     def draw(self, screen):
         # Fondo de pasto
