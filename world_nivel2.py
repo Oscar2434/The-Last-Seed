@@ -49,24 +49,24 @@ class World:
         
         # MUROS INTERNOS DEL LABERINTO
         internal_walls = [
-            (125, 130), (214, 130), (614, 130), (550, 130), (486, 130),
+            (125, 120), (214, 120), (614, 120), (550, 120), (486, 120),
             (214, 190), (486, 190), (550, 190),  
-            (294, 270), (358, 270), (130, 270), (166, 270), (230, 270),
+            (294, 270), (358, 270), (130, 270), (166, 270), (230, 270)
+            
+        ]
+        internal_walls_2 = [
             (130, 350), (219, 350), (358, 350), (422, 350), (614, 350)
+        ]
+        internal_walls_3 = [
+            (366, 355)
         ]
         
         # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
         internal_walls_left = [
-            (300, 110), (465, 110), (430, 270)
+            (300, 120), (465, 120), (430, 270)
         ]
         internal_walls_right = [
             (100, 120), (100, 180), (100, 240), (100, 300), (100, 360), (100, 420)
-        ]
-        internal_walls_fin = [
-            (150, 161)
-        ]
-        internal_walls_inicio = [
-            (150, 120)
         ]
 
         # BORDES CON BUCLES - PAREDES COMPLETAS
@@ -88,8 +88,7 @@ class World:
             wall_positions.append((right_wall_x, y, "left"))
             
         
-        for wall in internal_walls_right:
-            self.walls.append(Wall(wall[0], wall[1], "left", constants.WALL_SCALE))
+        
 
         # Piso (y = 440) - línea horizontal inferior  
         for x in range(0, 780, 51):
@@ -101,12 +100,14 @@ class World:
         for x, y, wall_type in wall_positions:
             self.walls.append(Wall(x, y, wall_type, constants.WALL_SCALE))
 
-
-
-
-        
         for wall in internal_walls_left:
-            self.walls.append(Wall(wall[0], wall[1], "right", constants.WALL_SCALE))
+            self.walls.append(Wall(wall[0], wall[1], "vertical_con_final", constants.WALL_SCALE))
+        for wall in internal_walls_2:
+            self.walls.append(Wall(wall[0], wall[1], "horizontal_con_final", constants.WALL_SCALE))
+        for wall in internal_walls_3:
+            self.walls.append(Wall(wall[0], wall[1], "horizontal_sin_final", constants.WALL_SCALE))
+        for wall in internal_walls_right:
+            self.walls.append(Wall(wall[0], wall[1], "left", constants.WALL_SCALE))
 
     def draw(self, screen):
         # Fondo de pasto
