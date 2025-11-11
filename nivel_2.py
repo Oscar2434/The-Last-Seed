@@ -118,6 +118,7 @@ def main():
     central_tree = CentralTree(350, 50)
     game_world.set_central_tree(central_tree)
 
+
     start_ticks = pygame.time.get_ticks()
     
     collected_resources = []
