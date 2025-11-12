@@ -2,6 +2,7 @@ import constants
 import pygame
 from ambient_nivel2 import Wall, Resource
 from resources_nivel_2 import WaterResource  # Importar la nueva clase
+from enemy_nivel2 import Enemy  # ✅ NUEVO: Importar el enemigo
 import os
 
 class World:
@@ -12,6 +13,7 @@ class World:
         self.trees = []
         self.central_tree = None  # Inicializar como None
         self.resources = []
+        self.enemies = []  # ✅ NUEVO: Lista de enemigos
 
         grass_path = os.path.join('assets', 'images', 'objects', 'grass3.png')
         self.grass_image = pygame.image.load(grass_path).convert()
@@ -19,6 +21,7 @@ class World:
 
         self.create_maze()
         self.create_resources()
+        self.create_enemies()  # ✅ NUEVO: Crear enemigos
 
     def set_central_tree(self, central_tree):
         """Método para establecer el árbol central desde nivel_2.py"""
@@ -41,6 +44,20 @@ class World:
                 # Usar Resource normal para los demás
                 self.resources.append(Resource(x, y, resource_type))
 
+    def create_enemies(self):
+        """✅ NUEVO: Crear enemigos en posiciones estratégicas"""
+        # Puedes ajustar estas posiciones según tu laberinto
+        enemy_positions = [
+            (700, 400),  # Esquina inferior derecha
+            (50, 50),    # Esquina superior izquierda
+        ]
+        
+        self.enemies.clear()
+        for x, y in enemy_positions:
+            self.enemies.append(Enemy(x, y))
+
+    # ... (el resto del código permanece igual)
+
     def create_maze(self):
         # Limpiar muros existentes
         self.walls.clear()
@@ -51,13 +68,14 @@ class World:
         internal_walls = [
             #(476, 80),
               
-             (30, 220), (115, 220), (200, 220), 
+             (30, 220), (115, 220), #(200, 220), 
             
         ]
         internal_walls_2 = [
             #604, 80),
             (90, 150), 
             (284, 220),
+            (120, 220),(265, 220),
             (600, 90), (530, 90),
 
             (475, 220), (580, 220),

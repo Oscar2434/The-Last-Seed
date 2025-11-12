@@ -118,14 +118,13 @@ def main():
     central_tree = CentralTree(350, 50)
     game_world.set_central_tree(central_tree)
 
-
     start_ticks = pygame.time.get_ticks()
     
     collected_resources = []
-    dialog_queue = []  # ✅ NUEVO: Cola de diálogos
+    dialog_queue = []
     game_paused = False
     puede_entregar = False
-    dialog_timer = 0   # ✅ NUEVO: Temporizador para diálogos automáticos
+    dialog_timer = 0
     
     running = True
     while running:
@@ -145,25 +144,20 @@ def main():
                             pygame.time.delay(3000)
                             return "victory"
                         else:
-                            # ✅ NUEVO: Usar cola de diálogos
                             dialog_queue.append("El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y semillas primero.")
                             if not game_paused:
                                 game_paused = True
                                 dialog_timer = current_time
                 
                 elif event.key == pygame.K_SPACE and game_paused:
-                    # ✅ NUEVO: Manejar cola de diálogos
                     if dialog_queue:
-                        dialog_queue.pop(0)  # Quitar el diálogo actual
-                        
-                        # Si hay más diálogos en la cola, mostrar el siguiente
+                        dialog_queue.pop(0)
                         if dialog_queue:
-                            dialog_timer = current_time  # Reiniciar temporizador
+                            dialog_timer = current_time
                         else:
                             game_paused = False
                     else:
                         game_paused = False
-        
 
         # --- DIBUJADO ---
         game_world.draw(screen)
@@ -175,20 +169,9 @@ def main():
         for resource in game_world.resources:
             resource.draw(screen)
         
-
-
-        # DEBUG: Dibujar hitboxes (opcional)
-        if hasattr(central_tree, 'image'):
-            tree_rect = pygame.Rect(
-                central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X,
-                central_tree.y + central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y,
-                central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH,
-                central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT
-            )
-            pygame.draw.rect(screen, (255, 0, 0), tree_rect, 2)
-            
-            interaction_rect = get_interaction_rect(central_tree)
-            pygame.draw.rect(screen, (0, 255, 0), interaction_rect, 2)
+        # ✅ NUEVO: Dibujar enemigos
+        for enemy in game_world.enemies:
+            enemy.draw(screen)
 
         # Movimiento del personaje (solo si no está pausado)
         if not game_paused:
@@ -202,32 +185,35 @@ def main():
             if keys[pygame.K_DOWN]:
                 game_character.move(dx=0, dy=5, world=game_world)
 
-            # ✅ MODIFICADO: Recolección automática con sistema de cola
+            # ✅ NUEVO: Movimiento de enemigos hacia el jugador
+            for enemy in game_world.enemies:
+                enemy.move_towards_player(game_character.x, game_character.y, game_world)
+                
+                # ✅ NUEVO: Verificar si el enemigo capturó al jugador
+                if enemy.check_capture(game_character):
+                    screen.blit(defeat_img, (0, 0))
+                    pygame.display.flip()
+                    pygame.time.delay(3000)
+                    return "defeat"
+
+            # Recolección de recursos (código existente)
             for resource in game_world.resources:
                 if not resource.collected and game_character.check_collision(game_character.x, game_character.y, resource):
                     resource.collected = True
-                    
-                    # Añadir el recurso a la lista SOLO después de mostrar el diálogo
                     temp_resource_type = resource.type
-                    
-                    # Añadir diálogo del recurso a la cola
                     dialog_queue.append(resource.get_dialog_text())
                     
-                    # Si es el tercer recurso, añadir el diálogo especial después
-                    if len(collected_resources) == 2:  # Porque aún no hemos añadido este
+                    if len(collected_resources) == 2:
                         dialog_queue.append("¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos.")
                         puede_entregar = True
                     
-                    # Ahora sí añadir el recurso a la lista
                     collected_resources.append(temp_resource_type)
                     
-                    # Activar pausa si no está activa
                     if not game_paused:
                         game_paused = True
                         dialog_timer = current_time
                     
                     break
-
         # ✅ NUEVO: Temporizador para diálogos automáticos (10 segundos)
         if game_paused and dialog_queue and (current_time - dialog_timer > 10000):  # 10000 ms = 10 segundos
             dialog_queue.pop(0)  # Quitar diálogo actual por tiempo
