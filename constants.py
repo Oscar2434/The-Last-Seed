@@ -81,3 +81,14 @@ DIFFICULTY_SETTINGS = {
         "spawn_delay": 240
     }
 }
+# Árbol central (treeC) hitbox
+CENTRAL_TREE_HITBOX_X = 0.3   # Porcentaje de desplazamiento en X
+CENTRAL_TREE_HITBOX_Y = 0.6   # Porcentaje de desplazamiento en Y
+CENTRAL_TREE_HITBOX_WIDTH = 0.4  # Porcentaje del ancho de la imagen
+CENTRAL_TREE_HITBOX_HEIGHT = 0.4 # Porcentaje del alto de la imagen
+
+# Escala de los muros (1.0 = tamaño original, 0.5 = mitad del tamaño, 2.0 = doble del tamaño)
+WALL_SCALE = 0.7
+
+# Margen para hitbox de interacción
+INTERACTION_MARGIN = 30
