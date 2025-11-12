@@ -1,6 +1,7 @@
 import pygame
 import constants 
 import os
+import config  # ✅ Añadir importación de config
 from constants import *
 
 #Clase del personaje
@@ -14,7 +15,15 @@ class Character:
          self.ry = 0.6 # escalar hitbox y
          self.rx = 0.55 # escalar hitbox x
          
-         image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
+         # ✅ Cargar sprite según personaje seleccionado (COPIADO DE character.py)
+         if hasattr(config, "selected_character"):
+             if config.selected_character == "niña":
+                 image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
+             else:
+                 image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+         else:
+             image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
          self.animation_frame = 0
