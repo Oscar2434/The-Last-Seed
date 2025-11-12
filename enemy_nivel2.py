@@ -1,4 +1,5 @@
 import pygame
+import pygame
 import constants
 import os
 from constants import *
@@ -15,59 +16,56 @@ class Enemy:
         self.ry = 0.6
         self.rx = 0.55
         
-        # Intentar cargar sprite del enemigo, si no existe usar placeholder
+        # Cargar sprites del fantasma
         try:
-            image_path = os.path.join('assets', 'images', 'character', 'enemy.png')
-            self.sprite = pygame.image.load(image_path).convert_alpha()
+            # Cargar ambas direcciones del fantasma
+            image_path_i = os.path.join('assets', 'images', 'fantasma', 'fantasma_i.png')
+            image_path_d = os.path.join('assets', 'images', 'fantasma', 'fantasma_d.png')
+            
+            self.sprite_i = pygame.image.load(image_path_i).convert_alpha()
+            self.sprite_d = pygame.image.load(image_path_d).convert_alpha()
+            
             self.has_sprite = True
-            self.frame_size = F_SIZE
-            self.animation_frame = 0
-            self.animation_timer = 0
-            self.animations_delay = DELAY_FPS
-            self.current_state = DOWN
+            
+            # Escalar los sprites al tamaño del personaje
+            self.sprite_i = pygame.transform.scale(self.sprite_i, (constants.PERSONAJE, constants.PERSONAJE))
+            self.sprite_d = pygame.transform.scale(self.sprite_d, (constants.PERSONAJE, constants.PERSONAJE))
+            
+            self.facing_left = False  # False = derecha, True = izquierda
             self.moving = False
-            self.facing_left = False
-            self.animations = self.load_animations()
-        except:
+            
+            # No usamos animaciones frame-by-frame, solo las dos imágenes
+            self.animation_timer = 0
+            self.animations_delay = 500  # ms entre cambios (opcional para parpadeo)
+            self.current_image = self.sprite_d  # Imagen inicial
+            
+        except Exception as e:
+            print(f"Error cargando sprites del fantasma: {e}")
             # Si no hay imagen, usar un cuadrado azul
             self.has_sprite = False
             self.placeholder = pygame.Surface((constants.PERSONAJE, constants.PERSONAJE))
             self.placeholder.fill((0, 0, 255))  # Azul
 
-    def load_animations(self):
-        """Cargar animaciones similares al personaje"""
-        animations = {}
-        for state in range(4):
-            frames = []
-            for frame in range(SPRITES):
-                surface = pygame.Surface((self.frame_size, self.frame_size), pygame.SRCALPHA)
-                surface.blit(self.sprite, (0, 0), (frame * self.frame_size, state * self.frame_size, self.frame_size, self.frame_size))
-                if constants.PERSONAJE != self.frame_size:
-                    surface = pygame.transform.scale(surface, (constants.PERSONAJE, constants.PERSONAJE))
-                frames.append(surface)
-            animations[state] = frames
-        return animations
-
     def update_animation(self):
-        """Actualizar animación si tiene sprite"""
+        """Actualizar animación simple"""
         if not self.has_sprite:
             return
             
         current_time = pygame.time.get_ticks()
+        
+        # Opcional: puedes añadir un efecto de parpadeo suave aquí si quieres
+        # Pero por ahora solo cambiamos la dirección
         if self.moving:
-            if current_time - self.animation_timer > self.animations_delay:
-                self.animation_timer = current_time
-                self.animation_frame = (self.animation_frame + 1) % SPRITES
+            # Actualizar la imagen según la dirección
+            if self.facing_left:
+                self.current_image = self.sprite_i
+            else:
+                self.current_image = self.sprite_d
 
     def draw(self, screen):
         """Dibujar al enemigo"""
         if self.has_sprite:
-            if self.current_state not in self.animations:
-                self.current_state = DOWN
-            current_image = self.animations[self.current_state][self.animation_frame]
-            if self.facing_left:
-                current_image = pygame.transform.flip(current_image, True, False)
-            screen.blit(current_image, (self.x, self.y))
+            screen.blit(self.current_image, (self.x, self.y))
         else:
             # Dibujar placeholder azul
             screen.blit(self.placeholder, (self.x, self.y))
@@ -92,23 +90,15 @@ class Enemy:
         dx = dx / distance * self.speed
         dy = dy / distance * self.speed
         
-        # Actualizar animación si tiene sprite
-        if self.has_sprite:
-            self.moving = True
-            if abs(dx) > abs(dy):
-                if dx > 0:
-                    self.current_state = RIGHT
-                    self.facing_left = False
-                else:
-                    self.current_state = RIGHT
-                    self.facing_left = True
+        # Actualizar dirección del sprite (SOLO basado en movimiento horizontal)
+        self.moving = True
+        
+        # Solo cambiamos dirección cuando hay movimiento horizontal significativo
+        if abs(dx) > 0.1:  # Umbral pequeño para evitar cambios bruscos
+            if dx > 0:
+                self.facing_left = False  # Mirando a la derecha
             else:
-                if dy > 0:
-                    self.current_state = DOWN
-                    self.facing_left = False
-                else:
-                    self.current_state = UP
-                    self.facing_left = False
+                self.facing_left = True   # Mirando a la izquierda
         
         # Intentar mover en X
         new_x = self.x + dx

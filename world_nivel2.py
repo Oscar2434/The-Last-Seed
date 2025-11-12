@@ -49,7 +49,7 @@ class World:
         # Puedes ajustar estas posiciones según tu laberinto
         enemy_positions = [
             (700, 400),  # Esquina inferior derecha
-            (50, 50),    # Esquina superior izquierda
+            (50, 50),    # Esquina superior izquierda   # Centro del laberinto
         ]
         
         self.enemies.clear()
