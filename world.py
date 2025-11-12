@@ -23,7 +23,7 @@ class World:
 
     def generate_trees(self):
         positions = [
-            (100, 120),
+            (200, 120),
             (200, 300),
             (500, 150),
             (600, 350),
@@ -66,7 +66,7 @@ class World:
         cy = self.central_tree.y
         h = self.central_tree.size
 
-        step = max(1, enemy_size - 6)  # separa visualmente; evita encimar
+        step = max(1, enemy_size - 6)
         top = cy
         bottom = cy + h - enemy_size
 
@@ -79,7 +79,6 @@ class World:
         left_x = self.central_tree.x - enemy_size - 10
         right_x = self.central_tree.x + self.central_tree.size + 10
 
-        # alternar izquierda/derecha por fila para repartir mejor
         toggle = True
         for yv in ys:
             if toggle:
@@ -106,3 +105,4 @@ class World:
             tree.draw(screen)
         for rock in self.rocks:
             rock.draw(screen)
+
