@@ -32,25 +32,25 @@ def cargar_y_escalar(ruta, escala=1.0):
     tamaño = int(TAM_CELDA * escala)
     return pygame.transform.scale(img, (tamaño, tamaño))
 
-background_img = pygame.image.load(os.path.join('The-Last-Seed', 'assets', 'images', 'objects', 'grass3.png')).convert()
+background_img = pygame.image.load(os.path.join('assets', 'images', 'objects', 'grass3.png')).convert()
 background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
 
 ESCALA_NIÑO = 1.25
 ESCALA_BASURA = 1.1
 
-trash_img = cargar_y_escalar(os.path.join('The-Last-Seed', 'assets', 'images', 'character', 'escombro.png'), ESCALA_BASURA)
-bag_img = cargar_y_escalar(os.path.join('The-Last-Seed', 'assets', 'images', 'character', 'basura.png'), 1.0)
-bote_img = cargar_y_escalar(os.path.join('The-Last-Seed', 'assets', 'images', 'character', 'bote de basuraaa.png'), 1.6)
+trash_img = cargar_y_escalar(os.path.join('assets', 'images', 'character', 'escombro.png'), ESCALA_BASURA)
+bag_img = cargar_y_escalar(os.path.join('assets', 'images', 'character', 'basura.png'), 1.0)
+bote_img = cargar_y_escalar(os.path.join('assets', 'images', 'character', 'bote de basuraaa.png'), 1.6)
 
 # Brillo del bote (efecto)
 bote_glow = bote_img.copy()
 bote_glow.fill((255, 255, 150, 80), special_flags=pygame.BLEND_RGBA_ADD)
 
 # Fondos de victoria y derrota
-victory_img = pygame.image.load(os.path.join('The-Last-Seed', 'assets', 'images', 'effects', 'victoria.png')).convert()
+victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'victoria.png')).convert()
 victory_img = pygame.transform.smoothscale(victory_img, (WIDTH, HEIGHT))
 
-defeat_img = pygame.image.load(os.path.join('The-Last-Seed', 'assets', 'images', 'effects', 'derrota.png')).convert()
+defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'derrota.png')).convert()
 defeat_img = pygame.transform.smoothscale(defeat_img, (WIDTH, HEIGHT))
 
 # ------------------------------------
@@ -72,7 +72,7 @@ def cargar_spritesheet(ruta, columnas, filas):
         sprites.append(fila_sprites)
     return sprites
 
-nino_sprites = cargar_spritesheet(os.path.join('The-Last-Seed', 'assets', 'images', 'character', 'nino.png'), 4, 4)
+nino_sprites = cargar_spritesheet(os.path.join('assets', 'images', 'character', 'nino.png'), 4, 4)
 
 DIRECCIONES = {
     "ABAJO": 0,
@@ -85,7 +85,6 @@ DIRECCIONES = {
 # FUNCIONES
 # ------------------------------------
 def mostrar_texto_contorno(texto, fuente, color, x, y):
-    """Dibuja texto con contorno negro"""
     render_texto = fuente.render(texto, True, color)
     render_contorno = fuente.render(texto, True, NEGRO)
     for dx in (-2, 0, 2):
