@@ -6,8 +6,8 @@ from button import Button
 pygame.init()
 
 lenguaje = True  # false = español, true = ingles
-music = False  # false = sin música, true = con música
-cambio= False
+music = False # false = sin música, true = con música
+
 # ventana
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 if lenguaje:
@@ -25,12 +25,11 @@ def config_menu():
     run = True
     while run:
         if lenguaje:
-            button_lenguaje_img = pygame.image.load("imagenes/Exit.png")  # Cambia la imagen si es necesario
+            button_lenguaje_img = pygame.image.load("imagenes\Exit.png")  # Cambia la imagen si es necesario
         else:
-            button_lenguaje_img = pygame.image.load("imagenes/Salida.png")  # Cambia la imagen si es necesario
+            button_lenguaje_img = pygame.image.load("imagenes\Salida.png")  # Cambia la imagen si es necesario
         
         button_lenguaje_img = pygame.transform.scale(button_lenguaje_img, (200, 100))  # Escalar la imagen
-        # Crear el botón de lenguaje
         button_lenguaje = Button(constants.WIDTH // 2 - button_lenguaje_img.get_width() // 2, constants.HEIGHT // 2 - button_lenguaje_img.get_height() // 2, button_lenguaje_img, 1)
 
         screen.blit(Fondo, (0, 0))
