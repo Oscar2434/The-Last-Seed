@@ -1,4 +1,4 @@
-# 🌱 The Last Seed: El Guardián del Bosque  
+![image alt][https://github.com/Oscar2434/The-Last-Seed/blob/main/imagenes/titulo1.png?raw=true]
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)  
 ![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=pygame)  
