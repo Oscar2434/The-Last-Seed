@@ -45,20 +45,13 @@ class World:
                 self.resources.append(Resource(x, y, resource_type))
 
     def create_enemies(self, difficulty="normal"):
-        """✅ MODIFICADO: Crear enemigos según la dificultad"""
-        # Obtener número máximo de enemigos según dificultad
-        max_enemies = constants.DIFFICULTY_SETTINGS[difficulty]["max_enemies"]
+        """✅ MODIFICADO: Crear enemigos según la dificultad usando configuración de NIVEL 2"""
+        # Obtener configuración específica para nivel 2
+        level2_settings = constants.LEVEL_2_SETTINGS[difficulty]
+        max_enemies = level2_settings["max_enemies"]
+        enemy_positions = level2_settings["enemy_positions"]
         
-        # Posiciones estratégicas para enemigos
-        all_enemy_positions = [
-            (700, 400),  # Esquina inferior derecha
-            (50, 50),    # Esquina superior izquierda
-            (400, 200),  # Centro del laberinto
-        ]
-        
-        # Tomar solo las posiciones necesarias según la dificultad
-        enemy_positions = all_enemy_positions[:max_enemies]
-        
+        # ✅ RESTAURADO: Usar las posiciones originales que teníamos antes
         self.enemies.clear()
         for x, y in enemy_positions:
             self.enemies.append(Enemy(x, y))

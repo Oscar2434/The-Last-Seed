@@ -70,17 +70,37 @@ DIFFICULTY_SETTINGS = {
         "ENEMY_SPEED": 1,
         "ENEMY_DAMAGE": 2,
         "LEVEL_TIME": 90,
-        "max_enemies": 1,  # ✅ MODIFICADO: 1 enemigo en normal
+        "max_enemies": 5,  # ✅ PARA NIVEL 1
         "spawn_delay": 300
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
         "ENEMY_DAMAGE": 6,
         "LEVEL_TIME": 60,
-        "max_enemies": 2,  # ✅ MODIFICADO: 2 enemigos en avanzado
+        "max_enemies": 8,  # ✅ PARA NIVEL 1
         "spawn_delay": 240
     }
 }
+
+# ✅ NUEVO: Configuración específica para NIVEL 2
+LEVEL_2_SETTINGS = {
+    "normal": {
+        "max_enemies": 2,  # ✅ 2 enemigos en normal para nivel 2
+        "enemy_positions": [
+            (700, 400),  # Esquina inferior derecha
+            (50, 50),    # Esquina superior izquierda
+        ]
+    },
+    "avanzado": {
+        "max_enemies": 3,  # ✅ 3 enemigos en avanzado para nivel 2
+        "enemy_positions": [
+            (700, 400),  # Esquina inferior derecha
+            (50, 50),    # Esquina superior izquierda
+            (400, 200),  # Centro del laberinto
+        ]
+    }
+}
+
 # Árbol central (treeC) hitbox
 CENTRAL_TREE_HITBOX_X = 0.3   # Porcentaje de desplazamiento en X
 CENTRAL_TREE_HITBOX_Y = 0.6   # Porcentaje de desplazamiento en Y
