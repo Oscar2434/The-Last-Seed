@@ -36,7 +36,8 @@ Su misión es doble: defender el sagrado árbol central de los leñadores en el 
 
 ## 🕹️ Esencia del Gameplay
 
-El juego se estructura alrededor de dos experiencias únicas pero interconectadas:
+Menu de seleccion de dificultad y personajes
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/3adee8e1c3da80772ca1d24440f7ed58f0fa2ee6/imagenes_de_Readme/Menu%20de%20personajes.png)
 
 ### 🌳 Nivel 1: Defensa del Ecosistema
 Los jugadores experimentan la urgencia de la conservación protegiendo físicamente los árboles de leñadores automatizados. Cada árbol salvado representa un triunfo tangible contra la deforestación, mientras que los árboles perdidos muestran consecuencias visuales inmediatas (efectos de fuego) que refuerzan el impacto del daño ambiental.
@@ -48,14 +49,28 @@ Los jugadores experimentan la urgencia de la conservación protegiendo físicame
 - Estados visuales de salud con 5 niveles de deterioro
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/bb311372e776816a83174b31152df64124d3bef1/imagenes_de_Readme/Nivel-1.png))
 
-### 🏰 Nivel 2: Laberinto del Conocimiento  
+### 👻 Nivel 2: Laberinto del Conocimiento  
 Transforma la recolección de recursos en una aventura educativa donde cada ítem recolectado desbloquea diálogos informativos sobre su valor ecológico. El laberinto simboliza la complejidad de los ecosistemas y la necesidad de comprensión para navegarlos efectivamente.
 
-**Recursos Educativos**:
-- 🍌 **Cáscara de Plátano**: Enseña sobre compostaje y nutrientes orgánicos
-- 🥚 **Cáscara de Huevo**: Explica los beneficios minerales para el suelo
-- 💧 **Agua**: Demuestra la importancia de la hidratación en plantas
+**Características Únicas**:
+- **Fantasmas Educativos**: Espíritus que roban recursos y enseñan sobre consecuencias del descuido ambiental
+- **Evitación Estratégica**: Los jugadores deben esquivar fantasmas mientras recolectan recursos
+- **Recursos Educativos**:
+  - 🍌 **Cáscara de Plátano**: Enseña sobre compostaje y nutrientes orgánicos
+  - 🥚 **Cáscara de Huevo**: Explica los beneficios minerales para el suelo
+  - 💧 **Agua**: Demuestra la importancia de la hidratación en plantas
+- **Narrativa Interactiva**: Diálogos que se activan al recolectar recursos específicos
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/bb311372e776816a83174b31152df64124d3bef1/imagenes_de_Readme/Nivel-2.png)
+
+### 🌱 Nivel 3: Reforestación y Renacimiento
+El nivel final desafía a los jugadores a aplicar todo lo aprendido en una misión de reforestación a gran escala. Combinando elementos de estrategia y gestión de recursos, los jugadores deben plantar y cuidar nuevos árboles mientras protegen el bosque renacido de amenazas persistentes.
+
+**Características Principales**:
+- **Sistema de Plantación**: Selección estratégica de ubicaciones para nuevos árboles
+- **Cuidado Continuo**: Riego y protección de árboles jóvenes
+- **Amenazas Combinadas**: Desafíos que integran mecánicas de niveles anteriores
+- **Ecosistema Dinámico**: Visualización del crecimiento y desarrollo del bosque
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/e2f454a4c2bb48b616b3ccf59e695d25363aad26/imagenes_de_Readme/Nivel-3.png)
 
 ## 🔄 Innovación Educativa
 
