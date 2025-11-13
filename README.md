@@ -46,6 +46,7 @@ Los jugadores experimentan la urgencia de la conservación protegiendo físicame
 - Sistema de curación mediante interacción con árboles dañados
 - IA enemiga que selecciona objetivos arbóreos inteligentemente
 - Estados visuales de salud con 5 niveles de deterioro
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/bb311372e776816a83174b31152df64124d3bef1/imagenes_de_Readme/Nivel-1.png))
 
 ### 🏰 Nivel 2: Laberinto del Conocimiento  
 Transforma la recolección de recursos en una aventura educativa donde cada ítem recolectado desbloquea diálogos informativos sobre su valor ecológico. El laberinto simboliza la complejidad de los ecosistemas y la necesidad de comprensión para navegarlos efectivamente.
@@ -54,6 +55,7 @@ Transforma la recolección de recursos en una aventura educativa donde cada íte
 - 🍌 **Cáscara de Plátano**: Enseña sobre compostaje y nutrientes orgánicos
 - 🥚 **Cáscara de Huevo**: Explica los beneficios minerales para el suelo
 - 💧 **Agua**: Demuestra la importancia de la hidratación en plantas
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/bb311372e776816a83174b31152df64124d3bef1/imagenes_de_Readme/Nivel-2.png)
 
 ## 🔄 Innovación Educativa
 
