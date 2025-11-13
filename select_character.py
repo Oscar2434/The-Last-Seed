@@ -18,19 +18,21 @@ def load_image(name, scale=1.0):
         image = pygame.transform.scale(image, (w, h))
     return image
 
-# Fondo del menú
 background = load_image("portada.png")
 background = pygame.transform.scale(background, (constants.WIDTH, constants.HEIGHT))
 
-# Personajes (normal / hover)
+title_img = load_image("seleccionPj.png")
+
 boy_normal = load_image("seleccionNiño.png")
 boy_hover = load_image("seleccionNiño2.png")
 girl_normal = load_image("seleccionNiña.png")
 girl_hover = load_image("seleccionNiña2.png")
 
-# Dificultades
-normal_img = load_image("normal.png", 0.45)
+normal_img = load_image("principiante.png", 0.45)
+normal_hover = load_image("principianteR.png", 0.45)
+
 hard_img = load_image("avanzado.png", 0.45)
+hard_hover = load_image("avanzadoR.png", 0.45)
 
 class HoverButton:
     def __init__(self, x, y, normal_img, hover_img, name):
@@ -46,10 +48,12 @@ class HoverButton:
         self.hovered = self.rect.collidepoint(pos)
         img = self.hover if (self.hovered or self.selected) else self.normal
         surface.blit(img, self.rect)
+
         clicked = False
         if self.hovered and pygame.mouse.get_pressed()[0]:
             self.selected = True
             clicked = True
+
         return clicked
 
 class Button:
@@ -73,26 +77,31 @@ def show(level=1):
     selected_character = None
     selected_difficulty = None
 
-    # Posicionamiento centrado
     center_x = constants.WIDTH // 2
-    center_y = constants.HEIGHT // 2 - 50
 
-    # Personajes
+    title_rect = title_img.get_rect(midtop=(center_x, int(constants.HEIGHT * 0.001)))
+
+    character_y = constants.HEIGHT // 2 + 60
+
     spacing_x = 230
     boy_x = center_x - spacing_x
     girl_x = center_x + spacing_x
-    character_y = center_y - 60
 
     boy_btn = HoverButton(boy_x, character_y, boy_normal, boy_hover, "niño")
     girl_btn = HoverButton(girl_x, character_y, girl_normal, girl_hover, "niña")
 
-    # Dificultades — centradas bajo cada personaje
-    difficulty_y = center_y + 160
-    normal_x = boy_x
-    hard_x = girl_x
+    gap_center_x = center_x
+    diff_top_y = character_y - int(constants.HEIGHT * 0.05)
 
-    normal_btn = Button(normal_x, difficulty_y, normal_img, "normal")
-    hard_btn = Button(hard_x, difficulty_y, hard_img, "avanzado")
+    normal_btn = HoverButton(gap_center_x, diff_top_y, normal_img, normal_hover, "normal")
+
+    hard_btn = HoverButton(
+        gap_center_x,
+        diff_top_y + normal_img.get_height() + int(constants.HEIGHT * 0.03),
+        hard_img,
+        hard_hover,
+        "avanzado"
+    )
 
     while True:
         for event in pygame.event.get():
@@ -101,28 +110,28 @@ def show(level=1):
                 sys.exit()
 
         screen.blit(background, (0, 0))
+        screen.blit(title_img, title_rect)
 
-        # Dibujar y gestionar personajes
         if boy_btn.draw(screen):
             selected_character = "niño"
             boy_btn.selected = True
             girl_btn.selected = False
+
         if girl_btn.draw(screen):
             selected_character = "niña"
             girl_btn.selected = True
             boy_btn.selected = False
 
-        # Dibujar y gestionar dificultad
         if normal_btn.draw(screen):
             selected_difficulty = "normal"
             normal_btn.selected = True
             hard_btn.selected = False
+
         if hard_btn.draw(screen):
             selected_difficulty = "avanzado"
             hard_btn.selected = True
             normal_btn.selected = False
 
-        # Si ambas selecciones están listas, avanzar
         if selected_character and selected_difficulty:
             config.selected_character = selected_character
             config.difficulty = selected_difficulty
