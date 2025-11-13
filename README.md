@@ -1,166 +1,101 @@
-# 🌱 The Last Seed: El Guardián del Bosque
+# 🌱 The Last Seed: El Guardián del Bosque  
 
-![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
-![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=pygame)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-![Age](https://img.shields.io/badge/Age%203--12-Educational-orange)
-![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)  
+![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=pygame)  
+![License](https://img.shields.io/badge/License-MIT-yellow)  
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)  
+![Edad](https://img.shields.io/badge/Edad%203--12-Educativo-orange)  
 
-**The Last Seed** es un videojuego educativo desarrollado en Python que combina acción, estrategia y conciencia ecológica. A través de dos niveles únicos, los jugadores se convierten en guardianes del bosque con la misión de proteger la naturaleza mientras aprenden valiosas lecciones sobre conservación ambiental.
+## 🎮 Trascendencia del Juego
 
-## 🎮 Características Principales
+**The Last Seed** es un videojuego educativo desarrollado en Python que narra la épica misión del **OBS 15**, un espíritu guardián ancestral de la naturaleza que despierta en un bosque amenazado por la destrucción humana. Los jugadores encarnan a este protector ambiental en una carrera contra el tiempo para salvar "La Última Semilla", fusionando acción estratégica con educación ecológica en una experiencia inmersiva.
 
-### 🎯 **Sistema de Niveles Completos**
-- **Nivel 1**: Defensa del Ecosistema - Protege el árbol central de leñadores
-- **Nivel 2**: Laberinto de la Naturaleza - Recolecta recursos educativos en un laberinto
-- **Sistema de progresión** entre niveles
-- **Objetivos claros** y mensajes educativos
+El proyecto representa una innovadora herramienta pedagógica que transforma conceptos complejos de ecología en experiencias de juego accesibles para niños de 3 a 12 años. A través de dos niveles distintos pero complementarios, los jugadores no solo se divierten, sino que internalizan valores de conservación mediante mecánicas de juego diseñadas específicamente para el aprendizaje experiencial.
 
-### 👥 **Selección de Personaje y Dificultad**
-- **Elección entre Niño y Niña** con sprites únicos
-- **Sistema de dificultad ajustable** (Normal/Avanzado)
-- **Menú interactivo** con efectos hover
-- **Configuración persistente** entre niveles
+## 🌍 Contexto Narrativo
 
-### 🌳 **Mecánicas de Juego Avanzadas**
-- **Sistema de salud visual** para árboles con barras de vida
-- **Recursos animados** (agua con efectos de animación)
-- **Efectos de partículas** (fuego en árboles dañados)
-- **Sistema de inventario** para recursos recolectados
+En un mundo donde la deforestación avanza implacable, el **OBS 15** emerge como la última esperanza del bosque. Este espíritu, que puede manifestarse como un niño o niña según la elección del jugador, posee la capacidad única de interactuar con la esencia vital de los árboles y recursos naturales. 
 
-## 🏗️ Arquitectura del Proyecto
-TheLastSeed/
-├── 🎯 Nivel 1 - Defensa del Ecosistema
-│ ├── main.py
-│ ├── character.py
-│ ├── world.py
-│ ├── enemy.py
-│ ├── central_tree.py
-│ ├── resources.py
-│ └── fire.py
-│
-├── 🏰 Nivel 2 - Laberinto de la Naturaleza
-│ ├── nivel_2.py
-│ ├── character_nivel_2.py
-│ ├── world_nivel2.py
-│ ├── ambient_nivel2.py
-│ ├── enemy_nivel2.py
-│ └── resources_nivel_2.py
-│
-├── ⚙️ Sistema Central
-│ ├── constants.py
-│ ├── config.py
-│ ├── select_character.py
-│ └── assets/
-│ ├── images/
-│ │ ├── character/
-│ │ ├── objects/
-│ │ ├── Muros/
-│ │ ├── fantasma/
-│ │ └── effects/
-│ └── sonidos/
+**Relación con OBS 15**: El personaje principal representa la conciencia ecológica que guía a los jugadores. OBS 15 no es solo un avatar jugable, sino la personificación de la conexión ancestral entre la humanidad y la naturaleza, despertando en el momento crítico para enseñar a las nuevas generaciones el valor de la conservación.
 
-## 🎯 Objetivos por Nivel
+Su misión es doble: defender el sagrado árbol central de los leñadores en el Nivel 1 y recuperar los recursos educativos perdidos en el laberinto del Nivel 2.
+
+## 🎯 Metas Fundamentales
+
+### Objetivos Educativos
+- **Conciencia Ecológica**: Enseñar sobre compostaje, minerales naturales y conservación del agua
+- **Pensamiento Estratégico**: Desarrollar habilidades de planificación y gestión de recursos
+- **Resolución de Problemas**: Fomentar el análisis de situaciones complejas bajo presión temporal
+- **Valores Ambientales**: Inculcar respeto por la biodiversidad y comprensión de ecosistemas
+
+### Objetivos Técnicos
+- **Accesibilidad**: Interface intuitiva adecuada para diferentes grupos de edad
+- **Escalabilidad**: Sistema de dificultad que se adapta al progreso del jugador
+- **Inmersión**: Gráficos atractivos y mecánicas fluidas que mantienen el engagement
+- **Modularidad**: Arquitectura de código que permite expansiones futuras
+
+## 🕹️ Esencia del Gameplay
+
+El juego se estructura alrededor de dos experiencias únicas pero interconectadas:
 
 ### 🌳 Nivel 1: Defensa del Ecosistema
-**Victoria:**
-- ✅ Mantener el árbol central con vida
-- ✅ Conservar al menos 3 árboles normales vivos  
-- ✅ Sobrevivir hasta que termine el tiempo
+Los jugadores experimentan la urgencia de la conservación protegiendo físicamente los árboles de leñadores automatizados. Cada árbol salvado representa un triunfo tangible contra la deforestación, mientras que los árboles perdidos muestran consecuencias visuales inmediatas (efectos de fuego) que refuerzan el impacto del daño ambiental.
 
-**Mecánicas:**
-- **Recolecta cubetas de agua** que aparecen aleatoriamente
-- **Cura árboles dañados** presionando `E` cerca de ellos
-- **Evita leñadores** que atacan árboles continuamente
-- **Sistema de fuego** en árboles con salud crítica
+**Mecánicas Principales**:
+- Recolección estratégica de recursos de agua animados
+- Sistema de curación mediante interacción con árboles dañados
+- IA enemiga que selecciona objetivos arbóreos inteligentemente
+- Estados visuales de salud con 5 niveles de deterioro
 
-### 🏰 Nivel 2: Laberinto de la Naturaleza
-**Victoria:**
-- ✅ Recolectar 3 recursos educativos:
-  - 🍌 Cáscara de plátano (composta)
-  - 🥚 Cáscara de huevo (minerales) 
-  - 💧 Agua (hidratación)
-- ✅ Entregarlos al árbol central presionando `E`
-- ✅ Evitar ser capturado por fantasmas
+### 🏰 Nivel 2: Laberinto del Conocimiento  
+Transforma la recolección de recursos en una aventura educativa donde cada ítem recolectado desbloquea diálogos informativos sobre su valor ecológico. El laberinto simboliza la complejidad de los ecosistemas y la necesidad de comprensión para navegarlos efectivamente.
 
-**Características Únicas:**
-- **Laberinto procedural** con diferentes tipos de muros
-- **Diálogos educativos** que explican beneficios ecológicos
-- **Fantasmas inteligentes** que persiguen al jugador
-- **Temporizador** con pausas durante diálogos
+**Recursos Educativos**:
+- 🍌 **Cáscara de Plátano**: Enseña sobre compostaje y nutrientes orgánicos
+- 🥚 **Cáscara de Huevo**: Explica los beneficios minerales para el suelo
+- 💧 **Agua**: Demuestra la importancia de la hidratación en plantas
 
-## 👾 Sistema de Enemigos
+## 🔄 Innovación Educativa
 
-### 🔥 Leñadores (Nivel 1)
-- **IA de ataque a árboles**: Eligen objetivos estratégicamente
-- **Sistema de animaciones**: 6 estados diferentes
-- **Detección de colisiones**: Evitan obstáculos y otros árboles
-- **Ataque coordinado**: Múltiples enemigos atacan diferentes objetivos
+**The Last Seed** revoluciona el aprendizaje ambiental mediante:
 
-### 👻 Fantasmas (Nivel 2)
-- **Persecución inteligente**: Siguen al jugador por el laberinto
-- **Evitación de obstáculos**: Navegan alrededor de muros
-- **Sprites direccionales**: Cambian según la dirección del movimiento
-- **Detección de captura**: Sistema de colisión preciso
-
-## 🎨 Sistema Gráfico y Animaciones
-
-### 🏃 Animaciones de Personaje
-- **Spritesheet completo**: 4 direcciones × 3 frames cada una
-- **Transiciones suaves**: Entre estados de movimiento y idle
-- **Flip horizontal**: Optimización de recursos para dirección izquierda
-- **Sistema de timing**: Frame rate consistente
-
-### 🔥 Efectos Visuales
-- **Fuego animado**: Partículas en árboles dañados (5 frames)
-- **Agua animada**: Cubetas con efectos de reflejo (10 frames) 
-- **Barra de vida**: Visualización clara del estado de árboles
-- **Interfaz de usuario**: Inventario y temporizador no intrusivos
-
-## 🎮 Controles
-
-| Acción | Tecla | Nivel 1 | Nivel 2 |
-|--------|-------|---------|---------|
-| **Movimiento** | `↑` `↓` `←` `→` | ✅ | ✅ |
-| **Interactuar/Curar** | `E` | ✅ | ✅ |
-| **Continuar diálogos** | `ESPACIO` | ❌ | ✅ |
-| **Recolectar recursos** | Automático | ✅ | ✅ |
-
-## ⚙️ Sistema de Dificultad
-
-### 🎯 Configuración por Nivel
-
-**Nivel 1:**
-- **Normal**: Velocidad 1, Daño 2, Tiempo 90s, 5 enemigos
-- **Avanzado**: Velocidad 2, Daño 6, Tiempo 60s, 8 enemigos
-
-**Nivel 2:**
-- **Normal**: 2 fantasmas en posiciones estratégicas
-- **Avanzado**: 3 fantasmas con cobertura completa
-
-## 🌟 Valor Educativo
-
-### 📚 Aprendizaje Integrado
-- **Compostaje**: Cáscaras de plátano como abono orgánico
-- **Minerales naturales**: Cáscaras de huevo como fuente de calcio
-- **Conservación del agua**: Importancia de la hidratación para plantas
-- **Reforestación**: Protección y cuidado de árboles
-- **Biodiversidad**: Equilibrio en el ecosistema
-
-### 💡 Mensajes Educativos
-- Diálogos contextuales que explican conceptos ecológicos
-- Sistema de retroalimentación inmediata
-- Aprendizaje through gameplay sin interrupciones forzadas
+- **Contextualización Natural**: Los conceptos ecológicos emergen orgánicamente de las mecánicas de juego
+- **Retroalimentación Visual Inmediata**: Los árboles muestran estados de salud visibles y consecuencias del daño
+- **Aprendizaje por Descubrimiento**: Los jugadores experimentan directamente las relaciones ecológicas
+- **Narrativa Empoderadora**: El OBS 15 como figura inspiradora que conecta con la mitología ambiental
 
 ## 🛠️ Instalación y Ejecución
 
 ### Prerrequisitos
 ```bash
-# Python 3.8 o superior
-python --version
+# Python 3.8 o superior requerido (Nota: si es muy actual puede dar conflictos con pygame)
+python --version 
 
 # Instalar Pygame
 pip install pygame
 
-# Tener Python 3.8 o superior instalado
-python --version
+## 🎮 Controles del OBS 15
+
+┌───────────────────┬──────────┬─────────┬─────────┬─────────────────────────┐
+│      ACCIÓN       │   TECLA  │ NIVEL 1 │ NIVEL 2 │       DESCRIPCIÓN       │
+├───────────────────┼──────────┼─────────┼─────────┼─────────────────────────┤
+│ Movimiento Arriba │    ↑     │    ✅   │    ✅  │ Mover hacia arriba      │
+│ Movimiento Abajo  │    ↓     │    ✅   │    ✅  │ Mover hacia abajo       │
+│ Movimiento Izq.   │    ←     │    ✅   │    ✅  │ Mover hacia izquierda   │
+│ Movimiento Der.   │    →     │    ✅   │    ✅  │ Mover hacia derecha     │
+│ Interactuar/Curar │    E     │    ✅   │    ✅  │ Curar/entregar recursos │
+│ Continuar Diálogos│  ESPACIO │    ❌   │    ✅  │ Avanzar conversaciones  │
+│ Recolectar        │Automático│    ✅   │    ✅  │ Por contacto            │
+└───────────────────┴──────────┴─────────┴─────────┴─────────────────────────┘
+
+### 📋 Leyenda de Símbolos
+- ✅ **Disponible**: La función está activa en este nivel
+- ❌ **No disponible**: La función no está presente en este nivel
+- ✅* **Condicional**: Disponible solo en contextos específicos
+
+### 🎯 Notas de Uso
+- **Movimiento Exclusivo**: Solo las teclas de flecha controlan el movimiento del OBS 15
+- **Interacción Contextual**: La tecla `E` tiene funciones diferentes según el nivel y situación
+- **Recolección Automática**: No requiere tecla adicional, ocurre al pasar sobre recursos
+- **Diálogos Educativos**: Solo en Nivel 2, pausan el juego para aprendizaje
+- **Menús Interactivos**: El mouse solo se usa en pantallas de selección inicial
