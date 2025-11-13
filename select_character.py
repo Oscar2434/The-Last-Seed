@@ -132,15 +132,26 @@ def show(level=1):
             hard_btn.selected = True
             normal_btn.selected = False
 
+        # ----------------------------
+        # ÚNICA MODIFICACIÓN AQUI
+        # ----------------------------
         if selected_character and selected_difficulty:
             config.selected_character = selected_character
             config.difficulty = selected_difficulty
             pygame.time.delay(250)
+
             if level == 1:
                 main.main()
-            else:
+
+            elif level == 2:
                 nivel_2.main()
+
+            elif level == 3:
+                import nivel_3
+                nivel_3.main()
+
             return
+        # ----------------------------
 
         pygame.display.update()
         clock.tick(60)

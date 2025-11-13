@@ -1,6 +1,7 @@
 import constants
 import pygame
 import os
+
 class Tree:
     def __init__(self, x, y):
         self.x = x
@@ -40,16 +41,98 @@ class Bush:
     def draw(self, screen):
        screen.blit(self.image, (self.x, self.y))
 
-class Wall:
+class CentralTree:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+        self.type = "central_tree" 
         
-        wall_path = os.path.join('assets', 'images', 'objects', 'lave.png')
-        self.image = pygame.image.load(wall_path).convert_alpha() 
-        # ⬇️ USAR EL TAMAÑO REAL SIN ESCALAR ⬇️
-        # self.image = pygame.transform.scale(self.image, (64, 51))  # QUITA ESTA LÍNEA
-        self.size = self.image.get_width()  # Esto será el tamaño real
+        # Cargar imagen del árbol central
+        tree_path = os.path.join('assets', 'images', 'objects', 'treeC.png')
+        try:
+            self.image = pygame.image.load(tree_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (80, 80))
+        except:
+            # Placeholder si no existe la imagen
+            self.image = pygame.Surface((80, 80), pygame.SRCALPHA)
+            pygame.draw.rect(self.image, (0, 100, 0), (0, 0, 80, 80))
+        
+        self.size = self.image.get_width()
 
     def draw(self, screen):
-       screen.blit(self.image, (self.x, self.y))      
+        screen.blit(self.image, (self.x, self.y))
+
+class Wall:
+    def __init__(self, x, y, wall_type="normal", scale=None):
+        self.x = x
+        self.y = y
+        self.wall_type = wall_type
+        
+        # Usar escala de constants si no se proporciona
+        if scale is None:
+            self.scale = constants.WALL_SCALE
+        else:
+            self.scale = scale
+        
+        # Elegir imagen según el tipo de pared
+        if wall_type == "vertical_con_final":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'pendiente.png')
+        elif wall_type == "vertical_sin_final":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'vertical_sin_final.png')
+        elif wall_type == "horizontal_con_final":
+            wall_path = os.path.join('assets', 'images', 'Muros', 'horizontal_con_final.png')
+        elif wall_type == "horizontal_sin_final":   
+            wall_path = os.path.join('assets', 'images', 'Muros', 'horizontal_sin_final.png')
+        else:
+            wall_path = os.path.join('assets', 'images', 'Muros', 'horizontal_sin_final.png')
+            
+        # Cargar y escalar imagen
+        self.original_image = pygame.image.load(wall_path).convert_alpha()
+        original_width = self.original_image.get_width()
+        original_height = self.original_image.get_height()
+        
+        new_width = int(original_width * self.scale)
+        new_height = int(original_height * self.scale)
+        
+        self.image = pygame.transform.scale(self.original_image, (new_width, new_height))
+        self.size = self.image.get_width()
+
+    def draw(self, screen):
+       screen.blit(self.image, (self.x, self.y))
+
+class Resource:
+    def __init__(self, x, y, resource_type):
+        self.x = x
+        self.y = y
+        self.type = resource_type  # "composta", "agua", "semillas"
+        self.collected = False
+        self.size = 30  # Tamaño para colisiones
+        
+        # Cargar imagen según el tipo de recurso
+        if resource_type == "composta":
+            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
+        elif resource_type == "semillas":
+            image_path = os.path.join('assets', 'images', 'Items', 'huevo.png')
+        else:
+            # Imagen por defecto si no existe
+            image_path = os.path.join('assets', 'images', 'Items', 'banana.png')
+
+        try:
+            self.image = pygame.image.load(image_path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (self.size, self.size))
+        except:
+            # Crear un placeholder si la imagen no existe
+            self.image = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+            pygame.draw.circle(self.image, (255, 0, 0), (self.size//2, self.size//2), self.size//2)
+
+    def draw(self, screen):
+        if not self.collected:
+            screen.blit(self.image, (self.x, self.y))
+    
+    def get_dialog_text(self):
+        # Textos educativos para cada recurso
+        dialogs = {
+            "composta": "¡Excelente! La cascara de platano servira como composta para la plantas. \nLa comoposta son nutrientes que ayudaran a las plantas a crecer fuertes.",
+            "semillas": "¡Excelente! La cáscara de huevo es rica en calcio y otros minerales que\nbenefician el suelo y las plantas."
+        }
+        return dialogs.get(self.type, "Este recurso ayuda a las plantas a crecer.")

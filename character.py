@@ -27,7 +27,7 @@ class Character:
         self.moving = False 
         self.facing_left = False
         self.animations = self.load_animatios()
-        self.carrying_resource = None   # puede cargar un recurso
+        self.carrying_resource = None  
 
     def load_animatios(self):
         animations = {}

@@ -61,10 +61,9 @@ TREE_HEALTH = 280
 ENEMY_DAMAGE = 2
 ENEMY_SPEED = 1
 RESOURCE_HEAL = 20
-LEVEL_TIME = 60  # segundos
+LEVEL_TIME = 60  
 
 # Configuraciones de niveles
-# --- CONFIGURACIÓN DE DIFICULTADES ---
 DIFFICULTY_SETTINGS = {
     "normal": {
         "ENEMY_SPEED": 1,
@@ -81,3 +80,32 @@ DIFFICULTY_SETTINGS = {
         "spawn_delay": 240
     }
 }
+
+LEVEL_2_SETTINGS = {
+    "normal": {
+        "max_enemies": 2,  
+        "enemy_positions": [
+            (700, 400),  
+            (50, 50),    
+        ]
+    },
+    "avanzado": {
+        "max_enemies": 3,  
+        "enemy_positions": [
+            (700, 400),  
+            (50, 50),    
+            (400, 200),  
+        ]
+    }
+}
+# Árbol central 
+CENTRAL_TREE_HITBOX_X = 0.3  
+CENTRAL_TREE_HITBOX_Y = 0.6 
+CENTRAL_TREE_HITBOX_WIDTH = 0.4 
+CENTRAL_TREE_HITBOX_HEIGHT = 0.4
+
+# Escala de los muros 
+WALL_SCALE = 0.7
+
+# Margen para hitbox de interacción
+INTERACTION_MARGIN = 30

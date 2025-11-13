@@ -25,7 +25,7 @@ class CentralTree:
         self.health += amount
         if self.health > constants.TREE_HEALTH:
             self.health = constants.TREE_HEALTH
-        # 💧 Apagar fuegos al curar
+    
         self.fires.clear()
 
     def add_fire(self, big=False):

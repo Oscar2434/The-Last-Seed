@@ -1,6 +1,7 @@
 import pygame
 import constants 
 import os
+import config  
 from constants import *
 
 #Clase del personaje
@@ -8,7 +9,20 @@ class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
-         image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+         
+         self.gy = 18 
+         self.gx = 12 
+         self.ry = 0.6 
+         self.rx = 0.55 
+         
+         if hasattr(config, "selected_character"):
+             if config.selected_character == "niña":
+                 image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
+             else:
+                 image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+         else:
+             image_path = os.path.join('assets', 'images', 'character', 'nino.png')
+
          self.sprite = pygame.image.load(image_path).convert_alpha()
          self.frame_size = F_SIZE
          self.animation_frame = 0
@@ -47,6 +61,7 @@ class Character:
         if self.facing_left:
             current_image = pygame.transform.flip(current_image, True, False)
         screen.blit(current_image, (self.x, self.y))
+     
 
     def move(self, dx, dy, world):
          self.moving = dx != 0 or dy != 0
@@ -86,7 +101,7 @@ class Character:
                  self.moving = False
                  return
 
-         #Colisión con el árbol central
+         
          if hasattr(world, "central_tree") and world.central_tree:
              if self.check_collision(new_x, new_y, world.central_tree):
                  self.moving = False
@@ -97,19 +112,49 @@ class Character:
          self.x = max(0, min(self.x, constants.WIDTH - constants.PERSONAJE))
          self.y = max(0, min(self.y, constants.HEIGHT - constants.PERSONAJE))
          self.update_animation()
+         
+         
+         self.near_resource = self.check_near_resource(world.resources)
 
-    def check_collision(self, x, y, obj):  # ⬅️ ESTE MÉTODO DEBE ESTAR DENTRO DE LA CLASE
-        # Si el objeto tiene ancho y alto diferentes
+    def check_collision(self, x, y, obj):
+        
+        if hasattr(obj, 'get_rect'):
+            obj_rect = obj.get_rect()
+            player_rect = pygame.Rect(
+                x + self.gx,
+                y + self.gy,
+                constants.PERSONAJE * self.ry,  
+                constants.PERSONAJE * self.rx   
+            )
+            return player_rect.colliderect(obj_rect)
+        
         if hasattr(obj, 'image'):
-            width = obj.image.get_width() * 0.8  # 80% del ancho visual
-            height = obj.image.get_height() * 0.8  # 80% del alto visual
-            return (x < obj.x + width and x + constants.PERSONAJE * 0.8 > obj.x and 
-                    y < obj.y + height and y + constants.PERSONAJE * 0.8 > obj.y)
-        else:
-            # Fallback al método original
-            return (x < obj.x + obj.size * 0.3 and x + constants.PERSONAJE * 0.3 > obj.x and 
-                    y < obj.y + obj.size * 0.1 and y + constants.PERSONAJE * 0.1 > obj.y)
-    
+           
+            if hasattr(obj, 'type') and obj.type == "central_tree":
+                
+                x_offset = obj.image.get_width() * constants.CENTRAL_TREE_HITBOX_X
+                y_offset = obj.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y
+                width = obj.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH
+                height = obj.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT
+
+                tree_rect = pygame.Rect(obj.x + x_offset, obj.y + y_offset, width, height)
+            else:
+                width = obj.image.get_width() * 0.9
+                height = obj.image.get_height() * 0.7
+
+                tree_rect = pygame.Rect(obj.x, obj.y, width, height)
+
+            player_rect = pygame.Rect(
+                x + self.gx,
+                y + self.gy,
+                constants.PERSONAJE * self.ry,
+                constants.PERSONAJE * self.rx
+            )
+
+            return player_rect.colliderect(tree_rect)
+        
+        return False
+
     def check_collect_resource(self, resources):
         for resource in resources:
             if not resource.collected and self.check_collision(self.x, self.y, resource):
@@ -122,3 +167,10 @@ class Character:
         if self.carrying_resource:
             tree.heal(constants.RESOURCE_HEAL)
             self.carrying_resource = None
+
+    def check_near_resource(self, resources):
+      
+        for resource in resources:
+            if not resource.collected and self.check_collision(self.x, self.y, resource):
+                return resource
+        return None
