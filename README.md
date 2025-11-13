@@ -36,7 +36,8 @@ Su misión es doble: defender el sagrado árbol central de los leñadores en el 
 
 ## 🕹️ Esencia del Gameplay
 
-El juego se estructura alrededor de dos experiencias únicas pero interconectadas:
+Menu de seleccion de dificultad y personajes
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/3adee8e1c3da80772ca1d24440f7ed58f0fa2ee6/imagenes_de_Readme/Menu%20de%20personajes.png)
 
 ### 🌳 Nivel 1: Defensa del Ecosistema
 Los jugadores experimentan la urgencia de la conservación protegiendo físicamente los árboles de leñadores automatizados. Cada árbol salvado representa un triunfo tangible contra la deforestación, mientras que los árboles perdidos muestran consecuencias visuales inmediatas (efectos de fuego) que refuerzan el impacto del daño ambiental.
