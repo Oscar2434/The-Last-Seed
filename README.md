@@ -48,14 +48,28 @@ Los jugadores experimentan la urgencia de la conservación protegiendo físicame
 - Estados visuales de salud con 5 niveles de deterioro
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/bb311372e776816a83174b31152df64124d3bef1/imagenes_de_Readme/Nivel-1.png))
 
-### 🏰 Nivel 2: Laberinto del Conocimiento  
+### 👻 Nivel 2: Laberinto del Conocimiento  
 Transforma la recolección de recursos en una aventura educativa donde cada ítem recolectado desbloquea diálogos informativos sobre su valor ecológico. El laberinto simboliza la complejidad de los ecosistemas y la necesidad de comprensión para navegarlos efectivamente.
 
-**Recursos Educativos**:
-- 🍌 **Cáscara de Plátano**: Enseña sobre compostaje y nutrientes orgánicos
-- 🥚 **Cáscara de Huevo**: Explica los beneficios minerales para el suelo
-- 💧 **Agua**: Demuestra la importancia de la hidratación en plantas
+**Características Únicas**:
+- **Fantasmas Educativos**: Espíritus que roban recursos y enseñan sobre consecuencias del descuido ambiental
+- **Evitación Estratégica**: Los jugadores deben esquivar fantasmas mientras recolectan recursos
+- **Recursos Educativos**:
+  - 🍌 **Cáscara de Plátano**: Enseña sobre compostaje y nutrientes orgánicos
+  - 🥚 **Cáscara de Huevo**: Explica los beneficios minerales para el suelo
+  - 💧 **Agua**: Demuestra la importancia de la hidratación en plantas
+- **Narrativa Interactiva**: Diálogos que se activan al recolectar recursos específicos
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/bb311372e776816a83174b31152df64124d3bef1/imagenes_de_Readme/Nivel-2.png)
+
+### 🌱 Nivel 3: Reforestación y Renacimiento
+El nivel final desafía a los jugadores a aplicar todo lo aprendido en una misión de reforestación a gran escala. Combinando elementos de estrategia y gestión de recursos, los jugadores deben plantar y cuidar nuevos árboles mientras protegen el bosque renacido de amenazas persistentes.
+
+**Características Principales**:
+- **Sistema de Plantación**: Selección estratégica de ubicaciones para nuevos árboles
+- **Cuidado Continuo**: Riego y protección de árboles jóvenes
+- **Amenazas Combinadas**: Desafíos que integran mecánicas de niveles anteriores
+- **Ecosistema Dinámico**: Visualización del crecimiento y desarrollo del bosque
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/e2f454a4c2bb48b616b3ccf59e695d25363aad26/imagenes_de_Readme/Nivel-3.png)
 
 ## 🔄 Innovación Educativa
 
