@@ -70,14 +70,14 @@ DIFFICULTY_SETTINGS = {
         "ENEMY_SPEED": 1,
         "ENEMY_DAMAGE": 2,
         "LEVEL_TIME": 90,
-        "max_enemies": 5,
+        "max_enemies": 1,  # ✅ MODIFICADO: 1 enemigo en normal
         "spawn_delay": 300
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
         "ENEMY_DAMAGE": 6,
         "LEVEL_TIME": 60,
-        "max_enemies": 8,
+        "max_enemies": 2,  # ✅ MODIFICADO: 2 enemigos en avanzado
         "spawn_delay": 240
     }
 }

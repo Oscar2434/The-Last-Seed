@@ -62,15 +62,7 @@ class Character:
         if self.facing_left:
             current_image = pygame.transform.flip(current_image, True, False)
         screen.blit(current_image, (self.x, self.y))
-        
-        # ⬇️ DEBUG: Dibujar rectángulo de colisión del PERSONAJE en AZUL ⬇️
-        debug_rect = pygame.Rect(
-            self.x + self.gx,  # ⬅️ AJUSTAR: Mover hitbox 10px a la DERECHA
-            self.y + self.gy,  # ⬅️ AJUSTAR: Mover hitbox 20px hacia ABAJO
-            constants.PERSONAJE * self.ry,  # 60% del ancho
-            constants.PERSONAJE * self.rx   # 60% del alto
-        )
-        pygame.draw.rect(screen, (0, 0, 255), debug_rect, 2)  # Azul, línea de 2px
+        # ✅ ELIMINADO: Dibujar rectángulo de colisión del PERSONAJE
 
     def move(self, dx, dy, world):
          self.moving = dx != 0 or dy != 0

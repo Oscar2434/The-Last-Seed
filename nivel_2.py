@@ -21,22 +21,45 @@ defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIG
 
 def draw_dialog(screen, text):
     """Dibujar cuadro de diálogo en pantalla"""
-    dialog_rect = pygame.Rect(50, constants.HEIGHT - 150, constants.WIDTH - 100, 120)
+    # ✅ MODIFICADO: Hacer el cuadro de diálogo más grande
+    dialog_rect = pygame.Rect(40, constants.HEIGHT - 180, constants.WIDTH - 80, 160)
     
     # Fondo del diálogo
     pygame.draw.rect(screen, (255, 255, 255), dialog_rect)
     pygame.draw.rect(screen, (0, 100, 0), dialog_rect, 3)  # Borde verde
     
     # Texto del diálogo
-    font = pygame.font.SysFont(None, 24)
-    y_offset = dialog_rect.y + 20
-    for line in text.split('\n'):
+    font = pygame.font.SysFont(None, 22)  # ✅ MODIFICADO: Fuente un poco más pequeña
+    y_offset = dialog_rect.y + 15
+    
+    # ✅ MODIFICADO: Dividir el texto en líneas más cortas
+    lines = []
+    for paragraph in text.split('\n'):
+        words = paragraph.split(' ')
+        current_line = ""
+        for word in words:
+            test_line = current_line + word + " "
+            # Verificar si la línea excede el ancho del diálogo
+            if font.size(test_line)[0] < dialog_rect.width - 40:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line.strip())
+                current_line = word + " "
+        if current_line:
+            lines.append(current_line.strip())
+    
+    # Dibujar cada línea
+    for line in lines:
+        if y_offset + 20 > dialog_rect.y + dialog_rect.height - 30:
+            break  # No dibujar más líneas si no caben
         text_surface = font.render(line, True, (0, 0, 0))
         screen.blit(text_surface, (dialog_rect.x + 20, y_offset))
-        y_offset += 30
+        y_offset += 22  # ✅ MODIFICADO: Espaciado entre líneas
     
     # Instrucción para continuar
-    continue_text = font.render("Presiona ESPACIO para continuar...", True, (100, 100, 100))
+    continue_font = pygame.font.SysFont(None, 20)
+    continue_text = continue_font.render("Presiona ESPACIO para continuar...", True, (100, 100, 100))
     screen.blit(continue_text, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
 
 def draw_inventory(screen, collected_resources):
@@ -109,7 +132,20 @@ def check_interaction(character, central_tree):
     
     return player_rect.colliderect(interaction_rect)
 
-def main():
+def show_defeat_screen(screen):
+    """Mostrar pantalla de derrota y esperar"""
+    screen.blit(defeat_img, (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(3000)  # Mostrar durante 3 segundos
+
+def show_victory_screen(screen):
+    """Mostrar pantalla de victoria y esperar"""
+    screen.blit(victory_img, (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(3000)  # Mostrar durante 3 segundos
+
+def run_level():
+    """Ejecutar un nivel completo y retornar el resultado"""
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
     game_character = Character(5, 386)
@@ -119,32 +155,82 @@ def main():
     game_world.set_central_tree(central_tree)
 
     start_ticks = pygame.time.get_ticks()
+    paused_time = 0  # ✅ NUEVO: Tiempo acumulado mientras está pausado
+    last_pause_start = 0  # ✅ NUEVO: Momento en que empezó la pausa actual
     
     collected_resources = []
     dialog_queue = []
-    game_paused = False
+    
+    # ✅ MODIFICADO: Diálogos iniciales con texto mejor dividido
+    initial_dialog = [
+        "EL LABERINTO DE LA NATURALEZA",
+        " ",
+        "OBJETIVO: Recolecta 3 recursos para",
+        "ayudar al árbol central:",
+        "• Cáscara de plátano (composta)",
+        "• Agua",
+        "• Cáscara de huevo",
+        " ",
+        "¡Cuidado! Los fantasmas te persiguen",
+        "por el laberinto. No dejes que te atrapen.",
+        
+        "CONTROLES:",
+        "• Flechas: Mover personaje",
+        "• E: Interactuar con árbol central", 
+        "• ESPACIO: Continuar diálogos",
+        " ",
+        "Tienes un límite de tiempo.",
+        "¡Buena suerte!"
+    ]
+    
+    # Añadir todos los diálogos iniciales a la cola
+    dialog_queue.extend(initial_dialog)
+    game_paused = True  # ✅ Pausar el juego al inicio
+    dialog_timer = pygame.time.get_ticks()  # ✅ Iniciar temporizador para diálogos
+    
     puede_entregar = False
-    dialog_timer = 0
+    
+    # ✅ NUEVO: Obtener dificultad (puedes cambiar esto según cómo manejes la dificultad)
+    try:
+        import config
+        difficulty = getattr(config, 'difficulty', 'normal')
+    except:
+        difficulty = 'normal'
+    
+    # ✅ NUEVO: Pasar dificultad al crear enemigos
+    game_world.create_enemies(difficulty)
     
     running = True
     while running:
         current_time = pygame.time.get_ticks()
         
+        # ✅ NUEVO: Calcular tiempo real de juego (excluyendo pausas)
+        if game_paused:
+            if last_pause_start == 0:
+                last_pause_start = current_time
+        else:
+            if last_pause_start > 0:
+                # Al despausar, sumar el tiempo que estuvo pausado
+                paused_time += current_time - last_pause_start
+                last_pause_start = 0
+        
+        # Tiempo real de juego (excluyendo pausas)
+        effective_time = current_time - start_ticks - paused_time
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
                 return "quit"
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_e and not game_paused:
                     if check_interaction(game_character, central_tree):
                         if puede_entregar:
-                            screen.blit(victory_img, (0, 0))
-                            pygame.display.flip()
-                            pygame.time.delay(3000)
+                            show_victory_screen(screen)
                             return "victory"
                         else:
-                            dialog_queue.append("El árbol central necesita todos los recursos para crecer fuerte. \nRecolecta composta, agua y semillas primero.")
+                            dialog_queue.append("El árbol central necesita todos los")
+                            dialog_queue.append("recursos para crecer fuerte.")
+                            dialog_queue.append("Recolecta composta, agua y semillas primero.")
                             if not game_paused:
                                 game_paused = True
                                 dialog_timer = current_time
@@ -191,9 +277,7 @@ def main():
                 
                 # ✅ NUEVO: Verificar si el enemigo capturó al jugador
                 if enemy.check_capture(game_character):
-                    screen.blit(defeat_img, (0, 0))
-                    pygame.display.flip()
-                    pygame.time.delay(3000)
+                    show_defeat_screen(screen)
                     return "defeat"
 
             # Recolección de recursos (código existente)
@@ -204,7 +288,9 @@ def main():
                     dialog_queue.append(resource.get_dialog_text())
                     
                     if len(collected_resources) == 2:
-                        dialog_queue.append("¡Has recolectado todos los recursos! \nAhora ve al árbol central y presiona 'E' para entregarlos.")
+                        dialog_queue.append("¡Has recolectado todos los recursos!")
+                        dialog_queue.append("Ahora ve al árbol central y")
+                        dialog_queue.append("presiona 'E' para entregarlos.")
                         puede_entregar = True
                     
                     collected_resources.append(temp_resource_type)
@@ -214,7 +300,8 @@ def main():
                         dialog_timer = current_time
                     
                     break
-        # ✅ NUEVO: Temporizador para diálogos automáticos (10 segundos)
+
+        # ✅ MODIFICADO: Temporizador para diálogos automáticos (10 segundos) - usa tiempo real
         if game_paused and dialog_queue and (current_time - dialog_timer > 10000):  # 10000 ms = 10 segundos
             dialog_queue.pop(0)  # Quitar diálogo actual por tiempo
             
@@ -223,8 +310,8 @@ def main():
             else:
                 game_paused = False
 
-        # Tiempo restante
-        seconds_passed = (current_time - start_ticks) // 1000
+        # ✅ MODIFICADO: Tiempo restante usando tiempo efectivo (excluyendo pausas)
+        seconds_passed = effective_time // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
         font = pygame.font.SysFont(None, 36)
         text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
@@ -235,25 +322,42 @@ def main():
 
         # ✅ MODIFICADO: Mostrar el primer diálogo de la cola
         if dialog_queue and game_paused:
-            draw_dialog(screen, dialog_queue[0])
+            # ✅ MODIFICADO: Unir las líneas para el cuadro de diálogo
+            dialog_text = "\n".join(dialog_queue[:8])  # Mostrar máximo 8 líneas a la vez
+            draw_dialog(screen, dialog_text)
             
             # ✅ NUEVO: Mostrar también el tiempo restante para el diálogo
             time_left = 12 - ((current_time - dialog_timer) // 1000)
             if time_left < 13:  # Solo mostrar los últimos 5 segundos
                 time_font = pygame.font.SysFont(None, 20)
                 time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
-                screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 170))
+                screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
 
-        # Condición de derrota por tiempo
+        # ✅ MODIFICADO: Condición de derrota por tiempo usando tiempo efectivo
         if remaining_time == 0:
-            screen.blit(defeat_img, (0, 0))
-            pygame.display.flip()
-            pygame.time.delay(3000)
+            show_defeat_screen(screen)
             return "defeat"
 
         pygame.display.flip()
         clock.tick(60)
 
+    return "quit"
+
+def main():
+    """Función principal que maneja la repetición del nivel"""
+    while True:
+        result = run_level()
+        
+        if result == "victory":
+            # Si gana, salir del bucle y terminar el nivel
+            break
+        elif result == "defeat":
+            # Si pierde, el bucle continúa y repite el nivel automáticamente
+            continue
+        elif result == "quit":
+            # Si el jugador cierra la ventana, salir
+            break
+    
     pygame.quit()
     sys.exit()
 

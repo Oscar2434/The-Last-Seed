@@ -71,13 +71,13 @@ class Enemy:
             screen.blit(self.placeholder, (self.x, self.y))
         
         # DEBUG: Dibujar rectángulo de colisión del ENEMIGO en ROJO
-        debug_rect = pygame.Rect(
-            self.x + self.gx,
-            self.y + self.gy,
-            constants.PERSONAJE * self.ry,
-            constants.PERSONAJE * self.rx
-        )
-        pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
+        #debug_rect = pygame.Rect(
+        #    self.x + self.gx,
+        #    self.y + self.gy,
+        #    constants.PERSONAJE * self.ry,
+        #    constants.PERSONAJE * self.rx
+        #)
+        #pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
 
     def move_towards_player(self, player_x, player_y, world):
         """Moverse hacia el jugador evitando obstáculos"""

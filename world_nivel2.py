@@ -21,7 +21,7 @@ class World:
 
         self.create_maze()
         self.create_resources()
-        self.create_enemies()  # ✅ NUEVO: Crear enemigos
+        # ✅ MODIFICADO: No crear enemigos aquí, se hará desde nivel_2.py con la dificultad
 
     def set_central_tree(self, central_tree):
         """Método para establecer el árbol central desde nivel_2.py"""
@@ -44,13 +44,20 @@ class World:
                 # Usar Resource normal para los demás
                 self.resources.append(Resource(x, y, resource_type))
 
-    def create_enemies(self):
-        """✅ NUEVO: Crear enemigos en posiciones estratégicas"""
-        # Puedes ajustar estas posiciones según tu laberinto
-        enemy_positions = [
+    def create_enemies(self, difficulty="normal"):
+        """✅ MODIFICADO: Crear enemigos según la dificultad"""
+        # Obtener número máximo de enemigos según dificultad
+        max_enemies = constants.DIFFICULTY_SETTINGS[difficulty]["max_enemies"]
+        
+        # Posiciones estratégicas para enemigos
+        all_enemy_positions = [
             (700, 400),  # Esquina inferior derecha
-            (50, 50),    # Esquina superior izquierda   # Centro del laberinto
+            (50, 50),    # Esquina superior izquierda
+            (400, 200),  # Centro del laberinto
         ]
+        
+        # Tomar solo las posiciones necesarias según la dificultad
+        enemy_positions = all_enemy_positions[:max_enemies]
         
         self.enemies.clear()
         for x, y in enemy_positions:
