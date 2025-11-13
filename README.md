@@ -29,7 +29,36 @@
 - **Sistema de inventario** para recursos recolectados
 
 ## 🏗️ Arquitectura del Proyecto
-
+TheLastSeed/
+├── 🎯 Nivel 1 - Defensa del Ecosistema
+│ ├── main.py
+│ ├── character.py
+│ ├── world.py
+│ ├── enemy.py
+│ ├── central_tree.py
+│ ├── resources.py
+│ └── fire.py
+│
+├── 🏰 Nivel 2 - Laberinto de la Naturaleza
+│ ├── nivel_2.py
+│ ├── character_nivel_2.py
+│ ├── world_nivel2.py
+│ ├── ambient_nivel2.py
+│ ├── enemy_nivel2.py
+│ └── resources_nivel_2.py
+│
+├── ⚙️ Sistema Central
+│ ├── constants.py
+│ ├── config.py
+│ ├── select_character.py
+│ └── assets/
+│ ├── images/
+│ │ ├── character/
+│ │ ├── objects/
+│ │ ├── Muros/
+│ │ ├── fantasma/
+│ │ └── effects/
+│ └── sonidos/
 
 ## 🎯 Objetivos por Nivel
 
