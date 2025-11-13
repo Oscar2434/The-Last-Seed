@@ -12,8 +12,8 @@ screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The last seed - Nivel 2")
 
 # Cargar imágenes de victoria/derrota
-victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'victoria.png')).convert_alpha()
-defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'derrota.png')).convert_alpha()
+victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
+defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
 
 # Escalarlas al tamaño de la ventana
 victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
@@ -21,18 +21,18 @@ defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIG
 
 def draw_dialog(screen, text):
     """Dibujar cuadro de diálogo en pantalla"""
-    
+    # ✅ MODIFICADO: Hacer el cuadro de diálogo más grande
     dialog_rect = pygame.Rect(40, constants.HEIGHT - 180, constants.WIDTH - 80, 160)
     
     # Fondo del diálogo
     pygame.draw.rect(screen, (255, 255, 255), dialog_rect)
-    pygame.draw.rect(screen, (0, 100, 0), dialog_rect, 3)  
+    pygame.draw.rect(screen, (0, 100, 0), dialog_rect, 3)  # Borde verde
     
     # Texto del diálogo
-    font = pygame.font.SysFont(None, 22)  
+    font = pygame.font.SysFont(None, 22)  # ✅ MODIFICADO: Fuente un poco más pequeña
     y_offset = dialog_rect.y + 15
     
-   
+    # ✅ MODIFICADO: Dividir el texto en líneas más cortas
     lines = []
     for paragraph in text.split('\n'):
         words = paragraph.split(' ')
@@ -83,7 +83,7 @@ def draw_inventory(screen, collected_resources):
     title = font.render("Inventario:", True, (255, 255, 255))
     screen.blit(title, (constants.WIDTH - 140, 15))
     
-   
+    # ✅ NUEVO: Mapeo de nombres amigables para los recursos
     resource_display_names = {
         "composta": "Cáscara Plátano",
         "agua": "Agua",
@@ -91,7 +91,7 @@ def draw_inventory(screen, collected_resources):
     }
     
     y_offset = 35
-   
+    # ✅ MODIFICADO: Usar el mapeo para mostrar nombres bonitos
     for resource_type in ["composta", "agua", "semillas"]:
         count = collected_resources.count(resource_type)
         display_name = resource_display_names.get(resource_type, resource_type)
@@ -122,7 +122,7 @@ def check_interaction(character, central_tree):
     if not interaction_rect:
         return False
     
-   
+    # Hitbox del personaje (la misma que usas para colisiones)
     player_rect = pygame.Rect(
         character.x + character.gx,
         character.y + character.gy,
@@ -136,13 +136,13 @@ def show_defeat_screen(screen):
     """Mostrar pantalla de derrota y esperar"""
     screen.blit(defeat_img, (0, 0))
     pygame.display.flip()
-    pygame.time.delay(3000)  
+    pygame.time.delay(3000)  # Mostrar durante 3 segundos
 
 def show_victory_screen(screen):
     """Mostrar pantalla de victoria y esperar"""
     screen.blit(victory_img, (0, 0))
     pygame.display.flip()
-    pygame.time.delay(3000)  
+    pygame.time.delay(3000)  # Mostrar durante 3 segundos
 
 def run_level():
     """Ejecutar un nivel completo y retornar el resultado"""
@@ -155,13 +155,13 @@ def run_level():
     game_world.set_central_tree(central_tree)
 
     start_ticks = pygame.time.get_ticks()
-    paused_time = 0 
-    last_pause_start = 0  
+    paused_time = 0  # ✅ NUEVO: Tiempo acumulado mientras está pausado
+    last_pause_start = 0  # ✅ NUEVO: Momento en que empezó la pausa actual
     
     collected_resources = []
     dialog_queue = []
     
-    
+    # ✅ MODIFICADO: Diálogos iniciales con texto mejor dividido
     initial_dialog = [
         "EL LABERINTO DE LA NATURALEZA",
         " ",
@@ -185,26 +185,26 @@ def run_level():
     
     # Añadir todos los diálogos iniciales a la cola
     dialog_queue.extend(initial_dialog)
-    game_paused = True  
-    dialog_timer = pygame.time.get_ticks()  
+    game_paused = True  # ✅ Pausar el juego al inicio
+    dialog_timer = pygame.time.get_ticks()  # ✅ Iniciar temporizador para diálogos
     
     puede_entregar = False
     
-   
+    # ✅ NUEVO: Obtener dificultad (puedes cambiar esto según cómo manejes la dificultad)
     try:
         import config
         difficulty = getattr(config, 'difficulty', 'normal')
     except:
         difficulty = 'normal'
     
-   
+    # ✅ NUEVO: Pasar dificultad al crear enemigos
     game_world.create_enemies(difficulty)
     
     running = True
     while running:
         current_time = pygame.time.get_ticks()
         
-       
+        # ✅ NUEVO: Calcular tiempo real de juego (excluyendo pausas)
         if game_paused:
             if last_pause_start == 0:
                 last_pause_start = current_time
@@ -255,7 +255,7 @@ def run_level():
         for resource in game_world.resources:
             resource.draw(screen)
         
-       
+        # ✅ NUEVO: Dibujar enemigos
         for enemy in game_world.enemies:
             enemy.draw(screen)
 
@@ -271,7 +271,7 @@ def run_level():
             if keys[pygame.K_DOWN]:
                 game_character.move(dx=0, dy=5, world=game_world)
 
-           
+            # ✅ NUEVO: Movimiento de enemigos hacia el jugador
             for enemy in game_world.enemies:
                 enemy.move_towards_player(game_character.x, game_character.y, game_world)
                 
@@ -301,39 +301,39 @@ def run_level():
                     
                     break
 
-       
-        if game_paused and dialog_queue and (current_time - dialog_timer > 10000):  
-            dialog_queue.pop(0)  
+        # ✅ MODIFICADO: Temporizador para diálogos automáticos (10 segundos) - usa tiempo real
+        if game_paused and dialog_queue and (current_time - dialog_timer > 10000):  # 10000 ms = 10 segundos
+            dialog_queue.pop(0)  # Quitar diálogo actual por tiempo
             
             if dialog_queue:
-                dialog_timer = current_time  
+                dialog_timer = current_time  # Reiniciar temporizador para el siguiente
             else:
                 game_paused = False
 
-       
+        # ✅ MODIFICADO: Tiempo restante usando tiempo efectivo (excluyendo pausas)
         seconds_passed = effective_time // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
         font = pygame.font.SysFont(None, 36)
         text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
         screen.blit(text, (10, 10))
 
-       
+        # Dibujar inventario
         draw_inventory(screen, collected_resources)
 
-        
+        # ✅ MODIFICADO: Mostrar el primer diálogo de la cola
         if dialog_queue and game_paused:
-           
-            dialog_text = "\n".join(dialog_queue[:8]) 
+            # ✅ MODIFICADO: Unir las líneas para el cuadro de diálogo
+            dialog_text = "\n".join(dialog_queue[:8])  # Mostrar máximo 8 líneas a la vez
             draw_dialog(screen, dialog_text)
             
-            
+            # ✅ NUEVO: Mostrar también el tiempo restante para el diálogo
             time_left = 12 - ((current_time - dialog_timer) // 1000)
-            if time_left < 13:  
+            if time_left < 13:  # Solo mostrar los últimos 5 segundos
                 time_font = pygame.font.SysFont(None, 20)
                 time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
                 screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
 
-   
+        # ✅ MODIFICADO: Condición de derrota por tiempo usando tiempo efectivo
         if remaining_time == 0:
             show_defeat_screen(screen)
             return "defeat"
