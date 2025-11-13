@@ -5,73 +5,110 @@ from button import Button
 import main
 import config
 import nivels
-#prueba
-pygame.init() #Inicializar pygame
 
-if config.music: #Reproducir las instruciones para que se reprodusca la musica del juego si la variable music que se encuentra en config es true que es verdadero
+pygame.init()
+
+if config.music:
     pygame.mixer.init()
-    pygame.mixer.music.load('music/prueba1.mp3')  #Ruta al archivo de música
-    pygame.mixer.music.play(-1)#Reproducir la música
+    pygame.mixer.music.load('music/prueba1.mp3')
+    pygame.mixer.music.play(-1)
 
-#ventana
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")
 
-#imágenes
-Fondo = pygame.image.load("imagenes\portada.png")
-button_config = pygame.image.load("imagenes\confi.png")
+# imágenes
+Fondo = pygame.image.load("imagenes\\portada.png")
+button_config = pygame.image.load("imagenes\\confi.png")
+title_img = pygame.image.load("imagenes\\titulo1.png").convert_alpha()
 
-#escalar imágenes
 Fondo = pygame.transform.scale(Fondo, (constants.WIDTH, constants.HEIGHT))
-button_config = pygame.transform.scale(button_config, ( 120, 100))
+button_config = pygame.transform.scale(button_config, (120, 100))
 
+# escala del título 
+title_img = pygame.transform.scale(
+    title_img,
+    (
+        int(title_img.get_width() * 0.90),
+        int(title_img.get_height() * 0.90)
+    )
+)
 
-#botones 
-    #config
-config_button = Button( 150 // 2 - button_config.get_width() // 2, 800 // 2 - button_config.get_height() // 2, button_config, 1)
+title_rect = title_img.get_rect(center=(constants.WIDTH // 2, 250))
 
-#Bucle
+# botón config
+config_button = Button(
+    150 // 2 - button_config.get_width() // 2,
+    800 // 2 - button_config.get_height() // 2,
+    button_config, 1
+)
+
 def menu():
     run = True
     while run:
-        # Cargar imágenes dinámicamente según el lenguaje
-        if config.lenguaje:  # Inglés
-            button_play = pygame.image.load("imagenes\Play.png")
-            button_exit = pygame.image.load("imagenes\Exit.png")
-        else:  # Español
-            button_play = pygame.image.load("imagenes\Jugar.png")
-            button_exit = pygame.image.load("imagenes\Salida.png")
 
-        # Escalar imágenes
-        button_play = pygame.transform.scale(button_play, (300, 100))
-        button_exit = pygame.transform.scale(button_exit, (200, 100))
+        # cargar imágenes por idioma
+        if config.lenguaje:
+            play_normal = pygame.image.load("imagenes\\Play.png")
+            play_hover  = pygame.image.load("imagenes\\PlayR.png")
 
-        # Actualizar botones
-        play_button = Button(780 // 2 - button_play.get_width() // 2, 500 // 2 - button_play.get_height() // 2, button_play, 1)
-        exit_button = Button(780 // 2 - button_exit.get_width() // 2, 800 // 2 - button_exit.get_height() // 2, button_exit, 1)
+            exit_normal = pygame.image.load("imagenes\\Exit.png")
+        else:
+            play_normal = pygame.image.load("imagenes\\Jugar.png")
+            play_hover  = pygame.image.load("imagenes\\playR.png")
 
-        # Dibujar fondo
+            exit_normal = pygame.image.load("imagenes\\Salida.png")
+
+        # ESCALAR
+        play_normal = pygame.transform.scale(play_normal, (300, 100))
+        play_hover  = pygame.transform.scale(play_hover,  (300, 100))
+        exit_normal = pygame.transform.scale(exit_normal, (200, 100))
+
+        # rects
+        play_rect = play_normal.get_rect(
+            center=(constants.WIDTH // 2, 500 // 2)
+        )
+        exit_rect = exit_normal.get_rect(
+            center=(constants.WIDTH // 2, 800 // 2)
+        )
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()[0]
+
         screen.blit(Fondo, (0, 0))
+        screen.blit(title_img, title_rect)
 
-        # Dibujar botones
-        if play_button.draw(screen):
-            nivels.niveles()  # Llama al menú de niveles
+        # HOVER PLAY
+        if play_rect.collidepoint(mouse):
+            screen.blit(play_hover, play_rect)
+            if click:
+                nivels.niveles()
+        else:
+            screen.blit(play_normal, play_rect)
 
+        # botón config
         if config_button.draw(screen):
-            config.config_menu()  # Llama al menú de configuración
+            config.config_menu()
 
-        if exit_button.draw(screen):
-            pygame.quit()
+        # EXIT
+        if exit_rect.collidepoint(mouse):
+            screen.blit(exit_normal, exit_rect)
+            if click:
+                pygame.quit()
+                sys.exit()
+        else:
+            screen.blit(exit_normal, exit_rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        pygame.display.update()  # Actualiza la pantalla
+        pygame.display.update()
+
 
 def main_loop():
     main.main()
+
 
 if __name__ == "__main__":
     menu()
