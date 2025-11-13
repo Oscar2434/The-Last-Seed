@@ -132,26 +132,44 @@ def show(level=1):
             hard_btn.selected = True
             normal_btn.selected = False
 
-        # ----------------------------
-        # ÚNICA MODIFICACIÓN AQUI
-        # ----------------------------
         if selected_character and selected_difficulty:
             config.selected_character = selected_character
             config.difficulty = selected_difficulty
             pygame.time.delay(250)
 
+            # 🟥 DETENER música del menú antes de cambiar
+            pygame.mixer.music.stop()
+
+            # ------------------------------------------------
+            # NIVEL 1 — música /m2.mp3
+            # ------------------------------------------------
             if level == 1:
+                pygame.mixer.music.load("music/m2.mp3")
+                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.play(-1)
                 main.main()
 
+            # ------------------------------------------------
+            # NIVEL 2 — música /m1.mp3
+            # ------------------------------------------------
             elif level == 2:
+                pygame.mixer.music.load("music/m1.mp3")
+                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.play(-1)
                 nivel_2.main()
 
+            # ------------------------------------------------
+            # NIVEL 3 — música /m3.mp3
+            # ------------------------------------------------
             elif level == 3:
+                pygame.mixer.music.load("music/m3.mp3")
+                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.play(-1)
+
                 import nivel_3
                 nivel_3.main()
 
             return
-        # ----------------------------
 
         pygame.display.update()
         clock.tick(60)

@@ -20,6 +20,17 @@ victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HE
 defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
 
 def main():
+
+    # ---------------------------
+    # Música del Nivel 1 (ÚNICO CAMBIO)
+    # ---------------------------
+    if pygame.mixer.get_init():
+        pygame.mixer.music.stop()
+    pygame.mixer.music.load('music/m2.mp3')
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
+    # ---------------------------
+
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
     game_character = Character(constants.WIDTH // 2, constants.HEIGHT - 100)
@@ -27,7 +38,6 @@ def main():
     game_world.central_tree = central_tree
     game_world.setup_enemy_slots(constants.LUMBERJACK_SIZE)
 
-    # --- Configuración de dificultad dinámica ---
     dificultad = getattr(config, "difficulty", "normal")
     ajustes = constants.DIFFICULTY_SETTINGS.get(dificultad, constants.DIFFICULTY_SETTINGS["normal"])
 
