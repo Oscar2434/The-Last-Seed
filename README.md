@@ -1,4 +1,4 @@
-![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/0001ea4533be872dd4a3a12a0eccab4ed634f226/imagenes/titulo1.png)
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/89149f15f48c40a6b695eb0fa4ff23e0e1ba2c9d/imagenes/titulo%20Para%20github.png)
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)  
 ![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=pygame)  
