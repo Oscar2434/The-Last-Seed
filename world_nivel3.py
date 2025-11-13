@@ -25,7 +25,7 @@ class World:
         )
 
         tree_img = pygame.image.load(
-            os.path.join("assets", "images", "objects", "treedes1.png")
+            os.path.join("assets", "images", "objects", "treeC.png")
         ).convert_alpha()
         tree_img = pygame.transform.scale(
             tree_img, (constants.TREES, constants.TREES)
