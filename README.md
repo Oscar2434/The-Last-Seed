@@ -4,50 +4,31 @@
 ![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=pygame)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Age](https://img.shields.io/badge/Age%203--12-Educational-orange)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
 
-**The Last Seed** es un videojuego educativo desarrollado en Python que sumerge a los niños en una misión épica para salvar el bosque. Como **Obs 15**, un espíritu guardián de la naturaleza, los jugadores deberán proteger "La Última Semilla" mientras aprenden valiosas lecciones sobre ecología y conservación ambiental.
+**The Last Seed** es un videojuego educativo desarrollado en Python que combina acción, estrategia y conciencia ecológica. A través de dos niveles únicos, los jugadores se convierten en guardianes del bosque con la misión de proteger la naturaleza mientras aprenden valiosas lecciones sobre conservación ambiental.
 
 ## 🎮 Características Principales
 
-### 🌳 **Nivel 1: Defensa del Ecosistema**
-- **Protege el árbol central** de leñadores que intentan destruirlo
-- **Recolecta recursos curativos** para sanar el árbol dañado
-- **Sistema de salud visual** con barra de vida dinámica
-- **IA enemiga inteligente** que se adapta a tu estrategia
-- **Modos de dificultad** ajustable (Fácil/Difícil)
+### 🎯 **Sistema de Niveles Completos**
+- **Nivel 1**: Defensa del Ecosistema - Protege el árbol central de leñadores
+- **Nivel 2**: Laberinto de la Naturaleza - Recolecta recursos educativos en un laberinto
+- **Sistema de progresión** entre niveles
+- **Objetivos claros** y mensajes educativos
 
-### 🧩 **Nivel 2: Aventura en el Laberinto**
-- **Explora un laberinto misterioso** lleno de recursos educativos
-- **Recolecta 3 tipos de recursos**: 
-  - ♻️ **Composta** - Aprende sobre abono orgánico
-  - 💧 **Agua** - Descubre la importancia de la hidratación
-  - 🌱 **Semillas** - Conoce el ciclo de vida de las plantas
-- **Sistema de inventario interactivo**
-- **Diálogos educativos** que explican conceptos ecológicos
+### 👥 **Selección de Personaje y Dificultad**
+- **Elección entre Niño y Niña** con sprites únicos
+- **Sistema de dificultad ajustable** (Normal/Avanzado)
+- **Menú interactivo** con efectos hover
+- **Configuración persistente** entre niveles
 
-## 🎯 Objetivo Educativo
+### 🌳 **Mecánicas de Juego Avanzadas**
+- **Sistema de salud visual** para árboles con barras de vida
+- **Recursos animados** (agua con efectos de animación)
+- **Efectos de partículas** (fuego en árboles dañados)
+- **Sistema de inventario** para recursos recolectados
 
-**The Last Seed** transforma conceptos complejos de ecología en experiencias de juego accesibles:
+## 🏗️ Arquitectura del Proyecto
 
-| Concepto | Aprendizaje en el Juego |
-|----------|------------------------|
-| **Reforestación** | Proteger y curar árboles |
-| **Reciclaje** | Recolectar y clasificar recursos |
-| **Biodiversidad** | Interactuar con diferentes elementos naturales |
-| **Conservación** | Mantener el equilibrio del ecosistema |
-
-## 🕹️ Controles
-
-| Acción | Tecla |
-|--------|-------|
-| **Movimiento** | `↑` `↓` `←` `→` |
-| **Echar agua (Nivel 1)** | `E` |
-| **Recolectar items (Nivel 2)** | `ENTER` |
-| **Saltar dialogo** | `ESPACIO` |
-
-## 🛠️ Instalación y Ejecución
-
-### Prerrequisitos
-```bash
 # Tener Python 3.8 o superior instalado
 python --version
