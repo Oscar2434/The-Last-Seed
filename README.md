@@ -35,9 +35,22 @@ Su misión es doble: defender el sagrado árbol central de los leñadores en el 
 - **Modularidad**: Arquitectura de código que permite expansiones futuras
 
 ## 🕹️ Esencia del Gameplay
+## Menu
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/5dd1deeaa16b1d41b02831cd2afcca98c0b35cf6/imagenes_de_Readme/Menu.png)
+**Pantalla Principal:**
+- **Jugar**: Inicia la selección de niveles
+- **Salir**: Cierra la aplicación
+- **Configuracion**; Se mete al menu de confugracion
+## Menu de niveles 
+![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/1a381f6777eebfb5b6177f0859cb300693891c52/imagenes_de_Readme/Menu%20de%20niveles.png)
+En este apartado de selccionara el nivel que se quiere jugar
+- **Nivel 1 - Defensa del Ecosistema**: Protege el árbol sagrado de los leñadores
+- **Nivel 2 - Laberinto del Conocimiento**: Recolecta abono educativo evitando fantasmas
+- **Nivel 3 - Limpieza del Bosque**: Recoge basura para restaurar el ecosistema
 
-Menu de seleccion de dificultad y personajes
+## Menu de seleccion de dificultad y personajes
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/3adee8e1c3da80772ca1d24440f7ed58f0fa2ee6/imagenes_de_Readme/Menu%20de%20personajes.png)
+En este apratado se seleciona el personaje y la difucultad antes de empezar el nivel
 
 ### 🌳 Nivel 1: Defensa del Ecosistema
 Los jugadores experimentan la urgencia de la conservación protegiendo físicamente los árboles de leñadores automatizados. Cada árbol salvado representa un triunfo tangible contra la deforestación, mientras que los árboles perdidos muestran consecuencias visuales inmediatas (efectos de fuego) que refuerzan el impacto del daño ambiental.
@@ -62,14 +75,14 @@ Transforma la recolección de recursos en una aventura educativa donde cada íte
 - **Narrativa Interactiva**: Diálogos que se activan al recolectar recursos específicos
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/c2dba83688f7ada444eb5eb64bc15f915bb6d1e0/imagenes_de_Readme/Nivel-2.png)
 
-### 🌱 Nivel 3: Reforestación y Renacimiento
-El nivel final desafía a los jugadores a aplicar todo lo aprendido en una misión de reforestación a gran escala. Combinando elementos de estrategia y gestión de recursos, los jugadores deben plantar y cuidar nuevos árboles mientras protegen el bosque renacido de amenazas persistentes.
+### 🗑️ Nivel 3: Limpieza del Bosque
+El nivel final desafía a los jugadores a aplicar todo lo aprendido en una misión de limpieza ambiental. Los jugadores deben recolectar bolsas de basura contaminantes para restaurar la pureza del ecosistema.
 
 **Características Principales**:
-- **Sistema de Plantación**: Selección estratégica de ubicaciones para nuevos árboles
-- **Cuidado Continuo**: Riego y protección de árboles jóvenes
-- **Amenazas Combinadas**: Desafíos que integran mecánicas de niveles anteriores
-- **Ecosistema Dinámico**: Visualización del crecimiento y desarrollo del bosque
+- **Recolección Urgente**: Recolectar bolsas de basura antes de que contaminen irreversiblemente
+- **Restauración Visual**: El bosque se regenera visualmente a medida que se limpia
+- **Final Épico**: Onda de energía pura que restaura completamente el bosque
+- **Mensaje Final**: Reflexión sobre la importancia de mantener limpios los ecosistemas
 ![image alt](https://github.com/Oscar2434/The-Last-Seed/blob/c2dba83688f7ada444eb5eb64bc15f915bb6d1e0/imagenes_de_Readme/Nivel-3.png)
 
 ## 🔄 Innovación Educativa
