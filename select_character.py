@@ -4,7 +4,8 @@ import os
 import config
 import constants
 import main
-import nivel_2
+# import nivel_2  # ← ELIMINAR ESTA LÍNEA
+from nivel_2 import main as nivel_2_main  # ← AGREGAR ESTA LÍNEA
 
 pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
@@ -133,7 +134,7 @@ def show(level=1):
             normal_btn.selected = False
 
         # ----------------------------
-        # ÚNICA MODIFICACIÓN AQUI
+        # MODIFICACIÓN AQUI
         # ----------------------------
         if selected_character and selected_difficulty:
             config.selected_character = selected_character
@@ -144,7 +145,7 @@ def show(level=1):
                 main.main()
 
             elif level == 2:
-                nivel_2.main()
+                nivel_2_main.main()  # ← CAMBIADO: nivel_2.main() por nivel_2_main.main()
 
             elif level == 3:
                 import nivel_3

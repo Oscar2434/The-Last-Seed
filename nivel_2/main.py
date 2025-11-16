@@ -1,10 +1,19 @@
 import pygame
 import sys
-import constants
-from character_nivel_2 import Character
-from world_nivel2 import World
-from ambient_nivel2 import CentralTree
 import os
+
+# === CORRECCIÓN DE IMPORTS ===
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+import constants
+from nivel_2.character import Character
+from nivel_2.world import World
+from nivel_2.ambient import CentralTree
+# === FIN DE CORRECCIÓN ===
+
 
 pygame.init()
 

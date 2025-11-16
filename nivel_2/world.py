@@ -1,9 +1,18 @@
+import sys
+import os
+
+# === CORRECCIÓN DE IMPORTS ===
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
 import constants
 import pygame
-from ambient_nivel2 import Wall, Resource
-from resources_nivel_2 import WaterResource  
-from enemy_nivel2 import Enemy 
-import os
+from nivel_2.ambient import Wall, Resource
+from nivel_2.resources import WaterResource  
+from nivel_2.enemy import Enemy 
+# === FIN DE CORRECCIÓN ===
 
 class World:
     def __init__(self, width, height):

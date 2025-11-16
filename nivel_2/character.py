@@ -1,8 +1,17 @@
 import pygame
-import constants 
+import sys
 import os
+
+# === CORRECCIÓN DE IMPORTS ===
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+import constants 
 import config  
 from constants import *
+# === FIN DE CORRECCIÓN ===
 
 class Character:
     def __init__(self, x, y):

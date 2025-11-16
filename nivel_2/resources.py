@@ -1,6 +1,15 @@
 import pygame
-import constants 
+import sys
 import os
+
+# === CORRECCIÓN DE IMPORTS ===
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+import constants 
+# === FIN DE CORRECCIÓN ===
 
 class WaterResource:
     def __init__(self, x, y):
