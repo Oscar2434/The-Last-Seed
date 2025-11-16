@@ -12,7 +12,7 @@ class Resource:
         self.animation_timer = 0
         self.total_frames = constants.WATER_FRAMES  # columnas
 
-        # spritesheet del cubo de agua (3 filas x 10 columnas → 30 imágenes)
+        
         image_path = os.path.join('assets', 'images', 'objects', 'water.png')
         self.sprite = pygame.image.load(image_path).convert_alpha()
         self.frame_size = constants.WATER_F_SIZE  # tamaño real del frame en el spritesheet

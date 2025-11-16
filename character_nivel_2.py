@@ -1,7 +1,7 @@
 import pygame
 import constants 
 import os
-import config  # ✅ Añadir importación de config
+import config  
 from constants import *
 
 #Clase del personaje
@@ -9,13 +9,12 @@ class Character:
     def __init__(self, x, y):
          self.x = x
          self.y = y
-         # Variables de hitbox como atributos de la clase
-         self.gy = 18 # Ajuste horizontal de la hitbox
-         self.gx = 12 # Ajuste vertical de la hitbox
-         self.ry = 0.6 # escalar hitbox y
-         self.rx = 0.55 # escalar hitbox x
          
-         # ✅ Cargar sprite según personaje seleccionado (COPIADO DE character.py)
+         self.gy = 18 
+         self.gx = 12 
+         self.ry = 0.6 
+         self.rx = 0.55 
+         
          if hasattr(config, "selected_character"):
              if config.selected_character == "niña":
                  image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
@@ -62,7 +61,7 @@ class Character:
         if self.facing_left:
             current_image = pygame.transform.flip(current_image, True, False)
         screen.blit(current_image, (self.x, self.y))
-        # ✅ ELIMINADO: Dibujar rectángulo de colisión del PERSONAJE
+     
 
     def move(self, dx, dy, world):
          self.moving = dx != 0 or dy != 0
@@ -102,7 +101,7 @@ class Character:
                  self.moving = False
                  return
 
-         # ✅ AGREGADO: Colisión con el árbol central del nivel 2
+         
          if hasattr(world, "central_tree") and world.central_tree:
              if self.check_collision(new_x, new_y, world.central_tree):
                  self.moving = False
@@ -114,25 +113,25 @@ class Character:
          self.y = max(0, min(self.y, constants.HEIGHT - constants.PERSONAJE))
          self.update_animation()
          
-         # ACTUALIZAR: Verificar colisión con recursos (pero no recolectar automáticamente)
+         
          self.near_resource = self.check_near_resource(world.resources)
 
     def check_collision(self, x, y, obj):
-        # MODIFICADO: Usar Rect para que la hitbox del personaje coincida con el cuadro rojo del árbol
+        
         if hasattr(obj, 'get_rect'):
             obj_rect = obj.get_rect()
             player_rect = pygame.Rect(
                 x + self.gx,
                 y + self.gy,
-                constants.PERSONAJE * self.ry,  # ancho usado en el debug_rect
-                constants.PERSONAJE * self.rx   # alto usado en el debug_rect
+                constants.PERSONAJE * self.ry,  
+                constants.PERSONAJE * self.rx   
             )
             return player_rect.colliderect(obj_rect)
         
         if hasattr(obj, 'image'):
-            # Usar las mismas proporciones que se dibujan en nivel_2.py para central_tree
+           
             if hasattr(obj, 'type') and obj.type == "central_tree":
-                # Usamos las constantes de hitbox del árbol central
+                
                 x_offset = obj.image.get_width() * constants.CENTRAL_TREE_HITBOX_X
                 y_offset = obj.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y
                 width = obj.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH
@@ -170,7 +169,7 @@ class Character:
             self.carrying_resource = None
 
     def check_near_resource(self, resources):
-        """Verificar si está cerca de un recurso para recoger"""
+      
         for resource in resources:
             if not resource.collected and self.check_collision(self.x, self.y, resource):
                 return resource

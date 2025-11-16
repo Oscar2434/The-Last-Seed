@@ -61,53 +61,50 @@ TREE_HEALTH = 280
 ENEMY_DAMAGE = 2
 ENEMY_SPEED = 1
 RESOURCE_HEAL = 20
-LEVEL_TIME = 60  # segundos
+LEVEL_TIME = 60  
 
 # Configuraciones de niveles
-# --- CONFIGURACIÓN DE DIFICULTADES ---
 DIFFICULTY_SETTINGS = {
     "normal": {
         "ENEMY_SPEED": 1,
         "ENEMY_DAMAGE": 2,
         "LEVEL_TIME": 90,
-        "max_enemies": 5,  # ✅ PARA NIVEL 1
+        "max_enemies": 5,
         "spawn_delay": 300
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
         "ENEMY_DAMAGE": 6,
         "LEVEL_TIME": 60,
-        "max_enemies": 8,  # ✅ PARA NIVEL 1
+        "max_enemies": 8,
         "spawn_delay": 240
     }
 }
 
-# ✅ NUEVO: Configuración específica para NIVEL 2
 LEVEL_2_SETTINGS = {
     "normal": {
-        "max_enemies": 2,  # ✅ 2 enemigos en normal para nivel 2
+        "max_enemies": 2,  
         "enemy_positions": [
-            (700, 400),  # Esquina inferior derecha
-            (50, 50),    # Esquina superior izquierda
+            (700, 400),  
+            (50, 50),    
         ]
     },
     "avanzado": {
-        "max_enemies": 3,  # ✅ 3 enemigos en avanzado para nivel 2
+        "max_enemies": 3,  
         "enemy_positions": [
-            (700, 400),  # Esquina inferior derecha
-            (50, 50),    # Esquina superior izquierda
-            (400, 200),  # Centro del laberinto
+            (700, 400),  
+            (50, 50),    
+            (400, 200),  
         ]
     }
 }
+# Árbol central 
+CENTRAL_TREE_HITBOX_X = 0.3  
+CENTRAL_TREE_HITBOX_Y = 0.6 
+CENTRAL_TREE_HITBOX_WIDTH = 0.4 
+CENTRAL_TREE_HITBOX_HEIGHT = 0.4
 
-# Árbol central (treeC) hitbox
-CENTRAL_TREE_HITBOX_X = 0.3   # Porcentaje de desplazamiento en X
-CENTRAL_TREE_HITBOX_Y = 0.6   # Porcentaje de desplazamiento en Y
-CENTRAL_TREE_HITBOX_WIDTH = 0.4  # Porcentaje del ancho de la imagen
-CENTRAL_TREE_HITBOX_HEIGHT = 0.4 # Porcentaje del alto de la imagen
-
-# Escala de los muros (1.0 = tamaño original, 0.5 = mitad del tamaño, 2.0 = doble del tamaño)
+# Escala de los muros 
 WALL_SCALE = 0.7
 
 # Margen para hitbox de interacción

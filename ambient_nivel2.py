@@ -45,7 +45,7 @@ class CentralTree:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.type = "central_tree"  # ✅ AGREGAR ESTA LÍNEA
+        self.type = "central_tree" 
         
         # Cargar imagen del árbol central
         tree_path = os.path.join('assets', 'images', 'objects', 'treeC.png')

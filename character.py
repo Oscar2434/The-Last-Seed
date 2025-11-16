@@ -9,7 +9,7 @@ class Character:
         self.x = x
         self.y = y
 
-        # ✅ Cargar sprite según personaje seleccionado
+
         if hasattr(config, "selected_character"):
             if config.selected_character == "niña":
                 image_path = os.path.join('assets', 'images', 'character', 'Eli.png')
@@ -27,7 +27,7 @@ class Character:
         self.moving = False 
         self.facing_left = False
         self.animations = self.load_animatios()
-        self.carrying_resource = None   # puede cargar un recurso
+        self.carrying_resource = None  
 
     def load_animatios(self):
         animations = {}

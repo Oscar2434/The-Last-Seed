@@ -1,8 +1,8 @@
 import constants
 import pygame
 from ambient_nivel2 import Wall, Resource
-from resources_nivel_2 import WaterResource  # Importar la nueva clase
-from enemy_nivel2 import Enemy  # ✅ NUEVO: Importar el enemigo
+from resources_nivel_2 import WaterResource  
+from enemy_nivel2 import Enemy 
 import os
 
 class World:
@@ -11,9 +11,9 @@ class World:
         self.height = height
         self.walls = []
         self.trees = []
-        self.central_tree = None  # Inicializar como None
+        self.central_tree = None  
         self.resources = []
-        self.enemies = []  # ✅ NUEVO: Lista de enemigos
+        self.enemies = []  
 
         grass_path = os.path.join('assets', 'images', 'objects', 'grass3.png')
         self.grass_image = pygame.image.load(grass_path).convert()
@@ -21,17 +21,17 @@ class World:
 
         self.create_maze()
         self.create_resources()
-        # ✅ MODIFICADO: No crear enemigos aquí, se hará desde nivel_2.py con la dificultad
+       
 
     def set_central_tree(self, central_tree):
-        """Método para establecer el árbol central desde nivel_2.py"""
+        
         self.central_tree = central_tree
 
     def create_resources(self):
-        # POSICIONES FIJAS para los 3 recursos en el laberinto
+      
         resource_positions = [
             (570, 50, "composta"),
-            (110, 100, "agua"),      # Este usará WaterResource
+            (110, 100, "agua"),      
             (610, 425, "semillas")
         ]
         
@@ -45,18 +45,18 @@ class World:
                 self.resources.append(Resource(x, y, resource_type))
 
     def create_enemies(self, difficulty="normal"):
-        """✅ MODIFICADO: Crear enemigos según la dificultad usando configuración de NIVEL 2"""
-        # Obtener configuración específica para nivel 2
+       
+        
         level2_settings = constants.LEVEL_2_SETTINGS[difficulty]
         max_enemies = level2_settings["max_enemies"]
         enemy_positions = level2_settings["enemy_positions"]
         
-        # ✅ RESTAURADO: Usar las posiciones originales que teníamos antes
+       
         self.enemies.clear()
         for x, y in enemy_positions:
             self.enemies.append(Enemy(x, y))
 
-    # ... (el resto del código permanece igual)
+  
 
     def create_maze(self):
         # Limpiar muros existentes
@@ -68,7 +68,7 @@ class World:
         internal_walls = [
             #(476, 80),
               
-             (30, 220), (115, 220), #(200, 220), 
+             (30, 220), (115, 220),  
             
         ]
         internal_walls_2 = [
@@ -90,7 +90,7 @@ class World:
             (30, 80), (100, 80),
             (570, 90), 
             (274, 220),
-            (150, 302), #(360, 382), #(540, 80), 
+            (150, 302), 
             (140, 382),
             (530, 220),
             (584, 302),
@@ -98,7 +98,7 @@ class World:
             #(689, 80)
         ]
         
-        # MUROS (de izquierda a derecha) INTERNOS DEL LABERINTO
+        # MUROS INTERNOS DEL LABERINTO
         vertical_con_final = [
             (240, 90),
             (160, 80),
@@ -148,28 +148,27 @@ class World:
         for wall in Union_wall_vertical:
             self.walls.append(Wall(wall[0], wall[1], "vertical_sin_final", constants.WALL_SCALE))
 
-        #------Inicio-------
-        # Techo (y = 0) - línea horizontal superior
+        
         for x in range(0, 780, 51):
             wall_positions.append((x, 0, "normal"))
         
-        # PARED IZQUIERDA COMPLETA (x = 0) - desde techo hasta piso
+        # PARED IZQUIERDA COMPLETA 
         for y in range(0, 350, 30):
             wall_positions.append((0, y, "vertical_sin_final"))
         
-        # PARED DERECHA COMPLETA - desde techo hasta piso
+        # PARED DERECHA COMPLETA 
         right_wall_x = 747
         for y in range(0, 480, 30):
             wall_positions.append((right_wall_x, y, "vertical_sin_final"))
             
-        # Piso (y = 440) - línea horizontal inferior  
+        # Piso  
         for x in range(0, 780, 51):
             wall_positions.append((x, 460, "normal"))
         
         # Crear muros en las posiciones definidas CON ESCALA
         for x, y, wall_type in wall_positions:
             self.walls.append(Wall(x, y, wall_type, constants.WALL_SCALE))
-        #--------fin de muros--------#
+       
         
 
     def draw(self, screen):

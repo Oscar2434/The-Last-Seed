@@ -12,8 +12,8 @@ screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The last seed - Nivel 2")
 
 # Cargar imágenes de victoria/derrota
-victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'victoria.png')).convert_alpha()
-defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'derrota.png')).convert_alpha()
+victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
+defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
 
 # Escalarlas al tamaño de la ventana
 victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))

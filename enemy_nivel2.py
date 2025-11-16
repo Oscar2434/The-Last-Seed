@@ -8,7 +8,7 @@ class Enemy:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.speed = 1  # Velocidad del enemigo (puedes ajustarla)
+        self.speed = 1  
         
         # Variables de hitbox similares al personaje
         self.gy = 18
@@ -31,74 +31,63 @@ class Enemy:
             self.sprite_i = pygame.transform.scale(self.sprite_i, (constants.PERSONAJE, constants.PERSONAJE))
             self.sprite_d = pygame.transform.scale(self.sprite_d, (constants.PERSONAJE, constants.PERSONAJE))
             
-            self.facing_left = False  # False = derecha, True = izquierda
+            self.facing_left = False  
             self.moving = False
-            
-            # No usamos animaciones frame-by-frame, solo las dos imágenes
+           
             self.animation_timer = 0
-            self.animations_delay = 500  # ms entre cambios (opcional para parpadeo)
-            self.current_image = self.sprite_d  # Imagen inicial
+            self.animations_delay = 500  
+            self.current_image = self.sprite_d  
             
         except Exception as e:
             print(f"Error cargando sprites del fantasma: {e}")
-            # Si no hay imagen, usar un cuadrado azul
+          
             self.has_sprite = False
             self.placeholder = pygame.Surface((constants.PERSONAJE, constants.PERSONAJE))
-            self.placeholder.fill((0, 0, 255))  # Azul
+            self.placeholder.fill((0, 0, 255)) 
 
     def update_animation(self):
-        """Actualizar animación simple"""
+        
         if not self.has_sprite:
             return
             
         current_time = pygame.time.get_ticks()
         
-        # Opcional: puedes añadir un efecto de parpadeo suave aquí si quieres
-        # Pero por ahora solo cambiamos la dirección
+       
         if self.moving:
-            # Actualizar la imagen según la dirección
+            
             if self.facing_left:
                 self.current_image = self.sprite_i
             else:
                 self.current_image = self.sprite_d
 
     def draw(self, screen):
-        """Dibujar al enemigo"""
+       
         if self.has_sprite:
             screen.blit(self.current_image, (self.x, self.y))
         else:
             # Dibujar placeholder azul
             screen.blit(self.placeholder, (self.x, self.y))
         
-        # DEBUG: Dibujar rectángulo de colisión del ENEMIGO en ROJO
-        #debug_rect = pygame.Rect(
-        #    self.x + self.gx,
-        #    self.y + self.gy,
-        #    constants.PERSONAJE * self.ry,
-        #    constants.PERSONAJE * self.rx
-        #)
-        #pygame.draw.rect(screen, (255, 0, 0), debug_rect, 2)  # Rojo, línea de 2px
-
+       
     def move_towards_player(self, player_x, player_y, world):
-        """Moverse hacia el jugador evitando obstáculos"""
-        # Calcular dirección hacia el jugador
+       
         dx = player_x - self.x
         dy = player_y - self.y
         
-        # Normalizar dirección
-        distance = max(1, (dx**2 + dy**2)**0.5)  # Evitar división por cero
+     
+        distance = max(1, (dx**2 + dy**2)**0.5)  
         dx = dx / distance * self.speed
         dy = dy / distance * self.speed
         
-        # Actualizar dirección del sprite (SOLO basado en movimiento horizontal)
+       
         self.moving = True
         
         # Solo cambiamos dirección cuando hay movimiento horizontal significativo
-        if abs(dx) > 0.1:  # Umbral pequeño para evitar cambios bruscos
+        if abs(dx) > 0.1: 
             if dx > 0:
-                self.facing_left = False  # Mirando a la derecha
+                self.facing_left = False  
             else:
-                self.facing_left = True   # Mirando a la izquierda
+                self.facing_left = True   
         
         # Intentar mover en X
         new_x = self.x + dx
@@ -127,7 +116,7 @@ class Enemy:
         self.update_animation()
 
     def check_collision(self, x, y, world):
-        """Verificar colisiones con obstáculos (similar al personaje)"""
+        
         # Hitbox del enemigo
         enemy_rect = pygame.Rect(
             x + self.gx,
@@ -164,7 +153,7 @@ class Enemy:
         return False
 
     def check_capture(self, character):
-        """Verificar si capturó al jugador"""
+        
         enemy_rect = pygame.Rect(
             self.x + self.gx,
             self.y + self.gy,
