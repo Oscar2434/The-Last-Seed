@@ -309,6 +309,8 @@ def main():
         result = run_level()
         
         if result == "victory":
+            import nivels
+            nivels.niveles()
             break
         elif result == "defeat":
             continue

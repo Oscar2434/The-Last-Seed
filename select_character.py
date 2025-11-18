@@ -145,7 +145,7 @@ def show(level=1):
                 main.main()
 
             elif level == 2:
-                nivel_2_main.main()  # ← CAMBIADO: nivel_2.main() por nivel_2_main.main()
+                nivel_2_main.main()
 
             elif level == 3:
                 import nivel_3
