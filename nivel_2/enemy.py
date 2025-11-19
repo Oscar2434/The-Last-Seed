@@ -16,7 +16,7 @@ class Enemy:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.speed = 1  
+        self.speed = 0.8  
         
         self.gy = 18
         self.gx = 12
