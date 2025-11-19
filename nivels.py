@@ -57,6 +57,12 @@ buttons = [
 ]
 
 def niveles():
+    # Reiniciar música del menú
+    if pygame.mixer.get_init():
+        pygame.mixer.music.load('music/m4.mp3')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+    
     run = True
     while run:
         screen.blit(Fondo, (0, 0))

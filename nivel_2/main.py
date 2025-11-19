@@ -131,6 +131,13 @@ def show_victory_screen(screen):
     pygame.time.delay(3000)
 
 def run_level():
+    # CARGAR MÚSICA DEL NIVEL AL INICIAR
+    if pygame.mixer.get_init():
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('music/m1.mp3')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+    
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
     game_character = Character(5, 386)
@@ -281,6 +288,7 @@ def main():
         result = run_level()
         
         if result == "victory":
+            pygame.mixer.music.stop()
             import nivels
             nivels.niveles()
             break
