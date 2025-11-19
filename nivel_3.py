@@ -21,8 +21,38 @@ def cargar_imagen_bolsa():
     return img
 
 def main():
+    # --- DETENER MÚSICA DEL MENÚ ---
+    try:
+        pygame.mixer.music.fadeout(800)
+    except:
+        pass
+
+    # --- INICIAR MÚSICA DEL NIVEL 3 ---
+    try:
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+
+        pygame.mixer.music.load("music/m3.mp3")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+
+    except Exception as e:
+        print("Error cargando música nivel 3:", e)
+
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
     clock = pygame.time.Clock()
+
+    # Imágenes de victoria y derrota a pantalla completa
+    victory_img = pygame.image.load(
+        os.path.join("assets", "images", "effects", "ganar.png")
+    ).convert_alpha()
+
+    lose_img = pygame.image.load(
+        os.path.join("assets", "images", "effects", "perder.png")
+    ).convert_alpha()
+
+    victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
+    lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
 
     world = world_nivel3.World(constants.WIDTH, constants.HEIGHT)
 
@@ -67,17 +97,23 @@ def main():
         basura = nuevas_basuras
 
         if snake_logic.fuera_de_limites(jugador, constants.WIDTH, constants.HEIGHT):
-            ui_nivel3.mensaje_final(screen, "Has perdido")
+            screen.blit(lose_img, (0, 0))
+            pygame.display.update()
+            pygame.time.delay(2000)
             return "defeat"
 
         if snake_logic.colision_obstaculos(jugador, world.obstacles):
-            ui_nivel3.mensaje_final(screen, "Has perdido")
+            screen.blit(lose_img, (0, 0))
+            pygame.display.update()
+            pygame.time.delay(2000)
             return "defeat"
 
         if recogidas >= objetivo and len(jugador.cola) > 0:
             cola_rect = jugador.cola[-1]
             if cola_rect.colliderect(world.bote.rect):
-                ui_nivel3.mensaje_final(screen, "¡Nivel completado!")
+                screen.blit(victory_img, (0, 0))
+                pygame.display.update()
+                pygame.time.delay(2000)
                 return "victory"
 
         tiempo = (pygame.time.get_ticks() - inicio) // 1000

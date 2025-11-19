@@ -12,6 +12,9 @@ class Objeto:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
+    def draw_hitbox(self, screen):
+        pygame.draw.rect(screen, (0, 255, 0), self.rect, 2)
+
 
 class World:
     def __init__(self, width, height):
@@ -46,15 +49,12 @@ class World:
             os.path.join("assets", "images", "effects", "bote.png")
         ).convert_alpha()
 
-       
         self.bote_img = pygame.transform.scale(self.bote_img, (45, 45))
 
-        # Subido 
         bx = width // 2 - 22
-        by = height // 2 - 75   
+        by = height // 2 - 75
 
         self.bote = Objeto(bx, by, self.bote_img)
-       
 
     def draw(self, screen):
         for y in range(0, self.height, constants.GRASS):
