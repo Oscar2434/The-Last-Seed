@@ -12,8 +12,8 @@ import constants
 from nivel_2.character import Character
 from nivel_2.world import World
 from nivel_2.ambient import CentralTree
+from nivel_2.dialog_manager import DialogManager  # <-- NUEVO IMPORT
 # === FIN DE CORRECCIÓN ===
-
 
 pygame.init()
 
@@ -138,37 +138,18 @@ def run_level():
     central_tree = CentralTree(350, 50)
     game_world.set_central_tree(central_tree)
 
+    # INICIALIZAR DIÁLOGOS
+    dialog_manager = DialogManager()
+
     start_ticks = pygame.time.get_ticks()
     paused_time = 0
     last_pause_start = 0
     
     collected_resources = []
-    dialog_queue = []
     
-    initial_dialog = [
-        "EL LABERINTO DE LA NATURALEZA",
-        " ",
-        "OBJETIVO: Recolecta 3 recursos para",
-        "ayudar al árbol central:",
-        "• Cáscara de plátano (composta)",
-        "• Agua",
-        "• Cáscara de huevo",
-        " ",
-        "¡Cuidado! Los fantasmas te persiguen",
-        "por el laberinto. No dejes que te atrapen.",
-        "CONTROLES:",
-        "• Flechas: Mover personaje",
-        "• E: Interactuar con árbol central", 
-        "• ESPACIO: Continuar diálogos",
-        " ",
-        "Tienes un límite de tiempo.",
-        "¡Buena suerte!"
-    ]
-    
-    dialog_queue.extend(initial_dialog)
-    game_paused = True
-    dialog_timer = pygame.time.get_ticks()
-    
+    # INICIAR DIÁLOGOS INICIALES
+    dialog_manager.start_initial_dialog()
+
     puede_entregar = False
     
     try:
@@ -182,6 +163,9 @@ def run_level():
     running = True
     while running:
         current_time = pygame.time.get_ticks()
+        
+        # ACTUALIZAR ESTADO DE PAUSA BASADO EN DIÁLOGOS
+        game_paused = dialog_manager.game_paused
         
         if game_paused:
             if last_pause_start == 0:
@@ -197,29 +181,20 @@ def run_level():
             if event.type == pygame.QUIT:
                 return "quit"
             
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_e and not game_paused:
                     if check_interaction(game_character, central_tree):
                         if puede_entregar:
                             show_victory_screen(screen)
                             return "victory"
                         else:
-                            dialog_queue.append("El árbol central necesita todos los")
-                            dialog_queue.append("recursos para crecer fuerte.")
-                            dialog_queue.append("Recolecta composta, agua y semillas primero.")
+                            dialog_manager.add_tree_dialog("need_resources")
                             if not game_paused:
-                                game_paused = True
-                                dialog_timer = current_time
+                                dialog_manager.game_paused = True
+                                dialog_manager.dialog_timer = current_time
                 
                 elif event.key == pygame.K_SPACE and game_paused:
-                    if dialog_queue:
-                        dialog_queue.pop(0)
-                        if dialog_queue:
-                            dialog_timer = current_time
-                        else:
-                            game_paused = False
-                    else:
-                        game_paused = False
+                    dialog_manager.next_dialog()
 
         game_world.draw(screen)
         game_character.draw(screen)
@@ -253,29 +228,25 @@ def run_level():
                 if not resource.collected and game_character.check_collision(game_character.x, game_character.y, resource):
                     resource.collected = True
                     temp_resource_type = resource.type
-                    dialog_queue.append(resource.get_dialog_text())
                     
-                    if len(collected_resources) == 2:
-                        dialog_queue.append("¡Has recolectado todos los recursos!")
-                        dialog_queue.append("Ahora ve al árbol central y")
-                        dialog_queue.append("presiona 'E' para entregarlos.")
-                        puede_entregar = True
+                    # AÑADIR DIÁLOGO DEL RECURSO
+                    dialog_manager.add_resource_dialog(temp_resource_type)
                     
                     collected_resources.append(temp_resource_type)
                     
+                    # VERIFICAR SI SE RECOLECTARON TODOS
+                    if len(collected_resources) >= 3:
+                        dialog_manager.add_tree_dialog("all_collected")
+                        puede_entregar = True
+                    
                     if not game_paused:
-                        game_paused = True
-                        dialog_timer = current_time
+                        dialog_manager.game_paused = True
+                        dialog_manager.dialog_timer = current_time
                     
                     break
 
-        if game_paused and dialog_queue and (current_time - dialog_timer > 10000):
-            dialog_queue.pop(0)
-            
-            if dialog_queue:
-                dialog_timer = current_time
-            else:
-                game_paused = False
+        # ACTUALIZAR DIÁLOGOS (para cierre automático)
+        dialog_manager.update(current_time)
 
         seconds_passed = effective_time // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
@@ -285,11 +256,12 @@ def run_level():
 
         draw_inventory(screen, collected_resources)
 
-        if dialog_queue and game_paused:
-            dialog_text = "\n".join(dialog_queue[:8])
+        # DIBUJAR DIÁLOGOS (si es necesario)
+        if dialog_manager.game_paused and dialog_manager.has_dialogs():
+            dialog_text = dialog_manager.get_current_dialog_text()
             draw_dialog(screen, dialog_text)
             
-            time_left = 12 - ((current_time - dialog_timer) // 1000)
+            time_left = 12 - ((current_time - dialog_manager.dialog_timer) // 1000)
             if time_left < 13:
                 time_font = pygame.font.SysFont(None, 20)
                 time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
