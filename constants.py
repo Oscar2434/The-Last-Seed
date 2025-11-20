@@ -83,18 +83,18 @@ DIFFICULTY_SETTINGS = {
 
 LEVEL_2_SETTINGS = {
     "normal": {
+        "max_enemies": 1,  
+        "enemy_positions": [
+            (700, 400),  
+            #(50, 50),    
+        ]
+    },
+    "avanzado": {
         "max_enemies": 2,  
         "enemy_positions": [
             (700, 400),  
             (50, 50),    
-        ]
-    },
-    "avanzado": {
-        "max_enemies": 3,  
-        "enemy_positions": [
-            (700, 400),  
-            (50, 50),    
-            (400, 200),  
+            #(400, 200),  
         ]
     }
 }

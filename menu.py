@@ -6,7 +6,7 @@ import main
 import config
 import nivels
 
-pygame.init()
+pygame.init()  
 
 if config.music:
     if not pygame.mixer.get_init():

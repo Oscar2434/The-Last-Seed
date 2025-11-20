@@ -143,23 +143,24 @@ def run_level():
     dialog_queue = []
 
     initial_dialog = [
-        "EL LABERINTO DE LA NATURALEZA",
-        " ",
+        #"EL LABERINTO DE LA NATURALEZA",
+        #" ",
         "OBJETIVO: Recolecta 3 recursos para",
         "ayudar al árbol central:",
-        "• Cáscara de plátano (composta)",
-        "• Agua",
-        "• Cáscara de huevo",
-        " ",
-        "¡Cuidado! Los fantasmas te persiguen",
-        "por el laberinto. No dejes que te atrapen.",
-        "CONTROLES:",
-        "• Flechas: Mover personaje",
-        "• E: Interactuar con árbol central", 
-        "• ESPACIO: Continuar diálogos",
-        " ",
-        "Tienes un límite de tiempo.",
-        "¡Buena suerte!"
+        "Ten cuidado con los fantasmas",
+        #"• Cáscara de plátano (composta)",
+        #"• Agua",
+        #"• Cáscara de huevo",
+        #" ",
+        #"¡Cuidado! Los fantasmas te persiguen",
+        #"por el laberinto. No dejes que te atrapen.",
+        #"CONTROLES:",
+        #"• Flechas: Mover personaje",
+        #"• E: Interactuar con árbol central", 
+        #"• ESPACIO: Continuar diálogos",
+        #" ",
+        #"Tienes un límite de tiempo.",
+        #"¡Buena suerte!"
     ]
     
     dialog_queue.extend(initial_dialog)
