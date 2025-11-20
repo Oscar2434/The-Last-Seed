@@ -13,9 +13,6 @@ from nivel_2.character import Character
 from nivel_2.world import World
 from nivel_2.ambient import CentralTree
 from nivel_2.dialog_manager import DialogManager
-from nivel_2.config.ui_config import draw_dialog, draw_inventory, draw_timer, draw_dialog_timer
-from nivel_2.config.interaction import check_interaction
-from nivel_2.config.screen_manager import show_defeat_screen, show_victory_screen, scale_screen_images
 # === FIN DE CORRECCIÓN ===
 
 pygame.init()
@@ -23,17 +20,117 @@ pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The last seed - Nivel 2")
 
-# Escalar imágenes de pantalla
-scale_screen_images(constants.WIDTH, constants.HEIGHT)
+victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
+defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
+
+victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
+defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
+
+def draw_dialog(screen, text):
+    dialog_rect = pygame.Rect(40, constants.HEIGHT - 180, constants.WIDTH - 80, 160)
+    
+    pygame.draw.rect(screen, (255, 255, 255), dialog_rect)
+    pygame.draw.rect(screen, (0, 100, 0), dialog_rect, 3)
+    
+    font = pygame.font.SysFont(None, 22)
+    y_offset = dialog_rect.y + 15
+    
+    lines = []
+    for paragraph in text.split('\n'):
+        words = paragraph.split(' ')
+        current_line = ""
+        for word in words:
+            test_line = current_line + word + " "
+            if font.size(test_line)[0] < dialog_rect.width - 40:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line.strip())
+                current_line = word + " "
+        if current_line:
+            lines.append(current_line.strip())
+    
+    for line in lines:
+        if y_offset + 20 > dialog_rect.y + dialog_rect.height - 30:
+            break
+        text_surface = font.render(line, True, (0, 0, 0))
+        screen.blit(text_surface, (dialog_rect.x + 20, y_offset))
+        y_offset += 22
+    
+    continue_font = pygame.font.SysFont(None, 20)
+    continue_text = continue_font.render("Presiona ESPACIO para continuar...", True, (100, 100, 100))
+    screen.blit(continue_text, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
+
+def draw_inventory(screen, collected_resources):
+    inventory_bg = pygame.Rect(constants.WIDTH - 150, 10, 140, 80)
+    
+    transparent_bg = pygame.Surface((inventory_bg.width, inventory_bg.height), pygame.SRCALPHA)
+    pygame.draw.rect(transparent_bg, (0, 0, 0, 80), transparent_bg.get_rect())
+    pygame.draw.rect(transparent_bg, (100, 100, 100, 100), transparent_bg.get_rect(), 1)
+    
+    screen.blit(transparent_bg, inventory_bg)
+    
+    font = pygame.font.SysFont(None, 20)
+    
+    title_shadow = font.render("Inventario:", True, (0, 0, 0, 100))
+    screen.blit(title_shadow, (constants.WIDTH - 139, 16))
+    
+    title = font.render("Inventario:", True, (255, 255, 255))
+    screen.blit(title, (constants.WIDTH - 140, 15))
+    
+    resource_display_names = {
+        "composta": "Cáscara Plátano",
+        "agua": "Agua",
+        "semillas": "Cáscara Huevo"
+    }
+    
+    y_offset = 35
+    for resource_type in ["composta", "agua", "semillas"]:
+        count = collected_resources.count(resource_type)
+        display_name = resource_display_names.get(resource_type, resource_type)
+        status = f"{display_name}: {count}" if count > 0 else f"{display_name}: 0"
+        color = (200, 250, 200) if count > 0 else (180, 0, 0)
+        text = font.render(status, True, color)
+        screen.blit(text, (constants.WIDTH - 140, y_offset))
+        y_offset += 20
+
+def get_interaction_rect(central_tree):
+    if hasattr(central_tree, 'image'):
+        interaction_margin = 30
+        
+        return pygame.Rect(
+            central_tree.x + central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_X - interaction_margin,
+            central_tree.y + central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_Y - interaction_margin,
+            central_tree.image.get_width() * constants.CENTRAL_TREE_HITBOX_WIDTH + (interaction_margin * 2),
+            central_tree.image.get_height() * constants.CENTRAL_TREE_HITBOX_HEIGHT + (interaction_margin * 2)
+        )
+    return None
+
+def check_interaction(character, central_tree):
+    interaction_rect = get_interaction_rect(central_tree)
+    if not interaction_rect:
+        return False
+    
+    player_rect = pygame.Rect(
+        character.x + character.gx,
+        character.y + character.gy,
+        constants.PERSONAJE * character.ry,
+        constants.PERSONAJE * character.rx
+    )
+    
+    return player_rect.colliderect(interaction_rect)
+
+def show_defeat_screen(screen):
+    screen.blit(defeat_img, (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(3000)
+
+def show_victory_screen(screen):
+    screen.blit(victory_img, (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(3000)
 
 def run_level():
-    # CARGAR MÚSICA DEL NIVEL AL INICIAR
-    if pygame.mixer.get_init():
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load('music/m1.mp3')
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)
-    
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
     game_character = Character(5, 386)
@@ -50,9 +147,8 @@ def run_level():
     
     collected_resources = []
     
-    # INICIAR DIÁLOGOS INICIALES
-    dialog_manager.start_initial_dialog()
-
+    # SE ELIMINÓ LA LLAMADA A DIÁLOGOS INICIALES
+    
     puede_entregar = False
     
     try:
@@ -92,9 +188,6 @@ def run_level():
                             return "victory"
                         else:
                             dialog_manager.add_tree_dialog("need_resources")
-                            if not game_paused:
-                                dialog_manager.game_paused = True
-                                dialog_manager.dialog_timer = current_time
                 
                 elif event.key == pygame.K_SPACE and game_paused:
                     dialog_manager.next_dialog()
@@ -142,10 +235,6 @@ def run_level():
                         dialog_manager.add_tree_dialog("all_collected")
                         puede_entregar = True
                     
-                    if not game_paused:
-                        dialog_manager.game_paused = True
-                        dialog_manager.dialog_timer = current_time
-                    
                     break
 
         # ACTUALIZAR DIÁLOGOS (para cierre automático)
@@ -153,15 +242,22 @@ def run_level():
 
         seconds_passed = effective_time // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
-        draw_timer(screen, remaining_time, constants)
+        font = pygame.font.SysFont(None, 36)
+        text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
+        screen.blit(text, (10, 10))
 
-        draw_inventory(screen, collected_resources, constants)
+        draw_inventory(screen, collected_resources)
 
         # DIBUJAR DIÁLOGOS (si es necesario)
         if dialog_manager.game_paused and dialog_manager.has_dialogs():
             dialog_text = dialog_manager.get_current_dialog_text()
-            draw_dialog(screen, dialog_text, constants)
-            draw_dialog_timer(screen, current_time, dialog_manager.dialog_timer, constants)
+            draw_dialog(screen, dialog_text)
+            
+            time_left = 10 - ((current_time - dialog_manager.dialog_timer) // 1000)
+            if time_left < 11:
+                time_font = pygame.font.SysFont(None, 20)
+                time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
+                screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
 
         if remaining_time == 0:
             show_defeat_screen(screen)
@@ -177,7 +273,6 @@ def main():
         result = run_level()
         
         if result == "victory":
-            pygame.mixer.music.stop()
             import nivels
             nivels.niveles()
             break

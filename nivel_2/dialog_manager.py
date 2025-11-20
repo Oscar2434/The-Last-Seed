@@ -18,27 +18,7 @@ class DialogManager:
         self.dialog_timer = 0
         self.auto_close_time = 10000  # 10 segundos
 
-        # Definir todos los diálogos aquí
-        self.initial_dialogs = [
-            "EL LABERINTO DE LA NATURALEZA",
-            " ",
-            "OBJETIVO: Recolecta 3 recursos para",
-            "ayudar al árbol central:",
-            "• Cáscara de plátano (composta)",
-            "• Agua", 
-            "• Cáscara de huevo",
-            " ",
-            "¡Cuidado! Los fantasmas te persiguen",
-            "por el laberinto. No dejes que te atrapen.",
-            "CONTROLES:",
-            "• Flechas: Mover personaje",
-            "• E: Interactuar con árbol central", 
-            "• ESPACIO: Continuar diálogos",
-            " ",
-            "Tienes un límite de tiempo.",
-            "¡Buena suerte!"
-        ]
-
+        # Definir diálogos de recursos y árbol
         self.resource_dialogs = {
             "composta": "¡Excelente! La cascara de platano servira como composta para la plantas. \nLa comoposta son nutrientes que ayudaran a las plantas a crecer fuertes.",
             "semillas": "¡Excelente! La cáscara de huevo es rica en calcio y otros minerales que\nbenefician el suelo y las plantas.",
@@ -58,46 +38,31 @@ class DialogManager:
             ]
         }
 
-    def start_initial_dialog(self):
-        """Inicia la secuencia de diálogos iniciales"""
-        self.dialog_queue.extend(self.initial_dialogs)
-        self.game_paused = True
-        self.dialog_timer = pygame.time.get_ticks()
-
     def add_resource_dialog(self, resource_type):
         """Añade el diálogo correspondiente a un recurso"""
         if resource_type in self.resource_dialogs:
             self.dialog_queue.append(self.resource_dialogs[resource_type])
+            self.game_paused = True
+            self.dialog_timer = pygame.time.get_ticks()
 
     def add_tree_dialog(self, dialog_key):
         """Añade diálogo del árbol central"""
         if dialog_key in self.tree_dialogs:
             self.dialog_queue.extend(self.tree_dialogs[dialog_key])
-
-    def add_custom_dialog(self, dialog_text):
-        """Añade un diálogo personalizado (puede ser string o lista de strings)"""
-        if isinstance(dialog_text, list):
-            self.dialog_queue.extend(dialog_text)
-        else:
-            self.dialog_queue.append(dialog_text)
+            self.game_paused = True
+            self.dialog_timer = pygame.time.get_ticks()
 
     def update(self, current_time):
         """Actualiza el estado de los diálogos (para cierre automático)"""
         if self.game_paused and self.dialog_queue and (current_time - self.dialog_timer > self.auto_close_time):
-            self.dialog_queue.pop(0)
-            if self.dialog_queue:
-                self.dialog_timer = current_time
-            else:
-                self.game_paused = False
+            # Limpia todos los diálogos en lugar de solo el primero
+            self.dialog_queue.clear()
+            self.game_paused = False
 
     def next_dialog(self):
-        """Avanza al siguiente diálogo"""
-        if self.dialog_queue:
-            self.dialog_queue.pop(0)
-            if self.dialog_queue:
-                self.dialog_timer = pygame.time.get_ticks()
-            else:
-                self.game_paused = False
+        """Cierra completamente el diálogo actual al presionar ESPACIO"""
+        self.dialog_queue.clear()
+        self.game_paused = False
 
     def has_dialogs(self):
         """Indica si hay diálogos en cola"""
@@ -152,8 +117,8 @@ class DialogManager:
         screen.blit(continue_text, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
 
         # Temporizador de cierre automático
-        time_left = 12 - ((pygame.time.get_ticks() - self.dialog_timer) // 1000)
-        if time_left < 13:
+        time_left = 10 - ((pygame.time.get_ticks() - self.dialog_timer) // 1000)
+        if time_left < 11:
             time_font = pygame.font.SysFont(None, 20)
             time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
             screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
