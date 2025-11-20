@@ -1,20 +1,15 @@
 import pygame
 import sys
 import os
-
-# === CORRECCIÓN DE IMPORTS ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.append(parent_dir)
-
 import constants
 from nivel_2.character import Character
 from nivel_2.world import World
 from nivel_2.ambient import CentralTree
 from nivel_2.dialog_manager import DialogManager
-# === FIN DE CORRECCIÓN ===
-
 pygame.init()
 
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
@@ -146,8 +141,6 @@ def run_level():
     last_pause_start = 0
     
     collected_resources = []
-    
-    # SE ELIMINÓ LA LLAMADA A DIÁLOGOS INICIALES
     
     puede_entregar = False
     
