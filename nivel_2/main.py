@@ -1,15 +1,21 @@
 import pygame
 import sys
 import os
+
+# === CORRECCIÓN DE IMPORTS ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.append(parent_dir)
+
 import constants
 from nivel_2.character import Character
 from nivel_2.world import World
 from nivel_2.ambient import CentralTree
 from nivel_2.dialog_manager import DialogManager
+from nivel_2.pause_menu import PauseMenu
+# === FIN DE CORRECCIÓN ===
+
 pygame.init()
 
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
@@ -135,12 +141,15 @@ def run_level():
 
     # INICIALIZAR DIÁLOGOS
     dialog_manager = DialogManager()
+    
+    # INICIALIZAR MENÚ DE PAUSA
+    pause_menu = PauseMenu(constants.WIDTH, constants.HEIGHT)
 
     start_ticks = pygame.time.get_ticks()
-    paused_time = 0
-    last_pause_start = 0
     
     collected_resources = []
+    
+    # SE ELIMINÓ LA LLAMADA A DIÁLOGOS INICIALES
     
     puede_entregar = False
     
@@ -156,35 +165,48 @@ def run_level():
     while running:
         current_time = pygame.time.get_ticks()
         
-        # ACTUALIZAR ESTADO DE PAUSA BASADO EN DIÁLOGOS
-        game_paused = dialog_manager.game_paused
+        # OBTENER TIEMPO EFECTIVO DESDE EL MENÚ DE PAUSA
+        effective_time = pause_menu.get_effective_time(current_time, start_ticks)
         
-        if game_paused:
-            if last_pause_start == 0:
-                last_pause_start = current_time
-        else:
-            if last_pause_start > 0:
-                paused_time += current_time - last_pause_start
-                last_pause_start = 0
-        
-        effective_time = current_time - start_ticks - paused_time
+        # VERIFICAR ESTADOS DE PAUSA
+        game_paused_by_dialog = dialog_manager.game_paused
+        game_paused_by_menu = pause_menu.is_active()
+        game_paused = game_paused_by_dialog or game_paused_by_menu
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
             
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_e and not game_paused:
-                    if check_interaction(game_character, central_tree):
-                        if puede_entregar:
-                            show_victory_screen(screen)
-                            return "victory"
-                        else:
-                            dialog_manager.add_tree_dialog("need_resources")
+                # Tecla P para activar/desactivar pausa
+                if event.key == pygame.K_p:
+                    pause_menu.toggle(current_time)
                 
-                elif event.key == pygame.K_SPACE and game_paused:
+                # Solo procesar otras teclas si no hay pausa activa
+                if not game_paused:
+                    if event.key == pygame.K_e:
+                        if check_interaction(game_character, central_tree):
+                            if puede_entregar:
+                                show_victory_screen(screen)
+                                return "victory"
+                            else:
+                                dialog_manager.add_tree_dialog("need_resources")
+                
+                # Manejar ESPACIO para diálogos (solo si hay diálogos activos)
+                elif event.key == pygame.K_SPACE and game_paused_by_dialog:
                     dialog_manager.next_dialog()
+            
+            # Manejar eventos del menú de pausa
+            if pause_menu.is_active():
+                menu_action = pause_menu.handle_event(event, current_time)
+                if menu_action == "continue":
+                    pause_menu.toggle(current_time)
+                elif menu_action == "restart":  # NUEVO: Manejar reinicio
+                    return "restart"
+                elif menu_action == "menu":
+                    return "menu"
 
+        # Dibujar elementos del juego (siempre se dibujan, incluso en pausa)
         game_world.draw(screen)
         game_character.draw(screen)
         central_tree.draw(screen)
@@ -195,6 +217,7 @@ def run_level():
         for enemy in game_world.enemies:
             enemy.draw(screen)
 
+        # Solo actualizar juego si no está en pausa
         if not game_paused:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
@@ -233,16 +256,18 @@ def run_level():
         # ACTUALIZAR DIÁLOGOS (para cierre automático)
         dialog_manager.update(current_time)
 
+        # CALCULAR Y MOSTRAR TIEMPO RESTANTE
         seconds_passed = effective_time // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
+        
         font = pygame.font.SysFont(None, 36)
         text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
         screen.blit(text, (10, 10))
 
         draw_inventory(screen, collected_resources)
 
-        # DIBUJAR DIÁLOGOS (si es necesario)
-        if dialog_manager.game_paused and dialog_manager.has_dialogs():
+        # DIBUJAR DIÁLOGOS (si es necesario y no está en pausa por menú)
+        if dialog_manager.game_paused and dialog_manager.has_dialogs() and not pause_menu.is_active():
             dialog_text = dialog_manager.get_current_dialog_text()
             draw_dialog(screen, dialog_text)
             
@@ -252,7 +277,12 @@ def run_level():
                 time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
                 screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
 
-        if remaining_time == 0:
+        # DIBUJAR MENÚ DE PAUSA (encima de todo)
+        if pause_menu.is_active():
+            pause_menu.draw(screen)
+
+        # VERIFICAR SI SE ACABÓ EL TIEMPO (solo si no está en pausa)
+        if remaining_time == 0 and not game_paused:
             show_defeat_screen(screen)
             return "defeat"
 
@@ -271,6 +301,12 @@ def main():
             break
         elif result == "defeat":
             continue
+        elif result == "restart":  # NUEVO: Reiniciar nivel
+            continue  # Simplemente continuar el bucle para reiniciar
+        elif result == "menu":  # Volver al menú principal
+            import menu
+            menu.menu()
+            break
         elif result == "quit":
             break
     

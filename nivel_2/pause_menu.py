@@ -17,6 +17,10 @@ class PauseMenu:
         self.screen_height = screen_height
         self.active = False
         
+        # Variables para control de tiempo
+        self.pause_start_time = 0
+        self.total_paused_time = 0
+        
         # Crear superficie semi-transparente para el fondo
         self.overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
         self.overlay.fill((0, 0, 0, 128))  # Negro semi-transparente
@@ -45,7 +49,7 @@ class PauseMenu:
         continue_button = {
             'rect': pygame.Rect(
                 center_x - self.button_width // 2,
-                center_y - self.button_height - self.button_margin // 2,
+                center_y - self.button_height * 2 - self.button_margin,
                 self.button_width,
                 self.button_height
             ),
@@ -53,11 +57,23 @@ class PauseMenu:
             'action': 'continue'
         }
         
+        # Botón de Reiniciar (NUEVO)
+        restart_button = {
+            'rect': pygame.Rect(
+                center_x - self.button_width // 2,
+                center_y - self.button_height,
+                self.button_width,
+                self.button_height
+            ),
+            'text': 'Reiniciar',
+            'action': 'restart'
+        }
+        
         # Botón de Salir al Menú
         menu_button = {
             'rect': pygame.Rect(
                 center_x - self.button_width // 2,
-                center_y + self.button_margin // 2,
+                center_y + self.button_margin,
                 self.button_width,
                 self.button_height
             ),
@@ -66,14 +82,39 @@ class PauseMenu:
         }
         
         buttons.append(continue_button)
+        buttons.append(restart_button)
         buttons.append(menu_button)
         
         return buttons
     
-    def toggle(self):
-        """Alterna el estado del menú de pausa"""
+    def toggle(self, current_time):
+        """Alterna el estado del menú de pausa y controla el tiempo"""
         self.active = not self.active
+        
+        if self.active:
+            # Iniciar pausa - guardar el momento en que se pausa
+            self.pause_start_time = current_time
+        else:
+            # Terminar pausa - calcular tiempo transcurrido en pausa
+            if self.pause_start_time > 0:
+                pause_duration = current_time - self.pause_start_time
+                self.total_paused_time += pause_duration
+                self.pause_start_time = 0
+        
         return self.active
+    
+    def get_effective_time(self, current_time, start_ticks):
+        """
+        Calcula el tiempo efectivo de juego (tiempo total menos tiempo en pausa)
+        """
+        current_pause_time = 0
+        if self.active and self.pause_start_time > 0:
+            current_pause_time = current_time - self.pause_start_time
+        
+        total_pause_time = self.total_paused_time + current_pause_time
+        effective_time = current_time - start_ticks - total_pause_time
+        
+        return effective_time
     
     def draw(self, screen):
         """Dibuja el menú de pausa en la pantalla"""
@@ -109,7 +150,7 @@ class PauseMenu:
             text_rect = button_text.get_rect(center=button['rect'].center)
             screen.blit(button_text, text_rect)
     
-    def handle_event(self, event):
+    def handle_event(self, event, current_time):
         """Maneja eventos del mouse para los botones"""
         if not self.active:
             return None
@@ -119,6 +160,12 @@ class PauseMenu:
             
             for button in self.buttons:
                 if button['rect'].collidepoint(mouse_pos):
+                    # Si se hace clic en "Continuar", actualizar el tiempo de pausa
+                    if button['action'] == 'continue' and self.pause_start_time > 0:
+                        pause_duration = current_time - self.pause_start_time
+                        self.total_paused_time += pause_duration
+                        self.pause_start_time = 0
+                    
                     return button['action']
         
         return None
@@ -126,3 +173,8 @@ class PauseMenu:
     def is_active(self):
         """Retorna si el menú de pausa está activo"""
         return self.active
+    
+    def reset(self):
+        """Reinicia el contador de tiempo pausado"""
+        self.total_paused_time = 0
+        self.pause_start_time = 0
