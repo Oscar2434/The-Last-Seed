@@ -5,7 +5,7 @@ import config
 import constants
 import main
 # import nivel_2  # ← ELIMINAR ESTA LÍNEA
-from nivel_2 import main as nivel_2_main  # ← AGREGAR ESTA LÍNEA
+import nivel_2 as nivel_2_main
 
 pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))

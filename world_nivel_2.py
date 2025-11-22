@@ -9,9 +9,9 @@ if parent_dir not in sys.path:
 
 import constants
 import pygame
-from nivel_2.ambient import Wall, Resource
-from nivel_2.resources import WaterResource  
-from nivel_2.enemy import Enemy 
+from ambient_nivel_2 import Wall, Resource
+from resources_nivel_2 import WaterResource  
+from enemy_nivel_2 import Enemy
 # === FIN DE CORRECCIÓN ===
 
 class World:

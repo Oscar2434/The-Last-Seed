@@ -9,11 +9,11 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
 import constants
-from nivel_2.character import Character
-from nivel_2.world import World
-from nivel_2.ambient import CentralTree
-from nivel_2.dialog_manager import DialogManager
-from nivel_2.pause_menu import PauseMenu
+from character_nivel_2 import Character
+from world_nivel_2 import World
+from ambient_nivel_2 import CentralTree
+from dialog_manager_nivel_2 import DialogManager
+from pause_menu_nivel_2 import PauseMenu
 # === FIN DE CORRECCIÓN ===
 
 pygame.init()
