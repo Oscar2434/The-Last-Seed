@@ -132,6 +132,12 @@ def show_victory_screen(screen):
     pygame.time.delay(3000)
 
 def run_level():
+    if pygame.mixer.get_init():
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('music/m1.mp3')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+    
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
     game_character = Character(5, 386)
@@ -295,15 +301,39 @@ def main():
     while True:
         result = run_level()
         
+        # DETENER MÚSICA DEL NIVEL AL SALIR
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+        
         if result == "victory":
+            # RESTAURAR MÚSICA DEL MENÚ
+            try:
+                import config
+                if config.music and pygame.mixer.get_init():
+                    pygame.mixer.music.load('music/m4.mp3')
+                    pygame.mixer.music.set_volume(0.5)
+                    pygame.mixer.music.play(-1)
+            except:
+                pass
+            
             import nivels
             nivels.niveles()
             break
         elif result == "defeat":
             continue
-        elif result == "restart":  # NUEVO: Reiniciar nivel
-            continue  # Simplemente continuar el bucle para reiniciar
-        elif result == "menu":  # Volver al menú principal
+        elif result == "restart":
+            continue
+        elif result == "menu":
+            # RESTAURAR MÚSICA DEL MENÚ
+            try:
+                import config
+                if config.music and pygame.mixer.get_init():
+                    pygame.mixer.music.load('music/m4.mp3')
+                    pygame.mixer.music.set_volume(0.5)
+                    pygame.mixer.music.play(-1)
+            except:
+                pass
+            
             import menu
             menu.menu()
             break

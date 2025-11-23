@@ -25,20 +25,37 @@ class PauseMenu:
         self.overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
         self.overlay.fill((0, 0, 0, 128))  # Negro semi-transparente
         
-        # Configuración de botones
-        self.button_width = 200
-        self.button_height = 50
-        self.button_margin = 20
-        
-        # Colores de botones
-        self.button_color = (70, 130, 180)  # Azul acero
-        self.button_hover_color = (100, 160, 210)  # Azul más claro
-        self.text_color = (255, 255, 255)  # Blanco
+        # Cargar imágenes
+        self.load_images()
         
         # Crear botones
         self.buttons = self.create_buttons()
+    
+    def load_images(self):
+        """Carga y escala las imágenes para el menú de pausa"""
+        # Cargar título
+        self.title_image = pygame.image.load("imagenes/titulo1.png").convert_alpha()
         
+        # Cargar imágenes de botones (usando Exit.png temporalmente para todos)
+        button_continue = pygame.image.load("imagenes/Exit.png").convert_alpha()
+        button_restart = pygame.image.load("imagenes/Exit.png").convert_alpha()
+        button_menu = pygame.image.load("imagenes/Exit.png").convert_alpha()
+        
+        # Escalar botones - ajusta el factor de escala según necesidad
+        scale_factor = 0.4  # Puedes ajustar este valor
+        button_width = int(button_continue.get_width() * scale_factor)
+        button_height = int(button_continue.get_height() * scale_factor)
+        
+        self.button_continue = pygame.transform.scale(button_continue, (button_width, button_height))
+        self.button_restart = pygame.transform.scale(button_restart, (button_width, button_height))
+        self.button_menu = pygame.transform.scale(button_menu, (button_width, button_height))
+        
+        # Guardar dimensiones de botones para uso posterior
+        self.button_width = button_width
+        self.button_height = button_height
+    
     def create_buttons(self):
+        """Crea los botones del menú de pausa"""
         buttons = []
         
         # Calcular posición central para los botones
@@ -47,36 +64,24 @@ class PauseMenu:
         
         # Botón de Continuar
         continue_button = {
-            'rect': pygame.Rect(
-                center_x - self.button_width // 2,
-                center_y - self.button_height * 2 - self.button_margin,
-                self.button_width,
-                self.button_height
-            ),
+            'image': self.button_continue,
+            'rect': self.button_continue.get_rect(center=(center_x, center_y - 80)),
             'text': 'Continuar',
             'action': 'continue'
         }
         
-        # Botón de Reiniciar (NUEVO)
+        # Botón de Reiniciar
         restart_button = {
-            'rect': pygame.Rect(
-                center_x - self.button_width // 2,
-                center_y - self.button_height,
-                self.button_width,
-                self.button_height
-            ),
+            'image': self.button_restart,
+            'rect': self.button_restart.get_rect(center=(center_x, center_y)),
             'text': 'Reiniciar',
             'action': 'restart'
         }
         
         # Botón de Salir al Menú
         menu_button = {
-            'rect': pygame.Rect(
-                center_x - self.button_width // 2,
-                center_y + self.button_margin,
-                self.button_width,
-                self.button_height
-            ),
+            'image': self.button_menu,
+            'rect': self.button_menu.get_rect(center=(center_x, center_y + 80)),
             'text': 'Salir al Menú',
             'action': 'menu'
         }
@@ -124,31 +129,27 @@ class PauseMenu:
         # Dibujar fondo semi-transparente
         screen.blit(self.overlay, (0, 0))
         
-        # Dibujar título
-        title_font = pygame.font.SysFont(None, 72)
-        title_text = title_font.render("PAUSA", True, (255, 255, 255))
-        title_rect = title_text.get_rect(center=(self.screen_width // 2, self.screen_height // 4))
-        screen.blit(title_text, title_rect)
-        
-        # Dibujar botones
+        # Dibujar botones primero
         mouse_pos = pygame.mouse.get_pos()
         
         for button in self.buttons:
-            # Determinar color del botón (hover o normal)
-            if button['rect'].collidepoint(mouse_pos):
-                color = self.button_hover_color
-            else:
-                color = self.button_color
+            # Determinar si el botón está siendo hovered
+            is_hovered = button['rect'].collidepoint(mouse_pos)
             
             # Dibujar botón
-            pygame.draw.rect(screen, color, button['rect'])
-            pygame.draw.rect(screen, (255, 255, 255), button['rect'], 2)  # Borde
+            screen.blit(button['image'], button['rect'])
             
             # Dibujar texto del botón
-            button_font = pygame.font.SysFont(None, 32)
-            button_text = button_font.render(button['text'], True, self.text_color)
+            button_font = pygame.font.SysFont(None, 24)
+            text_color = (255, 255, 255) if is_hovered else (200, 200, 200)
+            button_text = button_font.render(button['text'], True, text_color)
             text_rect = button_text.get_rect(center=button['rect'].center)
             screen.blit(button_text, text_rect)
+        
+        # Dibujar título DEBAJO de los botones
+        title_y = self.screen_height // 2 + 150  # Posición debajo de los botones
+        title_rect = self.title_image.get_rect(center=(self.screen_width // 2, title_y))
+        screen.blit(self.title_image, title_rect)
     
     def handle_event(self, event, current_time):
         """Maneja eventos del mouse para los botones"""
