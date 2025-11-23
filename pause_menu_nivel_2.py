@@ -33,7 +33,7 @@ class PauseMenu:
     
     def load_images(self):
         """Carga y escala las imágenes para el menú de pausa"""
-        # Cargar título
+        # Cargar título (sin escalar, ya que tiene el tamaño correcto)
         self.title_image = pygame.image.load("imagenes/titulo1.png").convert_alpha()
         
         # Cargar imágenes de botones (usando Exit.png temporalmente para todos)
@@ -66,7 +66,6 @@ class PauseMenu:
         continue_button = {
             'image': self.button_continue,
             'rect': self.button_continue.get_rect(center=(center_x, center_y - 80)),
-            'text': 'Continuar',
             'action': 'continue'
         }
         
@@ -74,7 +73,6 @@ class PauseMenu:
         restart_button = {
             'image': self.button_restart,
             'rect': self.button_restart.get_rect(center=(center_x, center_y)),
-            'text': 'Reiniciar',
             'action': 'restart'
         }
         
@@ -82,7 +80,6 @@ class PauseMenu:
         menu_button = {
             'image': self.button_menu,
             'rect': self.button_menu.get_rect(center=(center_x, center_y + 80)),
-            'text': 'Salir al Menú',
             'action': 'menu'
         }
         
@@ -129,27 +126,13 @@ class PauseMenu:
         # Dibujar fondo semi-transparente
         screen.blit(self.overlay, (0, 0))
         
-        # Dibujar botones primero
-        mouse_pos = pygame.mouse.get_pos()
+        # Dibujar título ocupando toda la pantalla (sin escalar)
+        screen.blit(self.title_image, (0, 0))
         
+        # Dibujar botones encima del título (gracias a las áreas transparentes)
         for button in self.buttons:
-            # Determinar si el botón está siendo hovered
-            is_hovered = button['rect'].collidepoint(mouse_pos)
-            
-            # Dibujar botón
+            # Dibujar botón (solo la imagen, sin texto)
             screen.blit(button['image'], button['rect'])
-            
-            # Dibujar texto del botón
-            button_font = pygame.font.SysFont(None, 24)
-            text_color = (255, 255, 255) if is_hovered else (200, 200, 200)
-            button_text = button_font.render(button['text'], True, text_color)
-            text_rect = button_text.get_rect(center=button['rect'].center)
-            screen.blit(button_text, text_rect)
-        
-        # Dibujar título DEBAJO de los botones
-        title_y = self.screen_height // 2 + 150  # Posición debajo de los botones
-        title_rect = self.title_image.get_rect(center=(self.screen_width // 2, title_y))
-        screen.blit(self.title_image, title_rect)
     
     def handle_event(self, event, current_time):
         """Maneja eventos del mouse para los botones"""
