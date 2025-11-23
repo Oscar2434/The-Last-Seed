@@ -1,6 +1,7 @@
 import constants
 import pygame
 import os
+import math
 from fire import Fire
 
 class Tree:
@@ -16,6 +17,12 @@ class Tree:
         self.total_frames = 5
         self.size = constants.TREE_MEDIUM
         self.sprite = pygame.image.load(os.path.join('assets', 'images', 'objects', 'arbolquemado.png')).convert_alpha()
+        self.glow = False
+        self.glow_start = 0
+
+    def start_glow(self):
+        self.glow = True
+        self.glow_start = pygame.time.get_ticks()
 
     def take_damage(self, amount):
         self.health -= amount
@@ -29,6 +36,7 @@ class Tree:
         if self.health > self.max_health:
             self.health = self.max_health
         self.fires.clear()
+        self.start_glow()
 
     def add_fire(self, big=False):
         fx = self.x + self.size // 2 - constants.FIRE_SIZE // 2 - 3
@@ -36,26 +44,50 @@ class Tree:
         self.fires.append(Fire(fx, fy, big))
 
     def draw(self, screen):
-        ratio = self.health / self.max_health if self.max_health > 0 else 0
-        if ratio > 0.95:
-            row = 0
-        elif ratio > 0.75:
-            row = 1
-        elif ratio > 0.55:
-            row = 2
-        elif ratio > 0.35:
-            row = 3
+        if self.glow:
+            elapsed = pygame.time.get_ticks() - self.glow_start
+            alpha = 150 + 80 * math.sin(elapsed / 100)
+            temp = pygame.Surface((self.frame_size, self.frame_size), pygame.SRCALPHA)
+            ratio = self.health / self.max_health if self.max_health > 0 else 0
+            if ratio > 0.95:
+                row = 0
+            elif ratio > 0.75:
+                row = 1
+            elif ratio > 0.55:
+                row = 2
+            elif ratio > 0.35:
+                row = 3
+            else:
+                row = 4
+            rect = pygame.Rect(self.current_frame * self.frame_size, row * self.frame_size, self.frame_size, self.frame_size)
+            temp.blit(self.sprite, (0, 0), rect)
+            temp = pygame.transform.scale(temp, (self.size, self.size))
+            temp.set_alpha(max(0, min(255, int(alpha))))
+            screen.blit(temp, (self.x, self.y))
+            if elapsed >= constants.THROW_ANIM_TIME:
+                self.glow = False
         else:
-            row = 4
-        current_time = pygame.time.get_ticks()
-        if self.health > 0 and current_time - self.animation_timer > constants.WATER_ANIM_DELAY:
-            self.animation_timer = current_time
-            self.current_frame = (self.current_frame + 1) % self.total_frames
-        rect = pygame.Rect(self.current_frame * self.frame_size, row * self.frame_size, self.frame_size, self.frame_size)
-        surface = pygame.Surface((self.frame_size, self.frame_size), pygame.SRCALPHA)
-        surface.blit(self.sprite, (0, 0), rect)
-        surface = pygame.transform.scale(surface, (self.size, self.size))
-        screen.blit(surface, (self.x, self.y))
+            ratio = self.health / self.max_health if self.max_health > 0 else 0
+            if ratio > 0.95:
+                row = 0
+            elif ratio > 0.75:
+                row = 1
+            elif ratio > 0.55:
+                row = 2
+            elif ratio > 0.35:
+                row = 3
+            else:
+                row = 4
+            current_time = pygame.time.get_ticks()
+            if self.health > 0 and current_time - self.animation_timer > constants.WATER_ANIM_DELAY:
+                self.animation_timer = current_time
+                self.current_frame = (self.current_frame + 1) % self.total_frames
+            rect = pygame.Rect(self.current_frame * self.frame_size, row * self.frame_size, self.frame_size, self.frame_size)
+            surface = pygame.Surface((self.frame_size, self.frame_size), pygame.SRCALPHA)
+            surface.blit(self.sprite, (0, 0), rect)
+            surface = pygame.transform.scale(surface, (self.size, self.size))
+            screen.blit(surface, (self.x, self.y))
+
         for fire in self.fires:
             fire.draw(screen)
 

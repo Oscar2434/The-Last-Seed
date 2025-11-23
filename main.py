@@ -8,7 +8,7 @@ from enemy import Lumberjack
 from resources import Resource
 import random
 import os
-import config  # Importado para leer dificultad
+import config
 
 pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
@@ -21,15 +21,11 @@ defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIG
 
 def main():
 
-    # ---------------------------
-    # Música del Nivel 1 (ÚNICO CAMBIO)
-    # ---------------------------
     if pygame.mixer.get_init():
         pygame.mixer.music.stop()
     pygame.mixer.music.load('music/m2.mp3')
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
-    # ---------------------------
 
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
@@ -54,9 +50,19 @@ def main():
     start_ticks = pygame.time.get_ticks()
 
     while True:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    all_trees = [central_tree] + game_world.trees
+                    closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
+                    distance = ((closest_tree.x - game_character.x) ** 2 + (closest_tree.y - game_character.y) ** 2) ** 0.5
+                    if distance <= 70:
+                        game_character.start_throw_animation()
+                        game_character.deliver_resource(closest_tree)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -67,13 +73,6 @@ def main():
             game_character.move(dx=0, dy=-5, world=game_world)
         if keys[pygame.K_DOWN]:
             game_character.move(dx=0, dy=5, world=game_world)
-
-        if keys[pygame.K_e]:
-            all_trees = [central_tree] + game_world.trees
-            closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
-            distance = ((closest_tree.x - game_character.x) ** 2 + (closest_tree.y - game_character.y) ** 2) ** 0.5
-            if distance <= 70:
-                game_character.deliver_resource(closest_tree)
 
         if len(lumberjacks) < max_enemies:
             if spawn_timer <= 0:

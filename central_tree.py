@@ -9,12 +9,18 @@ class CentralTree:
         self.y = y
         self.size = constants.TREE_SIZE
         self.health = constants.TREE_HEALTH
-        self.fires = [] 
+        self.fires = []
 
-        # Cargar sprite del árbol central
         image_path = os.path.join('assets', 'images', 'objects', 'treeC.png')
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
+
+        self.glow = False
+        self.glow_start = 0
+
+    def start_glow(self):
+        self.glow = True
+        self.glow_start = pygame.time.get_ticks()
 
     def take_damage(self, amount):
         self.health -= amount
@@ -25,8 +31,8 @@ class CentralTree:
         self.health += amount
         if self.health > constants.TREE_HEALTH:
             self.health = constants.TREE_HEALTH
-    
         self.fires.clear()
+        self.start_glow()
 
     def add_fire(self, big=False):
         fx = self.x + self.size // 2 - constants.FIRE_SIZE // 2 - 5
@@ -34,10 +40,17 @@ class CentralTree:
         self.fires.append(Fire(fx, fy, big))
 
     def draw(self, screen):
-        # Dibujar árbol
-        screen.blit(self.image, (self.x, self.y))
+        if self.glow:
+            elapsed = pygame.time.get_ticks() - self.glow_start
+            alpha = 150 + 80 * pygame.math.sin(elapsed / 100)
+            temp = self.image.copy()
+            temp.set_alpha(max(0, min(255, int(alpha))))
+            screen.blit(temp, (self.x, self.y))
+            if elapsed >= constants.THROW_ANIM_TIME:
+                self.glow = False
+        else:
+            screen.blit(self.image, (self.x, self.y))
 
-        # Barra de vida
         bar_width = self.size
         bar_height = 8
         fill = (self.health / constants.TREE_HEALTH) * bar_width
@@ -46,6 +59,5 @@ class CentralTree:
         pygame.draw.rect(screen, constants.RED, outline_rect)
         pygame.draw.rect(screen, constants.GREEN, fill_rect)
 
-        # Dibujar fuegos
         for fire in self.fires:
             fire.draw(screen)
