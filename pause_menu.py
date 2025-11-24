@@ -90,6 +90,7 @@ def show_pause_menu(screen, from_level, callback_restart=None):
                 pygame.quit()
                 exit()
 
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause_active = False
 

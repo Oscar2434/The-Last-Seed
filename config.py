@@ -16,7 +16,7 @@ TITLE_IMAGE       = "assets/images/effects/titulo1.png"
 CONFIG_ICON       = "assets/images/effects/config1.png"
 MUSIC_ICON        = "assets/images/effects/musicaL.png"
 FLAG_ES           = "assets/images/effects/españa.png"
-FLAG_EN           = "assets/images/effects/españa.png"   
+FLAG_EN           = "assets/images/effects/inglaterra .png"   
 EXIT_BUTTON       = "assets/images/effects/salida.png"
 
 
@@ -154,3 +154,4 @@ def open_config_menu(from_menu="main"):
     else:
         import menu
         menu.menu()
+

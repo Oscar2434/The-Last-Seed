@@ -173,3 +173,4 @@ def show(level=1):
 
         pygame.display.update()
         clock.tick(60)
+

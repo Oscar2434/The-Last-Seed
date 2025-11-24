@@ -44,7 +44,6 @@ config_button = Button(
 def menu():
     run = True
     while run:
-
         if config.lenguaje:
             play_normal = pygame.image.load("imagenes/Play.png")
             play_hover  = pygame.image.load("imagenes/PlayR.png")
@@ -70,28 +69,29 @@ def menu():
         if play_rect.collidepoint(mouse):
             screen.blit(play_hover, play_rect)
             if click:
-                
-                # =======================================================
-                # VALORES ENVIADOS DESDE LOS NIVELES / PAUSE MENU
-                # =======================================================
                 resultado = nivels.niveles()
-
-                if resultado == "menu":
-                    return  # <-- FIX CLAVE
-
+                
+                # MANEJO COMPLETO DE RETORNOS
                 if resultado == "menu_principal":
                     return  # Vuelve al menú principal
-
                 elif resultado == "config":
-                    config.from_menu = "pause"
-                    return config.open_config_menu()
-                # =======================================================
+                    config_result = config.open_config_menu(from_menu="main")
+                    if config_result == "menu_principal":
+                        continue  # Ya estamos en el menú
+                elif resultado == "reiniciar":
+                    # No aplica desde menú principal
+                    continue
+                elif resultado == "quit":
+                    pygame.quit()
+                    sys.exit()
 
         else:
             screen.blit(play_normal, play_rect)
 
         if config_button.draw(screen):
-            return config.open_config_menu()
+            config_result = config.open_config_menu(from_menu="main")
+            if config_result == "menu_principal":
+                continue  # Ya estamos en el menú principal
 
         if exit_rect.collidepoint(mouse):
             screen.blit(exit_normal, exit_rect)
