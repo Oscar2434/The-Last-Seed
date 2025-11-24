@@ -3,13 +3,11 @@ import constants
 
 pygame.init()
 
-
 lenguaje = True
 music = True
 volume_master = 0.5
 selected_character = None
 difficulty = None
-
 
 BACKGROUND_CONFIG = "assets/images/effects/portada.png"
 TITLE_IMAGE       = "assets/images/effects/titulo1.png"
@@ -19,7 +17,6 @@ FLAG_ES           = "assets/images/effects/españa.png"
 FLAG_EN           = "assets/images/effects/inglaterra .png"   
 EXIT_BUTTON       = "assets/images/effects/salida.png"
 
-
 def load_image(path, scale=1.0):
     img = pygame.image.load(path).convert_alpha()
     if scale != 1.0:
@@ -27,15 +24,12 @@ def load_image(path, scale=1.0):
         img = pygame.transform.scale(img, (int(w * scale), int(h * scale)))
     return img
 
-
 def draw_hover(screen, rect):
     pygame.draw.rect(screen, (255, 255, 0), rect.inflate(10, 10), 3)
 
-
 def open_config_menu(from_menu="main"):
-
     global lenguaje, music, volume_master
-
+    
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 
     # Cargar imágenes escaladas
@@ -54,53 +48,38 @@ def open_config_menu(from_menu="main"):
     flag_es_rect = flag_es.get_rect(center=(constants.WIDTH // 2 - 70, 245))
     flag_en_rect = flag_en.get_rect(center=(constants.WIDTH // 2 + 70, 245))
 
-
     bar_width  = 220
     bar_height = 32
     bar_y = 300
 
     icon_w = music_icon.get_width()
-    separation = 7  # separación estética
+    separation = 7
 
-    # Ancho total del bloque
     block_width = icon_w + separation + bar_width
-
-    # Mover conjunto 15 px a la izquierda
     start_x = (constants.WIDTH - block_width) // 2 - 15
 
-    # Ícono alineado verticalmente con la barra
     music_rect = music_icon.get_rect(center=(
         start_x + icon_w // 2,
         bar_y + bar_height // 2
     ))
 
-    # Barra alineada horizontalmente con el ícono
     bar_x = start_x + icon_w + separation
-
-
-
     exit_rect = exit_img.get_rect(center=(constants.WIDTH // 2, 395))
 
     running = True
     while running:
         screen.blit(bg, (0, 0))
-
-       
         screen.blit(title_img, title_rect)
         screen.blit(config_icon, config_rect)
-
-        
         screen.blit(flag_es, flag_es_rect)
         screen.blit(flag_en, flag_en_rect)
 
-        # Hover banderas
         mx, my = pygame.mouse.get_pos()
         if flag_es_rect.collidepoint(mx, my):
             draw_hover(screen, flag_es_rect)
         if flag_en_rect.collidepoint(mx, my):
             draw_hover(screen, flag_en_rect)
 
-    
         screen.blit(music_icon, music_rect)
 
         # Barra de volumen (fondo)
@@ -121,12 +100,9 @@ def open_config_menu(from_menu="main"):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-                return
+                return "quit"
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-
                 if flag_es_rect.collidepoint(mx, my):
                     lenguaje = True
                 if flag_en_rect.collidepoint(mx, my):
@@ -137,21 +113,10 @@ def open_config_menu(from_menu="main"):
                     volume_master = max(0, min(volume_master, 1))
 
                 if exit_rect.collidepoint(mx, my):
-                    running = False
+                    # CORRECCIÓN: Ahora retorna "menu" en lugar de "menu_principal"
+                    pygame.time.delay(100)
+                    return "menu"
 
         pygame.display.update()
 
-    while pygame.mouse.get_pressed()[0]:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-        pygame.time.delay(10)
-
-    if from_menu == "pause":
-        import pause_menu
-        pause_menu.open_pause_menu()
-    else:
-        import menu
-        menu.menu()
-
+    return "menu"

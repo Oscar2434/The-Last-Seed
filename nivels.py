@@ -73,14 +73,19 @@ def niveles():
                 pygame.time.delay(150)
                 resultado = select_character.show(level=b["lvl"])
 
-                if resultado == "menu_principal":
-                    return "menu_principal"
-
+                if resultado == "menu":
+                    return "menu"
                 if resultado == "config":
-                    return "config"
-
-                if resultado == "reiniciar":
+                    config_result = config.open_config_menu(from_menu="niveles")
+                    if config_result == "menu":
+                        return "menu"
+    # Si no, continuamos en niveles
+                    continue
+                elif resultado == "reiniciar":
                     return "reiniciar"
+                elif resultado == "quit":
+                    pygame.quit()
+                    sys.exit()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -89,7 +94,6 @@ def niveles():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return "menu_principal"
+                    return "menu"
 
         pygame.display.update()
-

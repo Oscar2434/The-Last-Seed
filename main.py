@@ -75,11 +75,11 @@ def main():
                 # TECLA ESC → ABRE MENÚ DE PAUSA
                 if event.key == pygame.K_ESCAPE:
                     action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-                    if action == "menu_principal":
-                        return "menu"
                     if action == "config":
-                        config.from_menu = "pause"
-                        return "config"
+                        result = config.open_config_menu(from_menu="pause")
+                        if result == "menu":
+                             return "menu"
+                        continue
                     if action == "reiniciar":
                         return main()
                     # reanudar → no hacemos nada
@@ -97,14 +97,14 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pause_rect.collidepoint(event.pos):
                     action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-                    if action == "menu_principal":
-                        return "menu"
                     if action == "config":
-                        config.from_menu = "pause"
-                        return "config"
-                    if action == "reiniciar":
-                        return main()
-                    # reanudar → continuar
+                        result = config.open_config_menu(from_menu="pause")
+                        if result == "pause":
+                            continue  # Volver al menú de pausa
+                        elif result == "menu":
+                            return "menu"
+                        elif result == "quit":
+                            return "quit"
 
         # === MOVIMIENTO ORIGINAL ===
         keys = pygame.key.get_pressed()
@@ -192,7 +192,7 @@ def main():
             pygame.time.delay(2000)
 
             action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-            if action == "menu_principal":
+            if action == "menu":
                 return "menu"
             if action == "config":
                 config.from_menu = "pause"
@@ -210,7 +210,7 @@ def main():
             pygame.time.delay(3000)
 
             action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-            if action == "menu_principal":
+            if action == "menu":
                 return "menu"
             if action == "config":
                 config.from_menu = "pause"

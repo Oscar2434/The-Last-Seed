@@ -1,5 +1,6 @@
 import pygame
 import constants
+import config
 
 pygame.init()
 
@@ -26,7 +27,6 @@ class PauseButton:
 
 
 def show_pause_menu(screen, from_level, callback_restart=None):
-
     # === CARGA DE IMÁGENES ===
     titulo_raw = pygame.image.load("assets/images/effects/titulo1.png").convert_alpha()
     menu_raw = pygame.image.load("assets/images/effects/menu1.png").convert_alpha()
@@ -85,20 +85,25 @@ def show_pause_menu(screen, from_level, callback_restart=None):
         pygame.display.update()
 
         for event in pygame.event.get():
-
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause_active = False
 
             if btn_menu.is_clicked(event):
-                return "menu_principal"
+                # CORRECCIÓN: Retorna "menu" en lugar de "menu_principal"
+                return "menu"
 
             if btn_conf.is_clicked(event):
-                return "config"
+                # Abre configuración desde pausa
+                result = config.open_config_menu(from_menu="pause")
+                # Si config retorna "menu", lo propagamos
+                if result == "menu":
+                    return "menu"
+                # Si no, continuamos en el menú de pausa
+                continue
 
             if btn_rean.is_clicked(event):
                 pause_active = False
@@ -107,3 +112,4 @@ def show_pause_menu(screen, from_level, callback_restart=None):
                 return "reiniciar"
 
     return "reanudar"
+# memu
