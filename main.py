@@ -10,6 +10,9 @@ import random
 import os
 import config
 
+# === IMPORTACIÓN DEL MENÚ DE PAUSA ===
+import pause_menu
+
 pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")
@@ -19,8 +22,16 @@ defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perd
 victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
 defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
 
+# === BOTÓN DE PAUSA (ahora reducido) ===
+pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_alpha()
+pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
+pause_rect = pause_icon.get_rect(center=(constants.WIDTH // 2, 20))
+
+
+
 def main():
 
+    # Música original sin cambios
     if pygame.mixer.get_init():
         pygame.mixer.music.stop()
     pygame.mixer.music.load('music/m2.mp3')
@@ -49,13 +60,31 @@ def main():
     resource_timer = 0
     start_ticks = pygame.time.get_ticks()
 
+    # === FUNCIÓN LOCAL PARA REINICIAR EL NIVEL ===
+    def restart_level():
+        return main()
+
     while True:
 
+        # === EVENTOS ORIGINALES DEL NIVEL ===
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
 
             if event.type == pygame.KEYDOWN:
+                # TECLA ESC → ABRE MENÚ DE PAUSA
+                if event.key == pygame.K_ESCAPE:
+                    action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
+                    if action == "menu_principal":
+                        return "menu"
+                    if action == "config":
+                        config.from_menu = "pause"
+                        return "config"
+                    if action == "reiniciar":
+                        return main()
+                    # reanudar → no hacemos nada
+
+                # Lógica original sin tocar:
                 if event.key == pygame.K_e:
                     all_trees = [central_tree] + game_world.trees
                     closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
@@ -64,6 +93,20 @@ def main():
                         game_character.start_throw_animation()
                         game_character.deliver_resource(closest_tree)
 
+            # CLICK EN BOTÓN DE PAUSA
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pause_rect.collidepoint(event.pos):
+                    action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
+                    if action == "menu_principal":
+                        return "menu"
+                    if action == "config":
+                        config.from_menu = "pause"
+                        return "config"
+                    if action == "reiniciar":
+                        return main()
+                    # reanudar → continuar
+
+        # === MOVIMIENTO ORIGINAL ===
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             game_character.move(dx=-5, dy=0, world=game_world)
@@ -74,6 +117,7 @@ def main():
         if keys[pygame.K_DOWN]:
             game_character.move(dx=0, dy=5, world=game_world)
 
+        # === SPAWNS ORIGINALES ===
         if len(lumberjacks) < max_enemies:
             if spawn_timer <= 0:
                 x = random.choice([0, constants.WIDTH-constants.LUMBERJACK_SIZE])
@@ -96,6 +140,8 @@ def main():
             enemy.attack()
 
         game_character.check_collect_resource(resources)
+
+        # === DIBUJO ORIGINAL SIN CAMBIOS ===
         game_world.draw(screen)
         for resource in resources:
             resource.draw(screen)
@@ -106,6 +152,7 @@ def main():
             tree.draw(screen)
         game_character.draw(screen)
 
+        # === HUD ORIGINAL ===
         seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
         font = pygame.font.SysFont(None, 26)
@@ -137,12 +184,23 @@ def main():
             y_offset += 16
 
         vivos = sum(1 for t in game_world.trees if t.health > 0)
+
+        # === DERROTA: ahora abre menú de pausa ===
         if central_tree.health <= 0:
             screen.blit(defeat_img, (0, 0))
             pygame.display.flip()
-            pygame.time.delay(3000)
-            return "defeat"
+            pygame.time.delay(2000)
 
+            action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
+            if action == "menu_principal":
+                return "menu"
+            if action == "config":
+                config.from_menu = "pause"
+                return "config"
+            if action == "reiniciar":
+                return main()
+
+        # === VICTORIA / DERROTA FINAL ===
         if remaining_time == 0:
             if vivos >= 3 and central_tree.health > 0:
                 screen.blit(victory_img, (0, 0))
@@ -150,7 +208,22 @@ def main():
                 screen.blit(defeat_img, (0, 0))
             pygame.display.flip()
             pygame.time.delay(3000)
-            return "victory" if vivos >= 3 and central_tree.health > 0 else "defeat"
+
+            action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
+            if action == "menu_principal":
+                return "menu"
+            if action == "config":
+                config.from_menu = "pause"
+                return "config"
+            if action == "reiniciar":
+                return main()
+
+        # === MOSTRAR BOTÓN DE PAUSA ===
+        screen.blit(pause_icon, pause_rect)
+
+        # HOVER amarillo del botón de pausa
+        if pause_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, (255, 255, 0), pause_rect, 2)
 
         pygame.display.flip()
         clock.tick(60)

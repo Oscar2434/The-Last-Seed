@@ -2,7 +2,6 @@ import pygame
 import sys
 import config
 import constants
-from button import Button
 import select_character
 
 pygame.init()
@@ -69,19 +68,27 @@ def niveles():
             hovered = b["rect"].collidepoint(mouse_pos)
             img = b["hover"] if hovered else b["normal"]
             screen.blit(img, b["rect"])
+
             if hovered and click:
                 pygame.time.delay(150)
-                select_character.show(level=b["lvl"])
+                resultado = select_character.show(level=b["lvl"])
+
+                if resultado == "menu_principal":
+                    return "menu_principal"
+
+                if resultado == "config":
+                    return "config"
+
+                if resultado == "reiniciar":
+                    return "reiniciar"
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return
+                    return "menu_principal"
 
         pygame.display.update()
-
-if __name__ == "__main__":
-    niveles()

@@ -70,12 +70,28 @@ def menu():
         if play_rect.collidepoint(mouse):
             screen.blit(play_hover, play_rect)
             if click:
-                nivels.niveles()
+                
+                # =======================================================
+                # VALORES ENVIADOS DESDE LOS NIVELES / PAUSE MENU
+                # =======================================================
+                resultado = nivels.niveles()
+
+                if resultado == "menu":
+                    return  # <-- FIX CLAVE
+
+                if resultado == "menu_principal":
+                    return  # Vuelve al menú principal
+
+                elif resultado == "config":
+                    config.from_menu = "pause"
+                    return config.open_config_menu()
+                # =======================================================
+
         else:
             screen.blit(play_normal, play_rect)
 
         if config_button.draw(screen):
-            config.config_menu()
+            return config.open_config_menu()
 
         if exit_rect.collidepoint(mouse):
             screen.blit(exit_normal, exit_rect)
