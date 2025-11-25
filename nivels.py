@@ -58,6 +58,9 @@ buttons = [
 def niveles():
     run = True
     while run:
+        # ACTUALIZAR CONFIGURACIÓN
+        config.update_global_config()
+        
         screen.blit(Fondo, (0, 0))
         screen.blit(title_img, title_rect)
 
@@ -79,16 +82,17 @@ def niveles():
                     config_result = config.open_config_menu(from_menu="niveles")
                     if config_result == "menu":
                         return "menu"
-    # Si no, continuamos en niveles
                     continue
                 elif resultado == "reiniciar":
                     return "reiniciar"
                 elif resultado == "quit":
+                    config.save_current_config()  # GUARDAR ANTES DE SALIR
                     pygame.quit()
                     sys.exit()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                config.save_current_config()  # GUARDAR ANTES DE SALIR
                 pygame.quit()
                 sys.exit()
 

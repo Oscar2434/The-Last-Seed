@@ -1,5 +1,6 @@
 import pygame
 import constants
+import config_manager
 
 pygame.init()
 
@@ -8,11 +9,15 @@ OPEN_MENU_EVENT = pygame.USEREVENT + 1
 OPEN_CONFIG_EVENT = pygame.USEREVENT + 2
 OPEN_LEVEL_EVENT = pygame.USEREVENT + 3
 
-lenguaje = True
-music = True
-volume_master = 0.5
-selected_character = None
-difficulty = None
+# Cargar configuración al inicio
+config_data = config_manager.load_config()
+
+# Variables globales actualizadas automáticamente
+lenguaje = config_data["lenguaje"]
+music = config_data["music"]
+volume_master = config_data["volume_master"]
+selected_character = config_data["selected_character"]
+difficulty = config_data["difficulty"]
 
 BACKGROUND_CONFIG = "assets/images/effects/portada.png"
 TITLE_IMAGE       = "assets/images/effects/titulo1.png"
@@ -21,6 +26,27 @@ MUSIC_ICON        = "assets/images/effects/musicaL.png"
 FLAG_ES           = "assets/images/effects/españa.png"
 FLAG_EN           = "assets/images/effects/inglaterra .png"   
 EXIT_BUTTON       = "assets/images/effects/salida.png"
+
+def update_global_config():
+    """Actualiza las variables globales con la configuración actual"""
+    global lenguaje, music, volume_master, selected_character, difficulty
+    current_config = config_manager.load_config()
+    lenguaje = current_config["lenguaje"]
+    music = current_config["music"]
+    volume_master = current_config["volume_master"]
+    selected_character = current_config["selected_character"]
+    difficulty = current_config["difficulty"]
+
+def save_current_config():
+    """Guarda la configuración actual"""
+    config_data = {
+        "lenguaje": lenguaje,
+        "music": music,
+        "volume_master": volume_master,
+        "selected_character": selected_character,
+        "difficulty": difficulty
+    }
+    return config_manager.save_config(config_data)
 
 def load_image(path, scale=1.0):
     img = pygame.image.load(path).convert_alpha()
@@ -34,6 +60,9 @@ def draw_hover(screen, rect):
 
 def open_config_menu(from_menu="main"):
     global lenguaje, music, volume_master
+    
+    # Actualizar configuración global al abrir
+    update_global_config()
     
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 
@@ -80,9 +109,17 @@ def open_config_menu(from_menu="main"):
         screen.blit(flag_en, flag_en_rect)
 
         mx, my = pygame.mouse.get_pos()
-        if flag_es_rect.collidepoint(mx, my):
+        
+        # Resaltar bandera seleccionada
+        if lenguaje:  # Español seleccionado
             draw_hover(screen, flag_es_rect)
-        if flag_en_rect.collidepoint(mx, my):
+        else:  # Inglés seleccionado
+            draw_hover(screen, flag_en_rect)
+            
+        # Resaltar al hover
+        if flag_es_rect.collidepoint(mx, my) and not lenguaje:
+            draw_hover(screen, flag_es_rect)
+        if flag_en_rect.collidepoint(mx, my) and lenguaje:
             draw_hover(screen, flag_en_rect)
 
         screen.blit(music_icon, music_rect)
@@ -105,26 +142,34 @@ def open_config_menu(from_menu="main"):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_current_config()  # Guardar antes de salir
                 pygame.quit()
                 exit()
 
             if event.type == OPEN_MENU_EVENT:
+                save_current_config()  # Guardar al salir del menú
                 return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if flag_es_rect.collidepoint(mx, my):
                     lenguaje = True
+                    save_current_config()  # Guardar inmediatamente
+                    
                 if flag_en_rect.collidepoint(mx, my):
                     lenguaje = False
+                    save_current_config()  # Guardar inmediatamente
 
                 if bar_x <= mx <= bar_x + bar_width and bar_y <= my <= bar_y + bar_height:
                     volume_master = (mx - bar_x) / bar_width
                     volume_master = max(0, min(volume_master, 1))
+                    save_current_config()  # Guardar inmediatamente
 
                 if exit_rect.collidepoint(mx, my):
                     pygame.time.delay(150)
+                    save_current_config()  # Guardar al salir
                     return
 
         pygame.display.update()
 
+    save_current_config()  # Guardar por si acaso
     return
