@@ -12,8 +12,9 @@ import constants
 from character_nivel_2 import Character
 from world_nivel_2 import World
 from ambient_nivel_2 import CentralTree
-from dialog_manager_nivel_2 import DialogManager
-from pause_menu_nivel_2 import PauseMenu
+from config_nivel_2.dialog_texts import DialogManager
+import pause_menu
+import config
 # === FIN DE CORRECCIÓN ===
 
 pygame.init()
@@ -59,8 +60,15 @@ def draw_dialog(screen, text):
         y_offset += 22
     
     continue_font = pygame.font.SysFont(None, 20)
-    continue_text = continue_font.render("Presiona ESPACIO para continuar...", True, (100, 100, 100))
-    screen.blit(continue_text, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
+    
+    # Texto "continuar" según idioma
+    if config.lenguaje:
+        continue_text = "Presiona ESPACIO para continuar..."
+    else:
+        continue_text = "Press SPACE to continue..."
+        
+    continue_surface = continue_font.render(continue_text, True, (100, 100, 100))
+    screen.blit(continue_surface, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
 
 def draw_inventory(screen, collected_resources):
     inventory_bg = pygame.Rect(constants.WIDTH - 150, 10, 140, 80)
@@ -73,17 +81,31 @@ def draw_inventory(screen, collected_resources):
     
     font = pygame.font.SysFont(None, 20)
     
-    title_shadow = font.render("Inventario:", True, (0, 0, 0, 100))
+    # Título del inventario según idioma
+    if config.lenguaje:
+        title_text = "Inventario:"
+    else:
+        title_text = "Inventory:"
+    
+    title_shadow = font.render(title_text, True, (0, 0, 0, 100))
     screen.blit(title_shadow, (constants.WIDTH - 139, 16))
     
-    title = font.render("Inventario:", True, (255, 255, 255))
+    title = font.render(title_text, True, (255, 255, 255))
     screen.blit(title, (constants.WIDTH - 140, 15))
     
-    resource_display_names = {
-        "composta": "Cáscara Plátano",
-        "agua": "Agua",
-        "semillas": "Cáscara Huevo"
-    }
+    # Nombres según el idioma
+    if config.lenguaje:  # Español
+        resource_display_names = {
+            "composta": "Cáscara Plátano",
+            "agua": "Agua",
+            "semillas": "Cáscara Huevo"
+        }
+    else:  # Inglés
+        resource_display_names = {
+            "composta": "Banana Peel",
+            "agua": "Water",
+            "semillas": "Egg Shell"
+        }
     
     y_offset = 35
     for resource_type in ["composta", "agua", "semillas"]:
@@ -132,10 +154,13 @@ def show_victory_screen(screen):
     pygame.time.delay(3000)
 
 def run_level():
+    # Actualizar configuración al inicio
+    config.update_global_config()
+    
     if pygame.mixer.get_init():
         pygame.mixer.music.stop()
         pygame.mixer.music.load('music/m1.mp3')
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(config.volume_master)
         pygame.mixer.music.play(-1)
     
     clock = pygame.time.Clock()
@@ -147,20 +172,17 @@ def run_level():
 
     # INICIALIZAR DIÁLOGOS
     dialog_manager = DialogManager()
-    
-    # INICIALIZAR MENÚ DE PAUSA
-    pause_menu = PauseMenu(constants.WIDTH, constants.HEIGHT)
 
     start_ticks = pygame.time.get_ticks()
+    pause_start_time = 0
+    total_pause_time = 0
+    game_paused = False
     
     collected_resources = []
-    
-    # SE ELIMINÓ LA LLAMADA A DIÁLOGOS INICIALES
     
     puede_entregar = False
     
     try:
-        import config
         difficulty = getattr(config, 'difficulty', 'normal')
     except:
         difficulty = 'normal'
@@ -171,25 +193,41 @@ def run_level():
     while running:
         current_time = pygame.time.get_ticks()
         
-        # OBTENER TIEMPO EFECTIVO DESDE EL MENÚ DE PAUSA
-        effective_time = pause_menu.get_effective_time(current_time, start_ticks)
+        # Calcular tiempo efectivo considerando pausas
+        if game_paused:
+            effective_time = (pause_start_time - start_ticks) - total_pause_time
+        else:
+            effective_time = (current_time - start_ticks) - total_pause_time
         
         # VERIFICAR ESTADOS DE PAUSA
         game_paused_by_dialog = dialog_manager.game_paused
-        game_paused_by_menu = pause_menu.is_active()
-        game_paused = game_paused_by_dialog or game_paused_by_menu
-        
+        game_paused_total = game_paused_by_dialog or game_paused
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return "quit"
             
             elif event.type == pygame.KEYDOWN:
                 # Tecla P para activar/desactivar pausa
-                if event.key == pygame.K_p:
-                    pause_menu.toggle(current_time)
+                if event.key == pygame.K_p and not game_paused_by_dialog:
+                    if not game_paused:
+                        # Iniciar pausa
+                        game_paused = True
+                        pause_start_time = current_time
+                        # Mostrar menú de pausa y capturar resultado
+                        result = pause_menu.show_pause_menu(screen, "level2")
+                        # Finalizar pausa
+                        game_paused = False
+                        total_pause_time += (current_time - pause_start_time)
+                        
+                        # Manejar resultado del menú de pausa
+                        if result == "restart":
+                            return "restart"
+                        elif result == "menu":
+                            return "menu"
                 
                 # Solo procesar otras teclas si no hay pausa activa
-                if not game_paused:
+                if not game_paused_total:
                     if event.key == pygame.K_e:
                         if check_interaction(game_character, central_tree):
                             if puede_entregar:
@@ -201,16 +239,6 @@ def run_level():
                 # Manejar ESPACIO para diálogos (solo si hay diálogos activos)
                 elif event.key == pygame.K_SPACE and game_paused_by_dialog:
                     dialog_manager.next_dialog()
-            
-            # Manejar eventos del menú de pausa
-            if pause_menu.is_active():
-                menu_action = pause_menu.handle_event(event, current_time)
-                if menu_action == "continue":
-                    pause_menu.toggle(current_time)
-                elif menu_action == "restart":  # NUEVO: Manejar reinicio
-                    return "restart"
-                elif menu_action == "menu":
-                    return "menu"
 
         # Dibujar elementos del juego (siempre se dibujan, incluso en pausa)
         game_world.draw(screen)
@@ -224,7 +252,7 @@ def run_level():
             enemy.draw(screen)
 
         # Solo actualizar juego si no está en pausa
-        if not game_paused:
+        if not game_paused_total:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
                 game_character.move(dx=-5, dy=0, world=game_world)
@@ -267,28 +295,38 @@ def run_level():
         remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
         
         font = pygame.font.SysFont(None, 36)
-        text = font.render(f"Tiempo: {remaining_time}s", True, constants.BLACK)
+        
+        # Texto del tiempo según idioma
+        if config.lenguaje:
+            time_text = f"Tiempo: {remaining_time}s"
+        else:
+            time_text = f"Time: {remaining_time}s"
+            
+        text = font.render(time_text, True, constants.BLACK)
         screen.blit(text, (10, 10))
 
         draw_inventory(screen, collected_resources)
 
         # DIBUJAR DIÁLOGOS (si es necesario y no está en pausa por menú)
-        if dialog_manager.game_paused and dialog_manager.has_dialogs() and not pause_menu.is_active():
+        if dialog_manager.game_paused and dialog_manager.has_dialogs() and not game_paused:
             dialog_text = dialog_manager.get_current_dialog_text()
             draw_dialog(screen, dialog_text)
             
             time_left = 10 - ((current_time - dialog_manager.dialog_timer) // 1000)
             if time_left < 11:
                 time_font = pygame.font.SysFont(None, 20)
-                time_text = time_font.render(f"Desaparece en: {time_left}s", True, (255, 220, 0))
+                
+                # Texto del temporizador según idioma
+                if config.lenguaje:
+                    time_display = f"Desaparece en: {time_left}s"
+                else:
+                    time_display = f"Disappears in: {time_left}s"
+                    
+                time_text = time_font.render(time_display, True, (255, 220, 0))
                 screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
 
-        # DIBUJAR MENÚ DE PAUSA (encima de todo)
-        if pause_menu.is_active():
-            pause_menu.draw(screen)
-
         # VERIFICAR SI SE ACABÓ EL TIEMPO (solo si no está en pausa)
-        if remaining_time == 0 and not game_paused:
+        if remaining_time == 0 and not game_paused_total:
             show_defeat_screen(screen)
             return "defeat"
 
@@ -306,37 +344,19 @@ def main():
             pygame.mixer.music.stop()
         
         if result == "victory":
-            # RESTAURAR MÚSICA DEL MENÚ
-            try:
-                import config
-                if config.music and pygame.mixer.get_init():
-                    pygame.mixer.music.load('music/m4.mp3')
-                    pygame.mixer.music.set_volume(0.5)
-                    pygame.mixer.music.play(-1)
-            except:
-                pass
-            
-            import nivels
-            nivels.niveles()
-            break
+            # Enviar evento para reiniciar música del menú
+            menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+            pygame.event.post(menu_event)
+            return "menu"
         elif result == "defeat":
             continue
         elif result == "restart":
             continue
         elif result == "menu":
-            # RESTAURAR MÚSICA DEL MENÚ
-            try:
-                import config
-                if config.music and pygame.mixer.get_init():
-                    pygame.mixer.music.load('music/m4.mp3')
-                    pygame.mixer.music.set_volume(0.5)
-                    pygame.mixer.music.play(-1)
-            except:
-                pass
-            
-            import menu
-            menu.menu()
-            break
+            # Enviar evento para reiniciar música del menú
+            menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+            pygame.event.post(menu_event)
+            return "menu"
         elif result == "quit":
             break
     

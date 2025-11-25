@@ -1,7 +1,7 @@
 {
-    "lenguaje": true,
+    "lenguaje": false,
     "music": true,
-    "volume_master": 0.8636363636363636,
-    "selected_character": null,
-    "difficulty": null
+    "volume_master": 0,
+    "selected_character": "niño",
+    "difficulty": "avanzado"
 }

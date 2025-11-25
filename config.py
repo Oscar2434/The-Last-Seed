@@ -19,6 +19,12 @@ volume_master = config_data["volume_master"]
 selected_character = config_data["selected_character"]
 difficulty = config_data["difficulty"]
 
+# Asegurar que difficulty tenga un valor por defecto si es None
+if difficulty is None:
+    difficulty = "normal"
+    config_data["difficulty"] = difficulty
+    config_manager.save_config(config_data)
+
 BACKGROUND_CONFIG = "assets/images/effects/portada.png"
 TITLE_IMAGE       = "assets/images/effects/titulo1.png"
 CONFIG_ICON       = "assets/images/effects/config1.png"
@@ -36,6 +42,12 @@ def update_global_config():
     volume_master = current_config["volume_master"]
     selected_character = current_config["selected_character"]
     difficulty = current_config["difficulty"]
+    
+    # Asegurar que difficulty tenga un valor por defecto si es None
+    if difficulty is None:
+        difficulty = "normal"
+        current_config["difficulty"] = difficulty
+        config_manager.save_config(current_config)
 
 def save_current_config():
     """Guarda la configuración actual"""

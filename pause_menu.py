@@ -158,6 +158,7 @@ def show_pause_menu(screen, from_level, callback_restart=None):
 
     pause_active = True
     needs_reload = False  # Bandera para recargar imágenes
+    return_value = None   # Valor a retornar
 
     while pause_active:
         clock.tick(60)
@@ -191,39 +192,36 @@ def show_pause_menu(screen, from_level, callback_restart=None):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                config.save_current_config()  # GUARDAR ANTES DE SALIR
+                config.save_current_config()
                 pygame.quit()
                 exit()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause_active = False
+                return_value = None
     
             if btn_menu.is_clicked(event):
-                # ENVIAR EVENTO PARA VOLVER AL MENÚ PRINCIPAL
-                config.save_current_config()  # GUARDAR CONFIGURACIÓN
-                menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
-                pygame.time.delay(100)
-                pygame.event.post(menu_event)
-                return
+                config.save_current_config()
+                return_value = "menu"
+                pause_active = False
 
             if btn_conf.is_clicked(event):
-                # Abrir configuración y marcar para recargar imágenes al regresar
                 config.open_config_menu(from_menu="pause")
-                needs_reload = True  # Recargar imágenes después de config
+                needs_reload = True
                 continue
 
             if btn_rean.is_clicked(event):
                 pause_active = False
+                return_value = None
 
             if btn_reini.is_clicked(event):
-                if callback_restart:
-                    callback_restart()
-                return
+                return_value = "restart"
+                pause_active = False
 
         # Verificar si llegó un evento para abrir el menú principal
         for ev in pygame.event.get(pump=False):
             if ev.type == config.OPEN_MENU_EVENT:
-                config.save_current_config()  # GUARDAR ANTES DE SALIR
-                return
+                config.save_current_config()
+                return "menu"
 
-    return
+    return return_value

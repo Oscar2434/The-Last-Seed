@@ -176,6 +176,8 @@ def show(level=1):
         if selected_character and selected_difficulty:
             config.selected_character = selected_character
             config.difficulty = selected_difficulty
+            # GUARDAR CONFIGURACIÓN INMEDIATAMENTE
+            config.save_current_config()
             pygame.time.delay(250)
 
             # 🟥 DETENER música del menú antes de cambiar
@@ -186,7 +188,7 @@ def show(level=1):
             # ------------------------------------------------
             if level == 1:
                 pygame.mixer.music.load("music/m2.mp3")
-                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.set_volume(config.volume_master)
                 pygame.mixer.music.play(-1)
                 result = main.main()  # CAPTURAR EL RETORNO
                 if result == "menu" or result == "to_menu":
@@ -200,7 +202,7 @@ def show(level=1):
             # ------------------------------------------------
             elif level == 2:
                 pygame.mixer.music.load("music/m1.mp3")
-                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.set_volume(config.volume_master)
                 pygame.mixer.music.play(-1)
                 result = nivel_2.main()  # CAPTURAR EL RETORNO
                 if result == "menu" or result == "to_menu":
@@ -214,7 +216,7 @@ def show(level=1):
             # ------------------------------------------------
             elif level == 3:
                 pygame.mixer.music.load("music/m3.mp3")
-                pygame.mixer.music.set_volume(0.5)
+                pygame.mixer.music.set_volume(config.volume_master)
                 pygame.mixer.music.play(-1)
 
                 import nivel_3

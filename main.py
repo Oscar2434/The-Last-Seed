@@ -52,226 +52,265 @@ def get_localized_texts():
 def main():
     global game_paused
     
-    # Actualizar configuración al inicio
-    config.update_global_config()
-    
-    # Variables para control de música
-    music_playing = False
-    
-    # Iniciar música del nivel
-    def start_level_music():
-        nonlocal music_playing
-        if config.music and not music_playing:
-            if pygame.mixer.get_init():
-                pygame.mixer.music.stop()
-            pygame.mixer.music.load('music/m2.mp3')
-            pygame.mixer.music.set_volume(config.volume_master)
-            pygame.mixer.music.play(-1)
-            music_playing = True
-    
-    def stop_level_music():
-        nonlocal music_playing
-        if music_playing:
-            pygame.mixer.music.stop()
-            music_playing = False
-    
-    # Iniciar música al comenzar
-    start_level_music()
-
-    clock = pygame.time.Clock()
-    game_world = World(constants.WIDTH, constants.HEIGHT)
-    game_character = Character(constants.WIDTH // 2, constants.HEIGHT - 100)
-    central_tree = CentralTree(constants.WIDTH//2 - 40, constants.HEIGHT//2 - 40)
-    game_world.central_tree = central_tree
-    game_world.setup_enemy_slots(constants.LUMBERJACK_SIZE)
-
-    dificultad = getattr(config, "difficulty", "normal")
-    ajustes = constants.DIFFICULTY_SETTINGS.get(dificultad, constants.DIFFICULTY_SETTINGS["normal"])
-
-    constants.ENEMY_SPEED = ajustes["ENEMY_SPEED"]
-    constants.ENEMY_DAMAGE = ajustes["ENEMY_DAMAGE"]
-    constants.LEVEL_TIME = ajustes["LEVEL_TIME"]
-    max_enemies = ajustes["max_enemies"]
-    spawn_delay = ajustes["spawn_delay"]
-
-    lumberjacks = []
-    resources = []
-    spawn_timer = 0
-    resource_timer = 0
-    start_ticks = pygame.time.get_ticks()
-
-    # === FUNCIÓN LOCAL PARA REINICIAR EL NIVEL ===
-    def restart_level():
-        nonlocal music_playing
-        music_playing = False  # Permitir que se reinicie la música
-        return main()
-
+    # Bucle principal del juego que permite reinicios
     while True:
-        # VERIFICAR EVENTOS DE NAVEGACIÓN
-        for event in pygame.event.get(pump=False):
-            if event.type == config.OPEN_MENU_EVENT:
-                stop_level_music()  # Detener música al salir al menú
-                return  # Salir al menú principal
-
-        # === EVENTOS ORIGINALES DEL NIVEL ===
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                stop_level_music()
-                pygame.quit()
-                sys.exit()
-
-            if event.type == config.OPEN_MENU_EVENT:
-                stop_level_music()
-                return  # Salir al menú principal
-
-            if event.type == pygame.KEYDOWN:
-                # TECLA ESC → ABRE MENÚ DE PAUSA
-                if event.key == pygame.K_ESCAPE:
-                    game_paused = True
-                    # No detenemos la música, solo pausamos el juego
-                    pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-                    game_paused = False
-                    # Reanudar música si se detuvo por configuración
-                    if config.music and not pygame.mixer.music.get_busy():
-                        start_level_music()
-
-                # Lógica original sin tocar:
-                if event.key == pygame.K_e:
-                    all_trees = [central_tree] + game_world.trees
-                    closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
-                    distance = ((closest_tree.x - game_character.x) ** 2 + (closest_tree.y - game_character.y) ** 2) ** 0.5
-                    if distance <= 70:
-                        game_character.start_throw_animation()
-                        game_character.deliver_resource(closest_tree)
-
-            # CLICK EN BOTÓN DE PAUSA
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if pause_rect.collidepoint(event.pos):
-                    game_paused = True
-                    # No detenemos la música, solo pausamos el juego
-                    pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-                    game_paused = False
-                    # Reanudar música si se detuvo por configuración
-                    if config.music and not pygame.mixer.music.get_busy():
-                        start_level_music()
-
-        # Si el juego está en pausa, saltar el resto de la lógica
-        if game_paused:
-            continue
-
-        # === MOVIMIENTO ORIGINAL ===
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            game_character.move(dx=-5, dy=0, world=game_world)
-        if keys[pygame.K_RIGHT]:
-            game_character.move(dx=5, dy=0, world=game_world)
-        if keys[pygame.K_UP]:
-            game_character.move(dx=0, dy=-5, world=game_world)
-        if keys[pygame.K_DOWN]:
-            game_character.move(dx=0, dy=5, world=game_world)
-
-        # === SPAWNS ORIGINALES ===
-        if len(lumberjacks) < max_enemies:
-            if spawn_timer <= 0:
-                x = random.choice([0, constants.WIDTH-constants.LUMBERJACK_SIZE])
-                y = random.choice([0, constants.HEIGHT-constants.LUMBERJACK_SIZE])
-                lumberjacks.append(Lumberjack(x, y, game_world))
-                spawn_timer = spawn_delay
-            else:
-                spawn_timer -= 1
-
-        if resource_timer <= 0:
-            rx = random.randint(0, constants.WIDTH-20)
-            ry = random.randint(0, constants.HEIGHT-20)
-            resources.append(Resource(rx, ry))
-            resource_timer = 300
-        else:
-            resource_timer -= 1
-
-        for enemy in lumberjacks:
-            enemy.move_towards_target()
-            enemy.attack()
-
-        game_character.check_collect_resource(resources)
-
-        # === DIBUJO ORIGINAL SIN CAMBIOS ===
-        game_world.draw(screen)
-        for resource in resources:
-            resource.draw(screen)
-        for enemy in lumberjacks:
-            enemy.draw(screen)
-        central_tree.draw(screen)
-        for tree in game_world.trees:
-            tree.draw(screen)
-        game_character.draw(screen)
-
-        # === HUD CON TEXTO TRADUCIDO ===
-        seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
-        remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
+        # Actualizar configuración al inicio
+        config.update_global_config()
         
-        # Obtener textos traducidos
-        texts = get_localized_texts()
+        # Variables para control de música
+        music_playing = False
         
-        font = pygame.font.SysFont(None, 26)
-        text = font.render(texts["time"].format(remaining_time), True, constants.BLACK)
-        screen.blit(text, (10, 10))
+        # Iniciar música del nivel
+        def start_level_music():
+            nonlocal music_playing
+            if config.music and not music_playing:
+                if pygame.mixer.get_init():
+                    pygame.mixer.music.stop()
+                pygame.mixer.music.load('music/m2.mp3')
+                pygame.mixer.music.set_volume(config.volume_master)
+                pygame.mixer.music.play(-1)
+                music_playing = True
+        
+        def stop_level_music():
+            nonlocal music_playing
+            if music_playing:
+                pygame.mixer.music.stop()
+                music_playing = False
+        
+        # Iniciar música al comenzar
+        start_level_music()
 
-        fade_duration = 1000
-        elapsed_time = pygame.time.get_ticks() - start_ticks
-        alpha_value = min(120, int((elapsed_time / fade_duration) * 120))
+        clock = pygame.time.Clock()
+        game_world = World(constants.WIDTH, constants.HEIGHT)
+        game_character = Character(constants.WIDTH // 2, constants.HEIGHT - 100)
+        central_tree = CentralTree(constants.WIDTH//2 - 40, constants.HEIGHT//2 - 40)
+        game_world.central_tree = central_tree
+        game_world.setup_enemy_slots(constants.LUMBERJACK_SIZE)
 
-        panel_surface = pygame.Surface((250, 85), pygame.SRCALPHA)
-        panel_surface.fill((255, 255, 255, alpha_value))
-        panel_x = constants.WIDTH - 265
-        panel_y = 15
-        screen.blit(panel_surface, (panel_x, panel_y))
+        dificultad = getattr(config, "difficulty", "normal")
+        ajustes = constants.DIFFICULTY_SETTINGS.get(dificultad, constants.DIFFICULTY_SETTINGS["normal"])
 
-        font2 = pygame.font.SysFont(None, 18)
-        objetivos = [
-            texts["objectives_title"],
-            texts["objective1"],
-            texts["objective2"],
-            texts["objective3"]
-        ]
+        constants.ENEMY_SPEED = ajustes["ENEMY_SPEED"]
+        constants.ENEMY_DAMAGE = ajustes["ENEMY_DAMAGE"]
+        constants.LEVEL_TIME = ajustes["LEVEL_TIME"]
+        max_enemies = ajustes["max_enemies"]
+        spawn_delay = ajustes["spawn_delay"]
 
-        y_offset = panel_y + 20
-        for line in objetivos:
-            t = font2.render(line, True, constants.BLACK)
-            screen.blit(t, (panel_x + 15, y_offset))
-            y_offset += 16
+        lumberjacks = []
+        resources = []
+        spawn_timer = 0
+        resource_timer = 0
+        start_ticks = pygame.time.get_ticks()
+        
+        # Variable para controlar si debemos reiniciar
+        restart_requested = False
 
-        vivos = sum(1 for t in game_world.trees if t.health > 0)
+        while True:
+            # VERIFICAR EVENTOS DE NAVEGACIÓN
+            for event in pygame.event.get(pump=False):
+                if event.type == config.OPEN_MENU_EVENT:
+                    stop_level_music()
+                    return  # Salir al menú principal
 
-        # === DERROTA: ahora abre menú de pausa ===
-        if central_tree.health <= 0:
-            screen.blit(defeat_img, (0, 0))
-            pygame.display.flip()
-            pygame.time.delay(2000)
-            game_paused = True
-            pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-            game_paused = False
+            # === EVENTOS ORIGINALES DEL NIVEL ===
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    stop_level_music()
+                    pygame.quit()
+                    sys.exit()
 
-        # === VICTORIA / DERROTA FINAL ===
-        if remaining_time == 0:
-            if vivos >= 3 and central_tree.health > 0:
-                screen.blit(victory_img, (0, 0))
+                if event.type == config.OPEN_MENU_EVENT:
+                    stop_level_music()
+                    return  # Salir al menú principal
+
+                if event.type == pygame.KEYDOWN:
+                    # TECLA ESC → ABRE MENÚ DE PAUSA
+                    if event.key == pygame.K_ESCAPE:
+                        game_paused = True
+                        result = pause_menu.show_pause_menu(screen, "level1")
+                        game_paused = False
+                        
+                        # Manejar resultado del menú de pausa
+                        if result == "restart":
+                            restart_requested = True
+                        elif result == "menu":
+                            stop_level_music()
+                            return
+                        
+                        # Reanudar música si se detuvo por configuración
+                        if config.music and not pygame.mixer.music.get_busy():
+                            start_level_music()
+
+                    # Lógica original sin tocar:
+                    if event.key == pygame.K_e:
+                        all_trees = [central_tree] + game_world.trees
+                        closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
+                        distance = ((closest_tree.x - game_character.x) ** 2 + (closest_tree.y - game_character.y) ** 2) ** 0.5
+                        if distance <= 70:
+                            game_character.start_throw_animation()
+                            game_character.deliver_resource(closest_tree)
+
+                # CLICK EN BOTÓN DE PAUSA
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pause_rect.collidepoint(event.pos):
+                        game_paused = True
+                        result = pause_menu.show_pause_menu(screen, "level1")
+                        game_paused = False
+                        
+                        # Manejar resultado del menú de pausa
+                        if result == "restart":
+                            restart_requested = True
+                        elif result == "menu":
+                            stop_level_music()
+                            return
+                        
+                        # Reanudar música si se detuvo por configuración
+                        if config.music and not pygame.mixer.music.get_busy():
+                            start_level_music()
+
+            # Verificar si se solicitó reinicio
+            if restart_requested:
+                break  # Romper el bucle interno y reiniciar
+
+            # Si el juego está en pausa, saltar el resto de la lógica
+            if game_paused:
+                continue
+
+            # === MOVIMIENTO ORIGINAL ===
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                game_character.move(dx=-5, dy=0, world=game_world)
+            if keys[pygame.K_RIGHT]:
+                game_character.move(dx=5, dy=0, world=game_world)
+            if keys[pygame.K_UP]:
+                game_character.move(dx=0, dy=-5, world=game_world)
+            if keys[pygame.K_DOWN]:
+                game_character.move(dx=0, dy=5, world=game_world)
+
+            # === SPAWNS ORIGINALES ===
+            if len(lumberjacks) < max_enemies:
+                if spawn_timer <= 0:
+                    x = random.choice([0, constants.WIDTH-constants.LUMBERJACK_SIZE])
+                    y = random.choice([0, constants.HEIGHT-constants.LUMBERJACK_SIZE])
+                    lumberjacks.append(Lumberjack(x, y, game_world))
+                    spawn_timer = spawn_delay
+                else:
+                    spawn_timer -= 1
+
+            if resource_timer <= 0:
+                rx = random.randint(0, constants.WIDTH-20)
+                ry = random.randint(0, constants.HEIGHT-20)
+                resources.append(Resource(rx, ry))
+                resource_timer = 300
             else:
+                resource_timer -= 1
+
+            for enemy in lumberjacks:
+                enemy.move_towards_target()
+                enemy.attack()
+
+            game_character.check_collect_resource(resources)
+
+            # === DIBUJO ORIGINAL SIN CAMBIOS ===
+            game_world.draw(screen)
+            for resource in resources:
+                resource.draw(screen)
+            for enemy in lumberjacks:
+                enemy.draw(screen)
+            central_tree.draw(screen)
+            for tree in game_world.trees:
+                tree.draw(screen)
+            game_character.draw(screen)
+
+            # === HUD CON TEXTO TRADUCIDO ===
+            seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
+            remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
+            
+            # Obtener textos traducidos
+            texts = get_localized_texts()
+            
+            font = pygame.font.SysFont(None, 26)
+            text = font.render(texts["time"].format(remaining_time), True, constants.BLACK)
+            screen.blit(text, (10, 10))
+
+            fade_duration = 1000
+            elapsed_time = pygame.time.get_ticks() - start_ticks
+            alpha_value = min(120, int((elapsed_time / fade_duration) * 120))
+
+            panel_surface = pygame.Surface((250, 85), pygame.SRCALPHA)
+            panel_surface.fill((255, 255, 255, alpha_value))
+            panel_x = constants.WIDTH - 265
+            panel_y = 15
+            screen.blit(panel_surface, (panel_x, panel_y))
+
+            font2 = pygame.font.SysFont(None, 18)
+            objetivos = [
+                texts["objectives_title"],
+                texts["objective1"],
+                texts["objective2"],
+                texts["objective3"]
+            ]
+
+            y_offset = panel_y + 20
+            for line in objetivos:
+                t = font2.render(line, True, constants.BLACK)
+                screen.blit(t, (panel_x + 15, y_offset))
+                y_offset += 16
+
+            vivos = sum(1 for t in game_world.trees if t.health > 0)
+
+            # === DERROTA: ahora abre menú de pausa ===
+            if central_tree.health <= 0:
                 screen.blit(defeat_img, (0, 0))
+                pygame.display.flip()
+                pygame.time.delay(2000)
+                game_paused = True
+                result = pause_menu.show_pause_menu(screen, "level1")
+                game_paused = False
+                if result == "restart":
+                    restart_requested = True
+                elif result == "menu":
+                    stop_level_music()
+                    return
+                # Si se cierra el menú de pausa sin reiniciar, continuamos el bucle interno
+                # pero en este caso, el árbol central está destruido, por lo que probablemente queremos reiniciar o salir.
+                # Vamos a forzar reinicio si no se elige menú.
+                else:
+                    restart_requested = True
+
+            # === VICTORIA / DERROTA FINAL ===
+            if remaining_time == 0:
+                if vivos >= 3 and central_tree.health > 0:
+                    screen.blit(victory_img, (0, 0))
+                else:
+                    screen.blit(defeat_img, (0, 0))
+                pygame.display.flip()
+                pygame.time.delay(3000)
+                game_paused = True
+                result = pause_menu.show_pause_menu(screen, "level1")
+                game_paused = False
+                if result == "restart":
+                    restart_requested = True
+                elif result == "menu":
+                    stop_level_music()
+                    return
+                else:
+                    # Por defecto, reiniciar si no se elige menú
+                    restart_requested = True
+
+            # === MOSTRAR BOTÓN DE PAUSA ===
+            screen.blit(pause_icon, pause_rect)
+
+            # HOVER amarillo del botón de pausa
+            if pause_rect.collidepoint(pygame.mouse.get_pos()):
+                pygame.draw.rect(screen, (255, 255, 0), pause_rect, 2)
+
             pygame.display.flip()
-            pygame.time.delay(3000)
-            game_paused = True
-            pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-            game_paused = False
+            clock.tick(60)
 
-        # === MOSTRAR BOTÓN DE PAUSA ===
-        screen.blit(pause_icon, pause_rect)
-
-        # HOVER amarillo del botón de pausa
-        if pause_rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(screen, (255, 255, 0), pause_rect, 2)
-
-        pygame.display.flip()
-        clock.tick(60)
+        # Si salimos del bucle interno por reinicio, continuamos el bucle externo
+        if restart_requested:
+            continue
 
 if __name__ == "__main__":
     main()
