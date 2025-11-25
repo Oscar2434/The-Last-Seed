@@ -27,10 +27,7 @@ pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_al
 pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
 pause_rect = pause_icon.get_rect(center=(constants.WIDTH // 2, 20))
 
-
-
 def main():
-
     # Música original sin cambios
     if pygame.mixer.get_init():
         pygame.mixer.music.stop()
@@ -65,24 +62,24 @@ def main():
         return main()
 
     while True:
+        # VERIFICAR EVENTOS DE NAVEGACIÓN
+        for event in pygame.event.get(pump=False):
+            if event.type == config.OPEN_MENU_EVENT:
+                return  # Salir al menú principal
 
         # === EVENTOS ORIGINALES DEL NIVEL ===
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return "quit"
+                pygame.quit()
+                sys.exit()
+
+            if event.type == config.OPEN_MENU_EVENT:
+                return  # Salir al menú principal
 
             if event.type == pygame.KEYDOWN:
                 # TECLA ESC → ABRE MENÚ DE PAUSA
                 if event.key == pygame.K_ESCAPE:
-                    action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-                    if action == "config":
-                        result = config.open_config_menu(from_menu="pause")
-                        if result == "menu":
-                             return "menu"
-                        continue
-                    if action == "reiniciar":
-                        return main()
-                    # reanudar → no hacemos nada
+                    pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
 
                 # Lógica original sin tocar:
                 if event.key == pygame.K_e:
@@ -96,15 +93,7 @@ def main():
             # CLICK EN BOTÓN DE PAUSA
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pause_rect.collidepoint(event.pos):
-                    action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-                    if action == "config":
-                        result = config.open_config_menu(from_menu="pause")
-                        if result == "pause":
-                            continue  # Volver al menú de pausa
-                        elif result == "menu":
-                            return "menu"
-                        elif result == "quit":
-                            return "quit"
+                    pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
 
         # === MOVIMIENTO ORIGINAL ===
         keys = pygame.key.get_pressed()
@@ -190,15 +179,7 @@ def main():
             screen.blit(defeat_img, (0, 0))
             pygame.display.flip()
             pygame.time.delay(2000)
-
-            action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-            if action == "menu":
-                return "menu"
-            if action == "config":
-                config.from_menu = "pause"
-                return "config"
-            if action == "reiniciar":
-                return main()
+            pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
 
         # === VICTORIA / DERROTA FINAL ===
         if remaining_time == 0:
@@ -208,15 +189,7 @@ def main():
                 screen.blit(defeat_img, (0, 0))
             pygame.display.flip()
             pygame.time.delay(3000)
-
-            action = pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
-            if action == "menu":
-                return "menu"
-            if action == "config":
-                config.from_menu = "pause"
-                return "config"
-            if action == "reiniciar":
-                return main()
+            pause_menu.show_pause_menu(screen, "level1", callback_restart=restart_level)
 
         # === MOSTRAR BOTÓN DE PAUSA ===
         screen.blit(pause_icon, pause_rect)
@@ -230,4 +203,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

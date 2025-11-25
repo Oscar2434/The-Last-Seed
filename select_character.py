@@ -94,7 +94,6 @@ def show(level=1):
     diff_top_y = character_y - int(constants.HEIGHT * 0.05)
 
     normal_btn = HoverButton(gap_center_x, diff_top_y, normal_img, normal_hover, "normal")
-
     hard_btn = HoverButton(
         gap_center_x,
         diff_top_y + normal_img.get_height() + int(constants.HEIGHT * 0.03),
@@ -147,7 +146,9 @@ def show(level=1):
                 pygame.mixer.music.load("music/m2.mp3")
                 pygame.mixer.music.set_volume(0.5)
                 pygame.mixer.music.play(-1)
-                main.main()
+                result = main.main()  # CAPTURAR EL RETORNO
+                if result == "menu" or result == "to_menu":
+                    return "menu"  # PROPAGAR EL RETORNO
 
             # ------------------------------------------------
             # NIVEL 2 — música /m1.mp3
@@ -156,7 +157,9 @@ def show(level=1):
                 pygame.mixer.music.load("music/m1.mp3")
                 pygame.mixer.music.set_volume(0.5)
                 pygame.mixer.music.play(-1)
-                nivel_2.main()
+                result = nivel_2.main()  # CAPTURAR EL RETORNO
+                if result == "menu" or result == "to_menu":
+                    return "menu"  # PROPAGAR EL RETORNO
 
             # ------------------------------------------------
             # NIVEL 3 — música /m3.mp3
@@ -167,10 +170,13 @@ def show(level=1):
                 pygame.mixer.music.play(-1)
 
                 import nivel_3
-                nivel_3.main()
+                result = nivel_3.main()  # CAPTURAR EL RETORNO
+                if result == "menu" or result == "to_menu":
+                    return "menu"  # PROPAGAR EL RETORNO
 
-            return
+            # Si llegamos aquí, el nivel terminó pero no retornó "menu"
+            # En ese caso, volvemos al menú principal
+            return "menu"
 
         pygame.display.update()
         clock.tick(60)
-

@@ -3,6 +3,11 @@ import constants
 
 pygame.init()
 
+# EVENTOS PERSONALIZADOS
+OPEN_MENU_EVENT = pygame.USEREVENT + 1
+OPEN_CONFIG_EVENT = pygame.USEREVENT + 2
+OPEN_LEVEL_EVENT = pygame.USEREVENT + 3
+
 lenguaje = True
 music = True
 volume_master = 0.5
@@ -100,7 +105,11 @@ def open_config_menu(from_menu="main"):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return "quit"
+                pygame.quit()
+                exit()
+
+            if event.type == OPEN_MENU_EVENT:
+                return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if flag_es_rect.collidepoint(mx, my):
@@ -113,10 +122,9 @@ def open_config_menu(from_menu="main"):
                     volume_master = max(0, min(volume_master, 1))
 
                 if exit_rect.collidepoint(mx, my):
-                    # CORRECCIÓN: Ahora retorna "menu" en lugar de "menu_principal"
                     pygame.time.delay(100)
-                    return "menu"
+                    return
 
         pygame.display.update()
 
-    return "menu"
+    return

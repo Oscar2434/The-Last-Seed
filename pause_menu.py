@@ -10,7 +10,6 @@ def make_blur(screen, width, height):
     blurred = pygame.transform.smoothscale(small, (width, height))
     return blurred
 
-
 class PauseButton:
     def __init__(self, image, center_pos):
         self.image = image
@@ -24,7 +23,6 @@ class PauseButton:
 
     def is_clicked(self, event):
         return event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos)
-
 
 def show_pause_menu(screen, from_level, callback_restart=None):
     # === CARGA DE IMÁGENES ===
@@ -91,25 +89,31 @@ def show_pause_menu(screen, from_level, callback_restart=None):
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 pause_active = False
-
+    
             if btn_menu.is_clicked(event):
-                # CORRECCIÓN: Retorna "menu" en lugar de "menu_principal"
-                return "menu"
+                # ENVIAR EVENTO PARA VOLVER AL MENÚ PRINCIPAL
+                menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+                pygame.time.delay(100)
+                pygame.event.post(menu_event)
+                return
 
             if btn_conf.is_clicked(event):
-                # Abre configuración desde pausa
-                result = config.open_config_menu(from_menu="pause")
-                # Si config retorna "menu", lo propagamos
-                if result == "menu":
-                    return "menu"
-                # Si no, continuamos en el menú de pausa
+                # Abrir configuración sin afectar el flujo
+                config.open_config_menu(from_menu="pause")
+                # Continuar en el menú de pausa después de cerrar configuración
                 continue
 
             if btn_rean.is_clicked(event):
                 pause_active = False
 
             if btn_reini.is_clicked(event):
-                return "reiniciar"
+                if callback_restart:
+                    callback_restart()
+                return
 
-    return "reanudar"
-# memu
+        # Verificar si llegó un evento para abrir el menú principal
+        for event in pygame.event.get(pump=False):
+            if event.type == config.OPEN_MENU_EVENT:
+                return
+
+    return

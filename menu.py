@@ -69,28 +69,14 @@ def menu():
         if play_rect.collidepoint(mouse):
             screen.blit(play_hover, play_rect)
             if click:
-                resultado = nivels.niveles()
-                
-                # MANEJO COMPLETO DE RETORNOS - CORREGIDO
-                if resultado == "menu":
-                    continue  # Cambié 'return' por 'continue'
-                elif resultado == "config":
-                    config_result = config.open_config_menu(from_menu="main")
-                    if config_result == "menu":
-                        continue
-                elif resultado == "reiniciar":
-                    continue
-                elif resultado == "quit":
-                    pygame.quit()
-                    sys.exit()
+                nivels.niveles()  # Simplemente llamar, sin manejar retornos
 
         else:
             screen.blit(play_normal, play_rect)
 
         if config_button.draw(screen):
-            config_result = config.open_config_menu(from_menu="main")
+            config.open_config_menu(from_menu="main")
 
-                
         if exit_rect.collidepoint(mouse):
             screen.blit(exit_normal, exit_rect)
             if click:
@@ -103,6 +89,10 @@ def menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == config.OPEN_MENU_EVENT:
+                # Este evento nos trae de vuelta al menú principal
+                continue
 
         pygame.display.update()
 
