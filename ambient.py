@@ -20,6 +20,22 @@ class Tree:
         self.glow = False
         self.glow_start = 0
 
+    def get_collision_rect(self):
+        """Hitbox de colisión (más pequeña, para evitar bloquearse)"""
+        scale = constants.TREE_COLLISION_HITBOX_SCALE
+        collision_size = self.size * scale
+        x_offset = (self.size - collision_size) / 2
+        y_offset = (self.size - collision_size) / 2
+        return pygame.Rect(self.x + x_offset, self.y + y_offset, collision_size, collision_size)
+
+    def get_attack_rect(self):
+        """Hitbox de ataque (aún más pequeña, en el centro)"""
+        scale = constants.TREE_ATTACK_HITBOX_SCALE
+        attack_size = self.size * scale
+        x_offset = (self.size - attack_size) / 2
+        y_offset = (self.size - attack_size) / 2
+        return pygame.Rect(self.x + x_offset, self.y + y_offset, attack_size, attack_size)
+
     def start_glow(self):
         self.glow = True
         self.glow_start = pygame.time.get_ticks()
@@ -87,6 +103,8 @@ class Tree:
             surface.blit(self.sprite, (0, 0), rect)
             surface = pygame.transform.scale(surface, (self.size, self.size))
             screen.blit(surface, (self.x, self.y))
+
+        # NOTA: Se eliminó el código de dibujo de hitboxes de debug
 
         for fire in self.fires:
             fire.draw(screen)

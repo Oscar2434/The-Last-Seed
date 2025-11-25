@@ -29,6 +29,12 @@ class Lumberjack:
         self.animations = self.load_animations()
 
         self.target_tree = self.choose_target()
+        
+        # Sistema de navegación mejorado
+        self.stuck_timer = 0
+        self.last_positions = []
+        self.path_attempts = 0
+        self.max_path_attempts = 5
 
     def load_animations(self):
         animations = {}
@@ -56,159 +62,247 @@ class Lumberjack:
             self.animation_timer = now
             self.animation_frame = (self.animation_frame + 1) % constants.SPRITES
 
-    def trunk_rect(self, tree):
-        h = int(tree.size * 0.45)
-        y0 = int(tree.y + tree.size - h)
-        return pygame.Rect(tree.x, y0, tree.size, h)
-
     def choose_target(self):
-        trees = [t for t in self.world.trees if t.health > 0]
+        """Selección de objetivos mejorada"""
+        available_trees = []
+        
+        for t in self.world.trees:
+            if t.health > 0:
+                available_trees.append(t)
+        
         if self.world.central_tree and self.world.central_tree.health > 0:
-            trees.append(self.world.central_tree)
-        if not trees:
+            available_trees.append(self.world.central_tree)
+        
+        if not available_trees:
             return None
 
-        def dist2(t):
-            cx = t.x + t.size * 0.5
-            cy = t.y + t.size * 0.5
-            return (cx - (self.x + self.size * 0.5))**2 + (cy - (self.y + self.size * 0.5))**2
+        def distance_to_tree(tree):
+            cx = tree.x + tree.size * 0.5
+            cy = tree.y + tree.size * 0.5
+            ex = self.x + self.size * 0.5
+            ey = self.y + self.size * 0.5
+            return (cx - ex)**2 + (cy - ey)**2
 
-        trees.sort(key=dist2)
+        available_trees.sort(key=distance_to_tree)
 
+        # Distribuir enemigos entre árboles
         if hasattr(self.world, "enemies"):
-            engaged = [e.target_tree for e in self.world.enemies if getattr(e, "target_tree", None)]
-            for t in trees:
-                if t not in engaged:
-                    return t
-        return trees[0]
+            target_count = {}
+            for enemy in self.world.enemies:
+                if hasattr(enemy, "target_tree") and enemy.target_tree:
+                    target_count[enemy.target_tree] = target_count.get(enemy.target_tree, 0) + 1
+            
+            for tree in available_trees:
+                if target_count.get(tree, 0) < 2:
+                    return tree
+        
+        return available_trees[0]
 
     def refresh_target_if_needed(self):
         if not self.target_tree or self.target_tree.health <= 0:
             self.attacking = False
             self.target_tree = self.choose_target()
+            self.path_attempts = 0  # Resetear intentos al cambiar objetivo
+            return True
+        return False
 
-    def desired_step(self, tx, ty):
-        dx = tx - self.x
-        dy = ty - self.y
-        d = (dx*dx + dy*dy) ** 0.5
-        if d < 1e-6:
-            return 0.0, 0.0
-        return (self.speed * dx / d, self.speed * dy / d)
+    def desired_step(self, target_x, target_y):
+        """Calcular dirección hacia el objetivo"""
+        dx = target_x - (self.x + self.size/2)
+        dy = target_y - (self.y + self.size/2)
+        distance = math.hypot(dx, dy)
+        
+        if distance < 1e-6:
+            return 0, 0
+            
+        dx_normalized = dx / distance
+        dy_normalized = dy / distance
+        
+        return dx_normalized * self.speed, dy_normalized * self.speed
 
-    def collide_any_tree(self, rect, target):
-        for t in self.world.trees:
-            if t is target:
-                if rect.colliderect(self.trunk_rect(t)):
-                    return t
-            else:
-                if rect.colliderect(pygame.Rect(t.x, t.y, t.size, t.size)):
-                    return t
-        ct = self.world.central_tree
-        if ct:
-            if ct is target:
-                if rect.colliderect(self.trunk_rect(ct)):
-                    return ct
-            else:
-                if rect.colliderect(pygame.Rect(ct.x, ct.y, ct.size, ct.size)):
-                    return ct
-        return None
+    def is_position_blocked(self, x, y, ignore_tree=None):
+        """Verificar si una posición está bloqueada por hitboxes de colisión"""
+        test_rect = pygame.Rect(x, y, self.size, self.size)
+        
+        # Verificar colisión con otros árboles
+        for tree in self.world.trees:
+            if tree.health > 0 and tree != ignore_tree:
+                if test_rect.colliderect(tree.get_collision_rect()):
+                    return True
+        
+        # Verificar colisión con árbol central
+        if self.world.central_tree and self.world.central_tree.health > 0 and self.world.central_tree != ignore_tree:
+            if test_rect.colliderect(self.world.central_tree.get_collision_rect()):
+                return True
+                
+        return False
+
+    def find_path_around_obstacle(self, target_x, target_y, obstacle_tree):
+        """Encontrar camino alrededor de un obstáculo específico"""
+        enemy_center_x = self.x + self.size/2
+        enemy_center_y = self.y + self.size/2
+        
+        # Calcular ángulo hacia el objetivo
+        dx = target_x - enemy_center_x
+        dy = target_y - enemy_center_y
+        target_angle = math.atan2(dy, dx)
+        
+        # Probar ángulos alternativos alrededor del obstáculo
+        angles_to_try = [
+            target_angle,  # Dirección original
+            target_angle + math.pi/4,    # 45° derecha
+            target_angle - math.pi/4,    # 45° izquierda
+            target_angle + math.pi/2,    # 90° derecha  
+            target_angle - math.pi/2,    # 90° izquierda
+            target_angle + math.pi*0.75, # 135° derecha
+            target_angle - math.pi*0.75, # 135° izquierda
+        ]
+        
+        # Radio para evitar el obstáculo (tamaño del árbol + margen)
+        avoid_radius = obstacle_tree.size * 0.8
+        
+        for angle in angles_to_try:
+            # Calcular posición de prueba
+            test_x = enemy_center_x + math.cos(angle) * avoid_radius
+            test_y = enemy_center_y + math.sin(angle) * avoid_radius
+            
+            # Ajustar a la posición del enemigo (esquina)
+            test_x -= self.size/2
+            test_y -= self.size/2
+            
+            # Verificar si esta posición está libre
+            if not self.is_position_blocked(test_x, test_y, obstacle_tree):
+                return self.desired_step(test_x + self.size/2, test_y + self.size/2)
+        
+        return 0, 0  # No se encontró camino
 
     def move_towards_target(self):
-        self.refresh_target_if_needed()
+        """Sistema de movimiento completamente nuevo con dos hitboxes"""
+        if self.refresh_target_if_needed():
+            return
+            
         if not self.target_tree or self.attacking:
             return
 
         t = self.target_tree
-        tx = t.x + t.size * 0.5 - self.size * 0.5
-        ty = t.y + t.size * 0.5 - self.size * 0.5
-        sx, sy = self.desired_step(tx, ty)
+        if t.health <= 0:
+            self.attacking = False
+            self.target_tree = self.choose_target()
+            self.path_attempts = 0
+            return
 
+        # Calcular posición objetivo (hitbox de ataque del árbol)
+        attack_rect = t.get_attack_rect()
+        target_x = attack_rect.x + attack_rect.width/2
+        target_y = attack_rect.y + attack_rect.height/2
+
+        # Verificar si ya estamos en posición de ataque
         enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
-        try_rect = enemy_rect.move(sx, 0)
-        hit = self.collide_any_tree(try_rect, t)
-        moved_x, moved_y = 0.0, 0.0
+        if enemy_rect.colliderect(attack_rect):
+            self.attacking = True
+            return
 
-        if hit is None:
-            self.x += sx
-            moved_x = sx
+        # Calcular movimiento hacia el objetivo
+        dx, dy = self.desired_step(target_x, target_y)
+        
+        # Verificar si el camino está bloqueado
+        new_x = self.x + dx
+        new_y = self.y + dy
+        
+        if self.is_position_blocked(new_x, new_y, t):
+            # Camino bloqueado, buscar ruta alternativa
+            self.path_attempts += 1
+            
+            if self.path_attempts <= self.max_path_attempts:
+                # Encontrar el árbol que está bloqueando
+                blocking_tree = None
+                test_rect = pygame.Rect(new_x, new_y, self.size, self.size)
+                
+                for tree in self.world.trees + ([self.world.central_tree] if self.world.central_tree else []):
+                    if tree != t and tree.health > 0:
+                        if test_rect.colliderect(tree.get_collision_rect()):
+                            blocking_tree = tree
+                            break
+                
+                if blocking_tree:
+                    # Intentar rodear el obstáculo
+                    alt_dx, alt_dy = self.find_path_around_obstacle(target_x, target_y, blocking_tree)
+                    if alt_dx != 0 or alt_dy != 0:
+                        new_x = self.x + alt_dx
+                        new_y = self.y + alt_dy
+            else:
+                # Demasiados intentos, cambiar objetivo
+                self.target_tree = self.choose_target()
+                self.path_attempts = 0
+                return
         else:
-            if hit is t:
-                self.attacking = True
-            else:
-                detour = self.speed
-                left_try = enemy_rect.move(-detour, 0)
-                right_try = enemy_rect.move(detour, 0)
-                if self.collide_any_tree(left_try, t) is None:
-                    self.x -= detour
-                    moved_x = -detour
-                elif self.collide_any_tree(right_try, t) is None:
-                    self.x += detour
-                    moved_x = detour
+            # Camino libre, resetear contador
+            self.path_attempts = 0
 
-        if not self.attacking:
-            enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
-            try_rect = enemy_rect.move(0, sy)
-            hit = self.collide_any_tree(try_rect, t)
-            if hit is None:
-                self.y += sy
-                moved_y = sy
+        # Aplicar movimiento si la nueva posición es válida
+        if not self.is_position_blocked(new_x, new_y, t):
+            self.x = new_x
+            self.y = new_y
+            
+            # Actualizar animación de movimiento
+            if abs(dy) > abs(dx):
+                self.current_state = constants.LUMBERJACK_UP if dy < 0 else constants.LUMBERJACK_DOWN
             else:
-                if hit is t:
-                    self.attacking = True
-                else:
-                    detour = self.speed
-                    up_try = enemy_rect.move(0, -detour)
-                    down_try = enemy_rect.move(0, detour)
-                    if self.collide_any_tree(up_try, t) is None:
-                        self.y -= detour
-                        moved_y = -detour
-                    elif self.collide_any_tree(down_try, t) is None:
-                        self.y += detour
-                        moved_y = detour
-
-        if not self.attacking:
-            if abs(moved_y) > abs(moved_x):
-                self.current_state = constants.LUMBERJACK_UP if moved_y < 0 else constants.LUMBERJACK_DOWN
-            elif abs(moved_x) > 0:
-                self.current_state = constants.LUMBERJACK_LEFT if moved_x < 0 else constants.LUMBERJACK_RIGHT
+                self.current_state = constants.LUMBERJACK_LEFT if dx < 0 else constants.LUMBERJACK_RIGHT
+        else:
+            # Si aún está bloqueado después de todo, cambiar objetivo
+            self.target_tree = self.choose_target()
+            self.path_attempts = 0
 
         self.update_animation()
 
     def attack(self):
+        """Sistema de ataque usando hitbox de ataque"""
         self.refresh_target_if_needed()
         if not self.target_tree:
             self.attacking = False
             return
 
         t = self.target_tree
+        if t.health <= 0:
+            self.attacking = False
+            self.target_tree = self.choose_target()
+            return
+
+        # Verificar si estamos en la hitbox de ataque
         enemy_rect = pygame.Rect(self.x, self.y, self.size, self.size)
-        tronco = self.trunk_rect(t)
-        tronco.inflate_ip(25, 25)
-
-        dx = (t.x + t.size / 2) - (self.x + self.size / 2)
-        dy = (t.y + t.size / 2) - (self.y + self.size / 2)
-        dist = math.hypot(dx, dy)
-        rango_ataque = (t.size + self.size) * 0.45
-
-        in_range = enemy_rect.colliderect(tronco) or dist < rango_ataque
-
-        if in_range and t.health > 0:
+        attack_rect = t.get_attack_rect()
+        
+        in_range = enemy_rect.colliderect(attack_rect)
+        
+        if in_range:
             self.attacking = True
+            
             if self.cooldown_timer <= 0:
                 t.take_damage(self.damage)
-                t.add_fire(big=True)
+                if hasattr(t, 'add_fire'):
+                    t.add_fire(big=True)
                 self.cooldown_timer = self.attack_cooldown
-            else:
-                self.cooldown_timer -= 1
-
-            self.current_state = (
-                constants.LUMBERJACK_ATTACK_LEFT if dx < 0 else constants.LUMBERJACK_ATTACK_RIGHT
-            )
+            
+            # Animación de ataque basada en posición relativa
+            enemy_center_x = self.x + self.size/2
+            enemy_center_y = self.y + self.size/2
+            tree_center_x = t.x + t.size/2
+            tree_center_y = t.y + t.size/2
+            
+            dx = tree_center_x - enemy_center_x
+            self.current_state = (constants.LUMBERJACK_ATTACK_LEFT 
+                                if dx < 0 else constants.LUMBERJACK_ATTACK_RIGHT)
         else:
             self.attacking = False
-
+        
+        if self.cooldown_timer > 0:
+            self.cooldown_timer -= 1
+        
         self.update_animation()
 
     def draw(self, screen):
         img = self.animations[self.current_state][self.animation_frame]
         screen.blit(img, (self.x, self.y))
+        
+        # NOTA: Se eliminó el código de dibujo de hitboxes de debug

@@ -70,6 +70,10 @@ ENEMY_SPEED = 1
 RESOURCE_HEAL = 20
 LEVEL_TIME = 60
 
+# Hitboxes de árboles
+TREE_COLLISION_HITBOX_SCALE = 0.7  # 70% del tamaño para colisión
+TREE_ATTACK_HITBOX_SCALE = 0.4     # 40% del tamaño para ataque
+
 # Configuraciones de niveles
 DIFFICULTY_SETTINGS = {
     "normal": {
@@ -81,7 +85,7 @@ DIFFICULTY_SETTINGS = {
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
-        "ENEMY_DAMAGE": 9,
+        "ENEMY_DAMAGE": 7,
         "LEVEL_TIME": 60,
         "max_enemies": 8,
         "spawn_delay": 240
