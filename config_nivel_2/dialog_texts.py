@@ -8,13 +8,13 @@ class DialogManager:
         self.game_paused = False
         self.dialog_timer = 0
         self.dialog_duration = 10000  # 10 segundos
-        
-        # Actualizar configuración
+
+    def get_dialog_texts(self):
+        """Obtiene los textos actualizados según el idioma configurado"""
         config.update_global_config()
         
-        # Textos según idioma
         if config.lenguaje:  # Español
-            self.dialog_texts = {
+            return {
                 "composta": "¡Has recolectado cáscara de plátano!\nLas cáscaras de plátano son ricas en nutrientes como potasio, fósforo y calcio, que ayudan a enriquecer el suelo y promover el crecimiento de las plantas.",
                 "agua": "¡Has recolectado agua!\nEl agua es esencial para la vida de las plantas. Ayuda a transportar nutrientes desde las raíces hasta las hojas y mantiene la planta hidratada y saludable.",
                 "semillas": "¡Has recolectado cáscara de huevo!\nLas cáscaras de huevo contienen carbonato de calcio que ayuda a reducir la acidez del suelo y proporciona calcio esencial para el crecimiento de las plantas.",
@@ -22,7 +22,7 @@ class DialogManager:
                 "all_collected": "¡Felicidades! Has recolectado todos los recursos.\nAhora ve al árbol central y presiona 'E' para entregarlos y completar la misión.\n¡Rápido, el tiempo se acaba!"
             }
         else:  # Inglés
-            self.dialog_texts = {
+            return {
                 "composta": "You have collected banana peel!\nBanana peels are rich in nutrients like potassium, phosphorus, and calcium, which help enrich the soil and promote plant growth.",
                 "agua": "You have collected water!\nWater is essential for plant life. It helps transport nutrients from the roots to the leaves and keeps the plant hydrated and healthy.",
                 "semillas": "You have collected egg shell!\nEgg shells contain calcium carbonate that helps reduce soil acidity and provides essential calcium for plant growth.",
@@ -31,16 +31,18 @@ class DialogManager:
             }
 
     def add_resource_dialog(self, resource_type):
-        if resource_type in self.dialog_texts:
-            self.dialogs.append(self.dialog_texts[resource_type])
+        dialog_texts = self.get_dialog_texts()
+        if resource_type in dialog_texts:
+            self.dialogs.append(dialog_texts[resource_type])
             if not self.game_paused:
                 self.game_paused = True
                 self.dialog_timer = pygame.time.get_ticks()
                 self.current_dialog_index = len(self.dialogs) - 1
 
     def add_tree_dialog(self, dialog_type):
-        if dialog_type in self.dialog_texts:
-            self.dialogs.append(self.dialog_texts[dialog_type])
+        dialog_texts = self.get_dialog_texts()
+        if dialog_type in dialog_texts:
+            self.dialogs.append(dialog_texts[dialog_type])
             if not self.game_paused:
                 self.game_paused = True
                 self.dialog_timer = pygame.time.get_ticks()
