@@ -104,12 +104,19 @@ def menu():
         if play_rect.collidepoint(mouse):
             screen.blit(play_hover, play_rect)
             if click:
+                pygame.time.delay(150)
+                # LIMPIAR EVENTOS DE MOUSE ANTES DE CAMBIAR DE PANTALLA
+                pygame.event.clear(pygame.MOUSEBUTTONDOWN)
+                pygame.event.clear(pygame.MOUSEBUTTONUP)
                 nivels.niveles()
 
         else:
             screen.blit(play_normal, play_rect)
 
         if config_button.draw(screen):
+            # LIMPIAR EVENTOS DE MOUSE ANTES DE CAMBIAR DE PANTALLA
+            pygame.event.clear(pygame.MOUSEBUTTONDOWN)
+            pygame.event.clear(pygame.MOUSEBUTTONUP)
             config.open_config_menu(from_menu="main")
             # Después de regresar de configuración, actualizar música
             apply_current_config()

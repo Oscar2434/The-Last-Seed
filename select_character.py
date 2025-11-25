@@ -34,6 +34,10 @@ normal_hover = load_image("principianteR.png", 0.45)
 hard_img = load_image("avanzado.png", 0.45)
 hard_hover = load_image("avanzadoR.png", 0.45)
 
+# Cargar imagen de retorno y escalarla
+return_scale = 0.50  # Variable para escalar el botón de retorno
+return_img = load_image("retorno.png", return_scale)
+
 class HoverButton:
     def __init__(self, x, y, normal_img, hover_img, name):
         self.normal = normal_img
@@ -62,20 +66,27 @@ class Button:
         self.rect = self.image.get_rect(center=(x, y))
         self.name = name
         self.selected = False
+        self.last_click_time = 0  # Control de tiempo entre clics
 
     def draw(self, surface):
         pos = pygame.mouse.get_pos()
         surface.blit(self.image, self.rect)
         clicked = False
-        if self.rect.collidepoint(pos) and pygame.mouse.get_pressed()[0]:
+        
+        current_time = pygame.time.get_ticks()
+        if (self.rect.collidepoint(pos) and pygame.mouse.get_pressed()[0] and 
+            current_time - self.last_click_time > 300):  # 300ms entre clics
             self.selected = True
             clicked = True
+            self.last_click_time = current_time
+            
         return clicked
 
 def show(level=1):
     clock = pygame.time.Clock()
     selected_character = None
     selected_difficulty = None
+    ignore_first_click = True  # Bandera para ignorar clics al entrar
 
     center_x = constants.WIDTH // 2
 
@@ -102,6 +113,9 @@ def show(level=1):
         "avanzado"
     )
 
+    # Botón de retorno
+    return_btn = Button(50, 430, return_img, "retorno")
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -111,25 +125,53 @@ def show(level=1):
         screen.blit(background, (0, 0))
         screen.blit(title_img, title_rect)
 
-        if boy_btn.draw(screen):
+        # Si es el primer clic después de entrar, ignorarlo
+        if ignore_first_click:
+            # Solo ignorar el primer clic que ocurra después de un breve período
+            if pygame.time.get_ticks() > 300:  # 300ms después de entrar
+                ignore_first_click = False
+
+        # Dibujar y verificar botón de retorno
+        return_clicked = return_btn.draw(screen)
+        if return_clicked and not ignore_first_click:
+            pygame.time.delay(150)
+            # LIMPIAR EVENTOS DE MOUSE ANTES DE CAMBIAR DE PANTALLA
+            pygame.event.clear(pygame.MOUSEBUTTONDOWN)
+            pygame.event.clear(pygame.MOUSEBUTTONUP)
+            return "nivels"  # CORRECCIÓN: Regresar a niveles en lugar de menú
+
+        # Verificar clics en botones de personaje y dificultad
+        character_clicked = False
+        difficulty_clicked = False
+        
+        if boy_btn.draw(screen) and not ignore_first_click:
             selected_character = "niño"
             boy_btn.selected = True
             girl_btn.selected = False
+            character_clicked = True
 
-        if girl_btn.draw(screen):
+        if girl_btn.draw(screen) and not ignore_first_click:
             selected_character = "niña"
             girl_btn.selected = True
             boy_btn.selected = False
+            character_clicked = True
 
-        if normal_btn.draw(screen):
+        if normal_btn.draw(screen) and not ignore_first_click:
             selected_difficulty = "normal"
             normal_btn.selected = True
             hard_btn.selected = False
+            difficulty_clicked = True
 
-        if hard_btn.draw(screen):
+        if hard_btn.draw(screen) and not ignore_first_click:
             selected_difficulty = "avanzado"
             hard_btn.selected = True
             normal_btn.selected = False
+            difficulty_clicked = True
+
+        # Si se hizo clic en algún botón, limpiar eventos
+        if (character_clicked or difficulty_clicked) and not ignore_first_click:
+            pygame.event.clear(pygame.MOUSEBUTTONDOWN)
+            pygame.event.clear(pygame.MOUSEBUTTONUP)
 
         if selected_character and selected_difficulty:
             config.selected_character = selected_character
