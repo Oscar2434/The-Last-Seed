@@ -6,14 +6,62 @@ import main
 import config
 import nivels
 
-pygame.init()
+pygame.init()  
 
-if config.music:
-    if not pygame.mixer.get_init():
-        pygame.mixer.init()
-    pygame.mixer.music.load('music/m4.mp3')
-    pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)
+# Variables globales para control de música
+music_initialized = False
+current_music = None  # Track de la música actual
+
+def initialize_music():
+    """Inicializa el sistema de música una sola vez"""
+    global music_initialized, current_music
+    if not music_initialized and config.music:
+        if not pygame.mixer.get_init():
+            pygame.mixer.init()
+        try:
+            pygame.mixer.music.load('music/m4.mp3')
+            pygame.mixer.music.set_volume(config.volume_master)
+            pygame.mixer.music.play(-1)
+            music_initialized = True
+            current_music = "menu"
+        except pygame.error as e:
+            print(f"Error cargando música: {e}")
+            music_initialized = False
+
+def restart_menu_music():
+    """Reinicia la música del menú principal"""
+    global music_initialized, current_music
+    if config.music:
+        try:
+            pygame.mixer.music.stop()  # Detener música actual
+            pygame.mixer.music.load('music/m4.mp3')
+            pygame.mixer.music.set_volume(config.volume_master)
+            pygame.mixer.music.play(-1)
+            music_initialized = True
+            current_music = "menu"
+            print("Música del menú reiniciada")  # Debug
+        except pygame.error as e:
+            print(f"Error cargando música del menú: {e}")
+
+def apply_current_config():
+    """Aplica la configuración actual cargada sin reiniciar la música"""
+    config.update_global_config()  # Actualizar variables globales
+    
+    # Actualizar volumen si la música está reproduciéndose
+    if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+        pygame.mixer.music.set_volume(config.volume_master)
+    
+    # Manejar estado de música (play/stop)
+    if config.music:
+        if not pygame.mixer.music.get_busy():
+            restart_menu_music()
+    else:
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
+
+# Aplicar configuración al inicio
+config.update_global_config()
+initialize_music()
 
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")
@@ -43,16 +91,22 @@ config_button = Button(
 
 def menu():
     run = True
+    # Asegurar que la música del menú esté sonando al entrar
+    restart_menu_music()
+    
     while run:
-
-        if config.lenguaje:
-            play_normal = pygame.image.load("imagenes/Play.png")
-            play_hover  = pygame.image.load("imagenes/PlayR.png")
-            exit_normal = pygame.image.load("imagenes/Exit.png")
-        else:
+        # ACTUALIZAR CONFIGURACIÓN EN CADA ITERACIÓN
+        config.update_global_config()
+        
+        # Cargar imágenes según idioma ACTUAL
+        if config.lenguaje:  # Español
             play_normal = pygame.image.load("imagenes/Jugar.png")
-            play_hover  = pygame.image.load("imagenes/playR.png")
-            exit_normal = pygame.image.load("imagenes/Salida.png")
+            play_hover  = pygame.image.load("imagenes/JugarR.png")
+            exit_normal = pygame.image.load("imagenes/SalidaR.png")
+        else:  # Inglés
+            play_normal = pygame.image.load("imagenes/PlayR.png")
+            play_hover  = pygame.image.load("imagenes/Play.png")
+            exit_normal = pygame.image.load("imagenes/Exit.png")
 
         play_normal = pygame.transform.scale(play_normal, (300, 100))
         play_hover  = pygame.transform.scale(play_hover,  (300, 100))
@@ -70,16 +124,21 @@ def menu():
         if play_rect.collidepoint(mouse):
             screen.blit(play_hover, play_rect)
             if click:
+                pygame.time.delay(150)
                 nivels.niveles()
+
         else:
             screen.blit(play_normal, play_rect)
 
         if config_button.draw(screen):
-            config.config_menu()
+            config.open_config_menu(from_menu="main")
+            # Después de regresar de configuración, actualizar música
+            apply_current_config()
 
         if exit_rect.collidepoint(mouse):
             screen.blit(exit_normal, exit_rect)
             if click:
+                config.save_current_config()  # Guardar antes de salir
                 pygame.quit()
                 sys.exit()
         else:
@@ -87,8 +146,16 @@ def menu():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                config.save_current_config()  # Guardar antes de salir
                 pygame.quit()
                 sys.exit()
+
+            if event.type == config.OPEN_MENU_EVENT:
+                # Este evento nos trae de vuelta al menú principal
+                print("Evento OPEN_MENU_EVENT recibido - Reiniciando música del menú")
+                restart_menu_music()  # REINICIAR MÚSICA DEL MENÚ
+                apply_current_config()  # Actualizar configuración
+                continue
 
         pygame.display.update()
 
