@@ -49,6 +49,65 @@ def get_localized_texts():
             "objective3": "- Survive until time runs out"
         }
 
+def show_tutorial_screens(screen, level_number):
+    """Muestra las pantallas de tutorial para el nivel especificado"""
+    # Cargar imágenes según idioma
+    if config.lenguaje:  # Español
+        tutorial_path = "assets/images/turorial en español"
+    else:  # Inglés
+        tutorial_path = "assets/images/tutorial en ingles"
+    
+    # Cargar imágenes
+    try:
+        universal_img = pygame.image.load(os.path.join(tutorial_path, "universal.png")).convert_alpha()
+        level_img = pygame.image.load(os.path.join(tutorial_path, f"N{level_number}.png")).convert_alpha()
+        continue_img = pygame.image.load("assets/images/Buttons/continuar.png").convert_alpha()
+        continue_img = pygame.transform.scale(continue_img, (int(continue_img.get_width() * 0.5), int(continue_img.get_height() * 0.5)))
+
+    except pygame.error as e:
+        print(f"Error cargando imágenes de tutorial: {e}")
+        return False
+    
+    # Escalar imágenes al tamaño de la pantalla
+    universal_img = pygame.transform.scale(universal_img, (constants.WIDTH, constants.HEIGHT))
+    level_img = pygame.transform.scale(level_img, (constants.WIDTH, constants.HEIGHT))
+    
+    # Posición del botón continuar
+    continue_rect = continue_img.get_rect(center=(750, 450))
+    
+    # Mostrar pantalla universal primero
+    current_screen = 0  # 0 = universal, 1 = nivel específico
+    screens = [universal_img, level_img]
+    
+    clock = pygame.time.Clock()
+    running = True
+    
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
+                if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                    current_screen += 1
+                    if current_screen >= len(screens):
+                        return True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if continue_rect.collidepoint(event.pos):
+                    current_screen += 1
+                    if current_screen >= len(screens):
+                        return True
+        
+        # Dibujar pantalla actual
+        screen.blit(screens[current_screen], (0, 0))
+        screen.blit(continue_img, continue_rect)
+        
+        pygame.display.flip()
+        clock.tick(60)
+    
+    return True
+
 def main():
     global game_paused
     
@@ -76,6 +135,10 @@ def main():
             if music_playing:
                 pygame.mixer.music.stop()
                 music_playing = False
+        
+        # MOSTRAR TUTORIALES ANTES DE INICIAR EL NIVEL
+        if not show_tutorial_screens(screen, 1):
+            return "menu"  # Salir al menú si se cierra durante tutorial
         
         # Iniciar música al comenzar
         start_level_music()

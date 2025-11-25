@@ -8,6 +8,7 @@ import world_nivel3
 import player_nivel3
 import objects_nivel3
 import snake_logic
+import ui_nivel3
 import pause_menu  # IMPORTAR MENÚ DE PAUSA
 
 pygame.init()
@@ -20,8 +21,68 @@ def cargar_imagen_bolsa():
         img = pygame.image.load(os.path.join(base_path, "basura.png")).convert_alpha()
     return img
 
-def dibujar_hud(screen, tiempo, recogidas, objetivo):
-    # Obtener textos según el idioma
+def show_tutorial_screens(screen, level_number):
+    """Muestra las pantallas de tutorial para el nivel especificado"""
+    # Cargar imágenes según idioma
+    if config.lenguaje:  # Español
+        tutorial_path = "assets/images/turorial en español"
+    else:  # Inglés
+        tutorial_path = "assets/images/tutorial en ingles"
+    
+    # Cargar imágenes
+    try:
+        universal_img = pygame.image.load(os.path.join(tutorial_path, "universal.png")).convert_alpha()
+        level_img = pygame.image.load(os.path.join(tutorial_path, f"N{level_number}.png")).convert_alpha()
+        continue_img = pygame.image.load("assets/images/Buttons/continuar.png").convert_alpha()
+        continue_img = pygame.transform.scale(continue_img, (int(continue_img.get_width() * 0.5), int(continue_img.get_height() * 0.5)))
+
+    except pygame.error as e:
+        print(f"Error cargando imágenes de tutorial: {e}")
+        return False
+    
+    # Escalar imágenes al tamaño de la pantalla
+    universal_img = pygame.transform.scale(universal_img, (constants.WIDTH, constants.HEIGHT))
+    level_img = pygame.transform.scale(level_img, (constants.WIDTH, constants.HEIGHT))
+    
+    # Posición del botón continuar
+    continue_rect = continue_img.get_rect(center=(750, 450))
+    
+    # Mostrar pantalla universal primero
+    current_screen = 0  # 0 = universal, 1 = nivel específico
+    screens = [universal_img, level_img]
+    
+    clock = pygame.time.Clock()
+    running = True
+    
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
+                if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                    current_screen += 1
+                    if current_screen >= len(screens):
+                        return True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if continue_rect.collidepoint(event.pos):
+                    current_screen += 1
+                    if current_screen >= len(screens):
+                        return True
+        
+        # Dibujar pantalla actual
+        screen.blit(screens[current_screen], (0, 0))
+        screen.blit(continue_img, continue_rect)
+        
+        pygame.display.flip()
+        clock.tick(60)
+    
+    return True
+
+def dibujar_hud_traducido(screen, tiempo, recogidas, objetivo):
+    """Versión traducida del HUD para nivel 3"""
+    # Obtener textos según idioma
     if config.lenguaje:  # Español
         texto_tiempo = f"Tiempo: {tiempo}"
         texto_basura = f"Basura: {recogidas}/{objetivo}"
@@ -69,9 +130,6 @@ def main():
         # Actualizar configuración al inicio
         config.update_global_config()
         
-        # Iniciar música del nivel
-        start_level_music()
-
         screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
         clock = pygame.time.Clock()
 
@@ -91,6 +149,13 @@ def main():
 
         victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
         lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
+
+        # MOSTRAR TUTORIALES ANTES DE INICIAR EL NIVEL
+        if not show_tutorial_screens(screen, 3):
+            return "menu"  # Salir al menú si se cierra durante tutorial
+
+        # Iniciar música del nivel
+        start_level_music()
 
         world = world_nivel3.World(constants.WIDTH, constants.HEIGHT)
 
@@ -267,7 +332,9 @@ def main():
             for b in basura:
                 b.dibujar(screen)
             jugador.dibujar(screen, bolsa_img)
-            dibujar_hud(screen, tiempo, recogidas, objetivo)  # LLAMADA A LA FUNCIÓN LOCAL
+            
+            # USAR HUD TRADUCIDO EN LUGAR DE ui_nivel3.dibujar_hud
+            dibujar_hud_traducido(screen, tiempo, recogidas, objetivo)
             
             # === MOSTRAR BOTÓN DE PAUSA ===
             screen.blit(pause_icon, pause_rect)
