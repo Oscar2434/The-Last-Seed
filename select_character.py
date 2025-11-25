@@ -11,28 +11,54 @@ screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("Selección de personaje y dificultad")
 
 def load_image(name, scale=1.0):
-    path = os.path.join("imagenes", name)
+    """Carga imágenes desde assets/images con manejo de errores"""
+    # Primero intentar en assets/images
+    path = os.path.join("assets", "images", name)
+    if not os.path.exists(path):
+        # Si no existe, intentar en la carpeta raíz de imágenes
+        path = os.path.join("imagenes", name)
+        if not os.path.exists(path):
+            # Si tampoco existe, mostrar error pero continuar
+            print(f"Advertencia: No se pudo encontrar la imagen: {name}")
+            # Crear una imagen de placeholder
+            surf = pygame.Surface((100, 100))
+            surf.fill((255, 0, 255))  # Color magenta para indicar error
+            return surf
+    
     image = pygame.image.load(path).convert_alpha()
     if scale != 1.0:
         w, h = int(image.get_width() * scale), int(image.get_height() * scale)
         image = pygame.transform.scale(image, (w, h))
     return image
 
+def load_localized_images():
+    """Carga las imágenes según el idioma actual"""
+    config.update_global_config()  # Actualizar configuración primero
+    
+    if config.lenguaje:  # Español
+        title_img = load_image("seleccionPj.png")
+        normal_img = load_image("principiante.png", 0.45)
+        normal_hover = load_image("principianteR.png", 0.45)
+        hard_img = load_image("avanzado.png", 0.45)
+        hard_hover = load_image("avanzadoR.png", 0.45)
+    else:  # Inglés
+        # Cargar imágenes en inglés desde la subcarpeta Selec
+        title_img = load_image(os.path.join("Selec", "selección de personaje INGLES.png"))
+        normal_img = load_image(os.path.join("Selec", "principiante INGLES.png"), 0.45)
+        normal_hover = load_image(os.path.join("Selec", "principiante INGLES ELEGIR.png"), 0.45)
+        hard_img = load_image(os.path.join("Selec", "avanzado INGLES.png"), 0.45)
+        hard_hover = load_image(os.path.join("Selec", "avanzado INGLES ELEGIR.png"), 0.45)
+    
+    return title_img, normal_img, normal_hover, hard_img, hard_hover
+
+# Cargar imágenes que no cambian con el idioma
 background = load_image("portada.png")
 background = pygame.transform.scale(background, (constants.WIDTH, constants.HEIGHT))
-
-title_img = load_image("seleccionPj.png")
 
 boy_normal = load_image("seleccionNiño.png")
 boy_hover = load_image("seleccionNiño2.png")
 girl_normal = load_image("seleccionNiña.png")
 girl_hover = load_image("seleccionNiña2.png")
-
-normal_img = load_image("principiante.png", 0.45)
-normal_hover = load_image("principianteR.png", 0.45)
-
-hard_img = load_image("avanzado.png", 0.45)
-hard_hover = load_image("avanzadoR.png", 0.45)
 
 # Cargar imagen de retorno y escalarla
 return_scale = 0.50  # Variable para escalar el botón de retorno
@@ -90,6 +116,8 @@ def show(level=1):
 
     center_x = constants.WIDTH // 2
 
+    # Cargar imágenes localizadas
+    title_img, normal_img, normal_hover, hard_img, hard_hover = load_localized_images()
     title_rect = title_img.get_rect(midtop=(center_x, int(constants.HEIGHT * 0.001)))
 
     character_y = constants.HEIGHT // 2 + 60
