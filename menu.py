@@ -8,23 +8,43 @@ import nivels
 
 pygame.init()  
 
-# Función para aplicar configuración actualizada
-def apply_current_config():
-    """Aplica la configuración actual cargada"""
-    config.update_global_config()  # Actualizar variables globales
-    
-    if config.music:
+# Variables globales para control de música
+music_initialized = False
+
+def initialize_music():
+    """Inicializa el sistema de música una sola vez"""
+    global music_initialized
+    if not music_initialized and config.music:
         if not pygame.mixer.get_init():
             pygame.mixer.init()
-        if hasattr(config, 'volume_master'):
+        try:
+            pygame.mixer.music.load('music/m4.mp3')
             pygame.mixer.music.set_volume(config.volume_master)
-        pygame.mixer.music.load('music/m4.mp3')
-        pygame.mixer.music.play(-1)
+            pygame.mixer.music.play(-1)
+            music_initialized = True
+        except pygame.error as e:
+            print(f"Error cargando música: {e}")
+            music_initialized = False
+
+def apply_current_config():
+    """Aplica la configuración actual cargada sin reiniciar la música"""
+    config.update_global_config()  # Actualizar variables globales
+    
+    # Actualizar volumen si la música está reproduciéndose
+    if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+        pygame.mixer.music.set_volume(config.volume_master)
+    
+    # Manejar estado de música (play/stop)
+    if config.music:
+        if not pygame.mixer.music.get_busy():
+            initialize_music()
     else:
-        pygame.mixer.music.stop()
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
 
 # Aplicar configuración al inicio
-apply_current_config()
+config.update_global_config()
+initialize_music()
 
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")

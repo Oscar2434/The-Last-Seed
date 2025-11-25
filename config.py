@@ -48,6 +48,11 @@ def save_current_config():
     }
     return config_manager.save_config(config_data)
 
+def update_music_volume():
+    """Actualiza el volumen de la música en tiempo real"""
+    if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+        pygame.mixer.music.set_volume(volume_master)
+
 def load_image(path, scale=1.0):
     img = pygame.image.load(path).convert_alpha()
     if scale != 1.0:
@@ -100,6 +105,9 @@ def open_config_menu(from_menu="main"):
     bar_x = start_x + icon_w + separation
     exit_rect = exit_img.get_rect(center=(constants.WIDTH // 2, 395))
 
+    # Variables para arrastre de barra
+    dragging_volume = False
+
     running = True
     while running:
         screen.blit(bg, (0, 0))
@@ -135,6 +143,13 @@ def open_config_menu(from_menu="main"):
                          (bar_x, bar_y, current_width, bar_height),
                          border_radius=5)
 
+        # Indicador de volumen actual
+        font = pygame.font.Font(None, 24)
+        volume_text = f"{int(volume_master * 100)}%"
+        text_surf = font.render(volume_text, True, (255, 255, 255))
+        text_rect = text_surf.get_rect(center=(bar_x + bar_width // 2, bar_y - 20))
+        screen.blit(text_surf, text_rect)
+
         screen.blit(exit_img, exit_rect)
 
         if exit_rect.collidepoint(mx, my):
@@ -160,14 +175,26 @@ def open_config_menu(from_menu="main"):
                     save_current_config()  # Guardar inmediatamente
 
                 if bar_x <= mx <= bar_x + bar_width and bar_y <= my <= bar_y + bar_height:
+                    dragging_volume = True
                     volume_master = (mx - bar_x) / bar_width
                     volume_master = max(0, min(volume_master, 1))
                     save_current_config()  # Guardar inmediatamente
+                    update_music_volume()  # Actualizar volumen en tiempo real
 
                 if exit_rect.collidepoint(mx, my):
                     pygame.time.delay(150)
                     save_current_config()  # Guardar al salir
                     return
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                dragging_volume = False
+
+            if event.type == pygame.MOUSEMOTION:
+                if dragging_volume:
+                    volume_master = (mx - bar_x) / bar_width
+                    volume_master = max(0, min(volume_master, 1))
+                    save_current_config()  # Guardar inmediatamente
+                    update_music_volume()  # Actualizar volumen en tiempo real
 
         pygame.display.update()
 

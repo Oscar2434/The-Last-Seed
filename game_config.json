@@ -1,7 +1,7 @@
 {
     "lenguaje": true,
     "music": true,
-    "volume_master": 0.5,
+    "volume_master": 1,
     "selected_character": null,
     "difficulty": null
 }
