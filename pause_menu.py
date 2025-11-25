@@ -204,6 +204,11 @@ def show_pause_menu(screen, from_level, callback_restart=None):
                 config.save_current_config()
                 return_value = "menu"
                 pause_active = False
+                # DELAY PARA EVITAR QUE SE ACTIVEN BOTONES EN EL MENÚ PRINCIPAL
+                pygame.time.delay(300)  # 300ms de delay
+                # Limpiar eventos de mouse pendientes
+                pygame.event.clear(pygame.MOUSEBUTTONDOWN)
+                pygame.event.clear(pygame.MOUSEBUTTONUP)
 
             if btn_conf.is_clicked(event):
                 config.open_config_menu(from_menu="pause")

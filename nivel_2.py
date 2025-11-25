@@ -28,6 +28,11 @@ defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perd
 victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
 defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
 
+# === BOTÓN DE PAUSA PARA NIVEL 2 ===
+pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_alpha()
+pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
+pause_rect = pause_icon.get_rect(center=(constants.WIDTH // 2, 20))
+
 def draw_dialog(screen, text):
     dialog_rect = pygame.Rect(40, constants.HEIGHT - 180, constants.WIDTH - 80, 160)
     
@@ -157,11 +162,20 @@ def run_level():
     # Actualizar configuración al inicio
     config.update_global_config()
     
-    if pygame.mixer.get_init():
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load('music/m1.mp3')
-        pygame.mixer.music.set_volume(config.volume_master)
-        pygame.mixer.music.play(-1)
+    # Control de música
+    def start_level_music():
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load('music/m1.mp3')
+            pygame.mixer.music.set_volume(config.volume_master)
+            pygame.mixer.music.play(-1)
+    
+    def stop_level_music():
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+    
+    # Iniciar música al comenzar
+    start_level_music()
     
     clock = pygame.time.Clock()
     game_world = World(constants.WIDTH, constants.HEIGHT)
@@ -208,8 +222,8 @@ def run_level():
                 return "quit"
             
             elif event.type == pygame.KEYDOWN:
-                # Tecla P para activar/desactivar pausa
-                if event.key == pygame.K_p and not game_paused_by_dialog:
+                # Tecla ESC para activar/desactivar pausa
+                if event.key == pygame.K_ESCAPE and not game_paused_by_dialog:
                     if not game_paused:
                         # Iniciar pausa
                         game_paused = True
@@ -224,7 +238,11 @@ def run_level():
                         if result == "restart":
                             return "restart"
                         elif result == "menu":
+                            stop_level_music()
                             return "menu"
+                        # Reanudar música si se detuvo por configuración
+                        if config.music and not pygame.mixer.music.get_busy():
+                            start_level_music()
                 
                 # Solo procesar otras teclas si no hay pausa activa
                 if not game_paused_total:
@@ -239,6 +257,29 @@ def run_level():
                 # Manejar ESPACIO para diálogos (solo si hay diálogos activos)
                 elif event.key == pygame.K_SPACE and game_paused_by_dialog:
                     dialog_manager.next_dialog()
+
+            # CLICK EN BOTÓN DE PAUSA
+            if event.type == pygame.MOUSEBUTTONDOWN and not game_paused_by_dialog:
+                if pause_rect.collidepoint(event.pos):
+                    if not game_paused:
+                        # Iniciar pausa
+                        game_paused = True
+                        pause_start_time = current_time
+                        # Mostrar menú de pausa y capturar resultado
+                        result = pause_menu.show_pause_menu(screen, "level2")
+                        # Finalizar pausa
+                        game_paused = False
+                        total_pause_time += (current_time - pause_start_time)
+                        
+                        # Manejar resultado del menú de pausa
+                        if result == "restart":
+                            return "restart"
+                        elif result == "menu":
+                            stop_level_music()
+                            return "menu"
+                        # Reanudar música si se detuvo por configuración
+                        if config.music and not pygame.mixer.music.get_busy():
+                            start_level_music()
 
         # Dibujar elementos del juego (siempre se dibujan, incluso en pausa)
         game_world.draw(screen)
@@ -306,6 +347,13 @@ def run_level():
         screen.blit(text, (10, 10))
 
         draw_inventory(screen, collected_resources)
+        
+        # === MOSTRAR BOTÓN DE PAUSA ===
+        screen.blit(pause_icon, pause_rect)
+
+        # HOVER amarillo del botón de pausa
+        if pause_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, (255, 255, 0), pause_rect, 2)
 
         # DIBUJAR DIÁLOGOS (si es necesario y no está en pausa por menú)
         if dialog_manager.game_paused and dialog_manager.has_dialogs() and not game_paused:
