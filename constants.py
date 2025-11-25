@@ -73,15 +73,15 @@ LEVEL_TIME = 60
 # Configuraciones de niveles
 DIFFICULTY_SETTINGS = {
     "normal": {
-        "ENEMY_SPEED": 1,
-        "ENEMY_DAMAGE": 2,
+        "ENEMY_SPEED": 1.5,
+        "ENEMY_DAMAGE": 7,
         "LEVEL_TIME": 90,
         "max_enemies": 5,
         "spawn_delay": 300
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
-        "ENEMY_DAMAGE": 6,
+        "ENEMY_DAMAGE": 9,
         "LEVEL_TIME": 60,
         "max_enemies": 8,
         "spawn_delay": 240

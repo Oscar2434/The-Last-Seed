@@ -17,11 +17,6 @@ pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The Last Seed")
 
-victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
-defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
-victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
-defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
-
 # === BOTÓN DE PAUSA (ahora reducido) ===
 pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_alpha()
 pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
@@ -107,6 +102,30 @@ def show_tutorial_screens(screen, level_number):
         clock.tick(60)
     
     return True
+
+def show_victory_screen(screen):
+    # Cargar imagen según idioma actual
+    if config.lenguaje:  # Español
+        victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
+    else:  # Inglés
+        victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganarI.png')).convert_alpha()
+    
+    victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
+    screen.blit(victory_img, (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(3000)
+
+def show_defeat_screen(screen):
+    # Cargar imagen según idioma actual
+    if config.lenguaje:  # Español
+        defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
+    else:  # Inglés
+        defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perderI.png')).convert_alpha()
+    
+    defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
+    screen.blit(defeat_img, (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(3000)
 
 def main():
     global game_paused
@@ -324,9 +343,7 @@ def main():
 
             # === DERROTA: ahora abre menú de pausa ===
             if central_tree.health <= 0:
-                screen.blit(defeat_img, (0, 0))
-                pygame.display.flip()
-                pygame.time.delay(2000)
+                show_defeat_screen(screen)
                 game_paused = True
                 result = pause_menu.show_pause_menu(screen, "level1")
                 game_paused = False
@@ -344,11 +361,9 @@ def main():
             # === VICTORIA / DERROTA FINAL ===
             if remaining_time == 0:
                 if vivos >= 3 and central_tree.health > 0:
-                    screen.blit(victory_img, (0, 0))
+                    show_victory_screen(screen)
                 else:
-                    screen.blit(defeat_img, (0, 0))
-                pygame.display.flip()
-                pygame.time.delay(3000)
+                    show_defeat_screen(screen)
                 game_paused = True
                 result = pause_menu.show_pause_menu(screen, "level1")
                 game_paused = False

@@ -55,10 +55,10 @@ def load_localized_images():
 background = load_image("portada.png")
 background = pygame.transform.scale(background, (constants.WIDTH, constants.HEIGHT))
 
-boy_normal = load_image("seleccionNiño.png")
-boy_hover = load_image("seleccionNiño2.png")
-girl_normal = load_image("seleccionNiña.png")
-girl_hover = load_image("seleccionNiña2.png")
+boy_normal = load_image("Dan sin flor.png")
+boy_hover = load_image("Dan con flor.png")
+girl_normal = load_image("Eli sin flor.png")
+girl_hover = load_image("Eli con flor.png")
 
 # Cargar imagen de retorno y escalarla
 return_scale = 0.50  # Variable para escalar el botón de retorno

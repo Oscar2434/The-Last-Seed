@@ -22,12 +22,6 @@ pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("The last seed - Nivel 2")
 
-victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
-defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
-
-victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
-defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
-
 # === BOTÓN DE PAUSA PARA NIVEL 2 ===
 pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_alpha()
 pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
@@ -208,11 +202,25 @@ def check_interaction(character, central_tree):
     return player_rect.colliderect(interaction_rect)
 
 def show_defeat_screen(screen):
+    # Cargar imagen según idioma actual
+    if config.lenguaje:  # Español
+        defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perder.png')).convert_alpha()
+    else:  # Inglés
+        defeat_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'perderI.png')).convert_alpha()
+    
+    defeat_img = pygame.transform.scale(defeat_img, (constants.WIDTH, constants.HEIGHT))
     screen.blit(defeat_img, (0, 0))
     pygame.display.flip()
     pygame.time.delay(3000)
 
 def show_victory_screen(screen):
+    # Cargar imagen según idioma actual
+    if config.lenguaje:  # Español
+        victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganar.png')).convert_alpha()
+    else:  # Inglés
+        victory_img = pygame.image.load(os.path.join('assets', 'images', 'effects', 'ganarI.png')).convert_alpha()
+    
+    victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
     screen.blit(victory_img, (0, 0))
     pygame.display.flip()
     pygame.time.delay(3000)

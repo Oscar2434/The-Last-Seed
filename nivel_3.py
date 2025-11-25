@@ -138,18 +138,6 @@ def main():
         pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
         pause_rect = pause_icon.get_rect(center=(constants.WIDTH // 2, 20))
 
-        # Imágenes de victoria y derrota a pantalla completa
-        victory_img = pygame.image.load(
-            os.path.join("assets", "images", "effects", "ganar.png")
-        ).convert_alpha()
-
-        lose_img = pygame.image.load(
-            os.path.join("assets", "images", "effects", "perder.png")
-        ).convert_alpha()
-
-        victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
-        lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
-
         # MOSTRAR TUTORIALES ANTES DE INICIAR EL NIVEL
         if not show_tutorial_screens(screen, 3):
             return "menu"  # Salir al menú si se cierra durante tutorial
@@ -259,6 +247,12 @@ def main():
             basura = nuevas_basuras
 
             if snake_logic.fuera_de_limites(jugador, constants.WIDTH, constants.HEIGHT):
+                # Cargar imagen de derrota según idioma actual
+                if config.lenguaje:  # Español
+                    lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perder.png")).convert_alpha()
+                else:  # Inglés
+                    lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perderI.png")).convert_alpha()
+                lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
                 screen.blit(lose_img, (0, 0))
                 pygame.display.update()
                 pygame.time.delay(2000)
@@ -281,6 +275,12 @@ def main():
                 continue
 
             if snake_logic.colision_obstaculos(jugador, world.obstacles):
+                # Cargar imagen de derrota según idioma actual
+                if config.lenguaje:  # Español
+                    lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perder.png")).convert_alpha()
+                else:  # Inglés
+                    lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perderI.png")).convert_alpha()
+                lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
                 screen.blit(lose_img, (0, 0))
                 pygame.display.update()
                 pygame.time.delay(2000)
@@ -305,6 +305,12 @@ def main():
             if recogidas >= objetivo and len(jugador.cola) > 0:
                 cola_rect = jugador.cola[-1]
                 if cola_rect.colliderect(world.bote.rect):
+                    # Cargar imagen de victoria según idioma actual
+                    if config.lenguaje:  # Español
+                        victory_img = pygame.image.load(os.path.join("assets", "images", "effects", "ganar.png")).convert_alpha()
+                    else:  # Inglés
+                        victory_img = pygame.image.load(os.path.join("assets", "images", "effects", "ganarI.png")).convert_alpha()
+                    victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
                     screen.blit(victory_img, (0, 0))
                     pygame.display.update()
                     pygame.time.delay(2000)
