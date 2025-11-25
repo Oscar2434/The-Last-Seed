@@ -82,7 +82,7 @@ def menu():
         if config.lenguaje:  # Español
             play_normal = pygame.image.load("imagenes/Jugar.png")
             play_hover  = pygame.image.load("imagenes/JugarR.png")
-            exit_normal = pygame.image.load("imagenes/Salida.png")
+            exit_normal = pygame.image.load("imagenes/SalidaR.png")
         else:  # Inglés
             play_normal = pygame.image.load("imagenes/PlayR.png")
             play_hover  = pygame.image.load("imagenes/Play.png")
@@ -105,18 +105,12 @@ def menu():
             screen.blit(play_hover, play_rect)
             if click:
                 pygame.time.delay(150)
-                # LIMPIAR EVENTOS DE MOUSE ANTES DE CAMBIAR DE PANTALLA
-                pygame.event.clear(pygame.MOUSEBUTTONDOWN)
-                pygame.event.clear(pygame.MOUSEBUTTONUP)
                 nivels.niveles()
 
         else:
             screen.blit(play_normal, play_rect)
 
         if config_button.draw(screen):
-            # LIMPIAR EVENTOS DE MOUSE ANTES DE CAMBIAR DE PANTALLA
-            pygame.event.clear(pygame.MOUSEBUTTONDOWN)
-            pygame.event.clear(pygame.MOUSEBUTTONUP)
             config.open_config_menu(from_menu="main")
             # Después de regresar de configuración, actualizar música
             apply_current_config()

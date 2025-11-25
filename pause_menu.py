@@ -11,15 +11,20 @@ def make_blur(screen, width, height):
     return blurred
 
 class PauseButton:
-    def __init__(self, image, center_pos):
-        self.image = image
+    def __init__(self, image_normal, image_hover, center_pos):
+        self.image_normal = image_normal
+        self.image_hover = image_hover
+        self.image = image_normal  # Imagen actual
         self.rect = self.image.get_rect(center=center_pos)
-        self.hover_color = (255, 255, 0)
 
     def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        # Cambiar imagen según si el mouse está sobre el botón
         if self.rect.collidepoint(pygame.mouse.get_pos()):
-            pygame.draw.rect(screen, self.hover_color, self.rect, 3)
+            self.image = self.image_hover
+        else:
+            self.image = self.image_normal
+            
+        screen.blit(self.image, self.rect)
 
     def is_clicked(self, event):
         return event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos)
@@ -31,25 +36,37 @@ def load_pause_images():
     
     # Cargar imágenes según idioma
     if config.lenguaje:  # Español
-        menu_img = pygame.image.load("assets/images/effects/menu1.png").convert_alpha()
-        reanudar_img = pygame.image.load("assets/images/effects/reanu1.png").convert_alpha()
-        reiniciar_img = pygame.image.load("assets/images/effects/reini1.png").convert_alpha()
+        menu_img = pygame.image.load("assets/images/Buttons/menu.png").convert_alpha()
+        menu_hover_img = pygame.image.load("assets/images/Buttons/menuR.png").convert_alpha()
+        reanudar_img = pygame.image.load("assets/images/Buttons/reanudar.png").convert_alpha()
+        reanudar_hover_img = pygame.image.load("assets/images/Buttons/reanudarR.png").convert_alpha()
+        reiniciar_img = pygame.image.load("assets/images/Buttons/reiniciar.png").convert_alpha()
+        reiniciar_hover_img = pygame.image.load("assets/images/Buttons/reiniciarR.png").convert_alpha()
+        config_img = pygame.image.load("assets/images/Buttons/conf.png").convert_alpha()
+        config_hover_img = pygame.image.load("assets/images/Buttons/confR.png").convert_alpha()
     else:  # Inglés
-        # NOTA: Necesitarás crear estas imágenes o usar las existentes
-        menu_img = pygame.image.load("assets/images/effects/menu1.png").convert_alpha()  # Cambiar por imagen en inglés
-        reanudar_img = pygame.image.load("assets/images/effects/reanu1.png").convert_alpha()  # Cambiar por imagen en inglés
-        reiniciar_img = pygame.image.load("assets/images/effects/reini1.png").convert_alpha()  # Cambiar por imagen en inglés
+        menu_img = pygame.image.load("assets/images/Buttons/menuI.png").convert_alpha()
+        menu_hover_img = pygame.image.load("assets/images/Buttons/menuRI.png").convert_alpha()
+        reanudar_img = pygame.image.load("assets/images/Buttons/reanudarI.png").convert_alpha()
+        reanudar_hover_img = pygame.image.load("assets/images/Buttons/reanudarRI.png").convert_alpha()
+        reiniciar_img = pygame.image.load("assets/images/Buttons/reiniciarI.png").convert_alpha()
+        reiniciar_hover_img = pygame.image.load("assets/images/Buttons/reiniciarRI.png").convert_alpha()
+        config_img = pygame.image.load("assets/images/Buttons/confI.png").convert_alpha()
+        config_hover_img = pygame.image.load("assets/images/Buttons/confRI.png").convert_alpha()
 
-    # Imágenes que no cambian con idioma
+    # Imagen que no cambia con idioma
     titulo_img = pygame.image.load("assets/images/effects/titulo1.png").convert_alpha()
-    config_img = pygame.image.load("assets/images/effects/config1.png").convert_alpha()
 
     return {
         "titulo": titulo_img,
         "menu": menu_img,
+        "menu_hover": menu_hover_img,
         "config": config_img,
+        "config_hover": config_hover_img,
         "reanudar": reanudar_img,
-        "reiniciar": reiniciar_img
+        "reanudar_hover": reanudar_hover_img,
+        "reiniciar": reiniciar_img,
+        "reiniciar_hover": reiniciar_hover_img
     }
 
 def scale_images(images):
@@ -62,6 +79,7 @@ def scale_images(images):
          int(images["titulo"].get_height() * 0.75))
     )
     
+    # Escalar imágenes normales
     scaled["menu"] = pygame.transform.scale(
         images["menu"],
         (int(images["menu"].get_width() * 0.60),
@@ -86,6 +104,31 @@ def scale_images(images):
          int(images["reiniciar"].get_height() * 0.60))
     )
     
+    # Escalar imágenes hover
+    scaled["menu_hover"] = pygame.transform.scale(
+        images["menu_hover"],
+        (int(images["menu_hover"].get_width() * 0.60),
+         int(images["menu_hover"].get_height() * 0.60))
+    )
+    
+    scaled["config_hover"] = pygame.transform.scale(
+        images["config_hover"],
+        (int(images["config_hover"].get_width() * 0.60),
+         int(images["config_hover"].get_height() * 0.60))
+    )
+    
+    scaled["reanudar_hover"] = pygame.transform.scale(
+        images["reanudar_hover"],
+        (int(images["reanudar_hover"].get_width() * 0.60),
+         int(images["reanudar_hover"].get_height() * 0.60))
+    )
+    
+    scaled["reiniciar_hover"] = pygame.transform.scale(
+        images["reiniciar_hover"],
+        (int(images["reiniciar_hover"].get_width() * 0.60),
+         int(images["reiniciar_hover"].get_height() * 0.60))
+    )
+    
     return scaled
 
 def show_pause_menu(screen, from_level, callback_restart=None):
@@ -105,11 +148,11 @@ def show_pause_menu(screen, from_level, callback_restart=None):
     first_button_y = titulo_y + 130
     center_x = WIDTH // 2
 
-    # Crear botones con imágenes escaladas
-    btn_menu = PauseButton(images["menu"], (center_x, first_button_y))
-    btn_conf = PauseButton(images["config"], (center_x, first_button_y + separation))
-    btn_rean = PauseButton(images["reanudar"], (center_x, first_button_y + separation * 2))
-    btn_reini = PauseButton(images["reiniciar"], (center_x, first_button_y + separation * 3))
+    # Crear botones con imágenes normales y hover
+    btn_menu = PauseButton(images["menu"], images["menu_hover"], (center_x, first_button_y))
+    btn_conf = PauseButton(images["config"], images["config_hover"], (center_x, first_button_y + separation))
+    btn_rean = PauseButton(images["reanudar"], images["reanudar_hover"], (center_x, first_button_y + separation * 2))
+    btn_reini = PauseButton(images["reiniciar"], images["reiniciar_hover"], (center_x, first_button_y + separation * 3))
 
     titulo_rect = images["titulo"].get_rect(center=(center_x, titulo_y))
 
@@ -125,10 +168,14 @@ def show_pause_menu(screen, from_level, callback_restart=None):
             images = scale_images(raw_images)
             
             # Actualizar botones con nuevas imágenes
-            btn_menu.image = images["menu"]
-            btn_conf.image = images["config"] 
-            btn_rean.image = images["reanudar"]
-            btn_reini.image = images["reiniciar"]
+            btn_menu.image_normal = images["menu"]
+            btn_menu.image_hover = images["menu_hover"]
+            btn_conf.image_normal = images["config"]
+            btn_conf.image_hover = images["config_hover"]
+            btn_rean.image_normal = images["reanudar"]
+            btn_rean.image_hover = images["reanudar_hover"]
+            btn_reini.image_normal = images["reiniciar"]
+            btn_reini.image_hover = images["reiniciar_hover"]
             
             needs_reload = False
 

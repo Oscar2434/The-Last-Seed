@@ -25,7 +25,7 @@ CONFIG_ICON       = "assets/images/effects/config1.png"
 MUSIC_ICON        = "assets/images/effects/musicaL.png"
 FLAG_ES           = "assets/images/effects/españa.png"
 FLAG_EN           = "assets/images/effects/inglaterra .png"   
-EXIT_BUTTON       = "assets/images/effects/salida.png"
+EXIT_BUTTON       = "assets/images/effects/salidaH.png"
 
 def update_global_config():
     """Actualiza las variables globales con la configuración actual"""
