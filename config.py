@@ -26,12 +26,10 @@ if difficulty is None:
     config_manager.save_config(config_data)
 
 BACKGROUND_CONFIG = "assets/images/effects/portada.png"
-TITLE_IMAGE       = "assets/images/effects/titulo1.png"
-CONFIG_ICON       = "assets/images/effects/config1.png"
+TITLE_IMAGE       = "assets/images/effects/titulo1.png"  # Título del juego (universal)
 MUSIC_ICON        = "assets/images/effects/musicaL.png"
 FLAG_ES           = "assets/images/effects/españa.png"
 FLAG_EN           = "assets/images/effects/inglaterra .png"   
-EXIT_BUTTON       = "assets/images/effects/salidaH.png"
 
 def update_global_config():
     """Actualiza las variables globales con la configuración actual"""
@@ -83,18 +81,16 @@ def open_config_menu(from_menu="main"):
     
     screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
 
-    # Cargar imágenes escaladas
+    # Cargar imágenes base (no cambian con idioma)
     bg          = load_image(BACKGROUND_CONFIG)
-    title_img   = load_image(TITLE_IMAGE, 0.85)
-    config_icon = load_image(CONFIG_ICON, 0.70)
-    exit_img    = load_image(EXIT_BUTTON, 0.30)
+    title_img   = load_image(TITLE_IMAGE, 0.85)  # Título del juego, universal
     music_icon  = load_image(MUSIC_ICON, 0.75)
     flag_es     = load_image(FLAG_ES, 0.65)
     flag_en     = load_image(FLAG_EN, 0.65)
 
     # Posiciones generales
     title_rect  = title_img.get_rect(center=(constants.WIDTH // 2, 75))
-    config_rect = config_icon.get_rect(center=(constants.WIDTH // 2, 150))
+    # config_rect lo definimos dentro del bucle porque la imagen cambia
 
     flag_es_rect = flag_es.get_rect(center=(constants.WIDTH // 2 - 70, 245))
     flag_en_rect = flag_en.get_rect(center=(constants.WIDTH // 2 + 70, 245))
@@ -115,16 +111,30 @@ def open_config_menu(from_menu="main"):
     ))
 
     bar_x = start_x + icon_w + separation
-    exit_rect = exit_img.get_rect(center=(constants.WIDTH // 2, 395))
+    exit_y = 395
 
     # Variables para arrastre de barra
     dragging_volume = False
 
     running = True
     while running:
+        # ACTUALIZAR CONFIGURACIÓN EN CADA ITERACIÓN
+        update_global_config()
+        
+        # Cargar imágenes según idioma ACTUAL (el icono de configuración y el botón de salida)
+        if lenguaje:  # Español
+            config_icon = load_image("assets/images/Buttons/conf.png", 0.70)
+            exit_img = load_image("imagenes/SalidaR.png", 0.30)
+        else:  # Inglés
+            config_icon = load_image("assets/images/Buttons/confI.png", 0.70)
+            exit_img = load_image("imagenes/Exit.png", 0.30)
+        
+        config_rect = config_icon.get_rect(center=(370, 150))
+        exit_rect = exit_img.get_rect(center=(constants.WIDTH // 2, exit_y))
+
         screen.blit(bg, (0, 0))
-        screen.blit(title_img, title_rect)
-        screen.blit(config_icon, config_rect)
+        screen.blit(title_img, title_rect)  # Título universal
+        screen.blit(config_icon, config_rect)  # Icono de configuración (idioma)
         screen.blit(flag_es, flag_es_rect)
         screen.blit(flag_en, flag_en_rect)
 
@@ -154,13 +164,6 @@ def open_config_menu(from_menu="main"):
         pygame.draw.rect(screen, (0, 180, 0),
                          (bar_x, bar_y, current_width, bar_height),
                          border_radius=5)
-
-        # Indicador de volumen actual
-        font = pygame.font.Font(None, 24)
-        volume_text = f"{int(volume_master * 100)}%"
-        text_surf = font.render(volume_text, True, (255, 255, 255))
-        text_rect = text_surf.get_rect(center=(bar_x + bar_width // 2, bar_y - 20))
-        screen.blit(text_surf, text_rect)
 
         screen.blit(exit_img, exit_rect)
 
