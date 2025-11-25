@@ -45,13 +45,13 @@ def menu():
     run = True
     while run:
         if config.lenguaje:
-            play_normal = pygame.image.load("imagenes/Play.png")
-            play_hover  = pygame.image.load("imagenes/PlayR.png")
-            exit_normal = pygame.image.load("imagenes/Exit.png")
-        else:
             play_normal = pygame.image.load("imagenes/Jugar.png")
-            play_hover  = pygame.image.load("imagenes/playR.png")
+            play_hover  = pygame.image.load("imagenes/JugarR.png")
             exit_normal = pygame.image.load("imagenes/Salida.png")
+        else:
+            play_normal = pygame.image.load("imagenes/PlayR.png")
+            play_hover  = pygame.image.load("imagenes/Play.png")
+            exit_normal = pygame.image.load("imagenes/Exit.png")
 
         play_normal = pygame.transform.scale(play_normal, (300, 100))
         play_hover  = pygame.transform.scale(play_hover,  (300, 100))

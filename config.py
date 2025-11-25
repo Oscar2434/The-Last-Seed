@@ -122,7 +122,7 @@ def open_config_menu(from_menu="main"):
                     volume_master = max(0, min(volume_master, 1))
 
                 if exit_rect.collidepoint(mx, my):
-                    pygame.time.delay(100)
+                    pygame.time.delay(150)
                     return
 
         pygame.display.update()
