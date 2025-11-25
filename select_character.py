@@ -190,6 +190,9 @@ def show(level=1):
                 pygame.mixer.music.play(-1)
                 result = main.main()  # CAPTURAR EL RETORNO
                 if result == "menu" or result == "to_menu":
+                    # Enviar evento para reiniciar música del menú
+                    menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+                    pygame.event.post(menu_event)
                     return "menu"  # PROPAGAR EL RETORNO
 
             # ------------------------------------------------
@@ -201,6 +204,9 @@ def show(level=1):
                 pygame.mixer.music.play(-1)
                 result = nivel_2.main()  # CAPTURAR EL RETORNO
                 if result == "menu" or result == "to_menu":
+                    # Enviar evento para reiniciar música del menú
+                    menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+                    pygame.event.post(menu_event)
                     return "menu"  # PROPAGAR EL RETORNO
 
             # ------------------------------------------------
@@ -214,10 +220,16 @@ def show(level=1):
                 import nivel_3
                 result = nivel_3.main()  # CAPTURAR EL RETORNO
                 if result == "menu" or result == "to_menu":
+                    # Enviar evento para reiniciar música del menú
+                    menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+                    pygame.event.post(menu_event)
                     return "menu"  # PROPAGAR EL RETORNO
 
             # Si llegamos aquí, el nivel terminó pero no retornó "menu"
             # En ese caso, volvemos al menú principal
+            # Enviar evento para reiniciar música del menú
+            menu_event = pygame.event.Event(config.OPEN_MENU_EVENT)
+            pygame.event.post(menu_event)
             return "menu"
 
         pygame.display.update()

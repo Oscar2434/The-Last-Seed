@@ -1,7 +1,7 @@
 {
-    "lenguaje": false,
+    "lenguaje": true,
     "music": true,
-    "volume_master": 0.6090909090909091,
+    "volume_master": 0.8636363636363636,
     "selected_character": null,
     "difficulty": null
 }

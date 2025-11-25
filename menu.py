@@ -10,10 +10,11 @@ pygame.init()
 
 # Variables globales para control de música
 music_initialized = False
+current_music = None  # Track de la música actual
 
 def initialize_music():
     """Inicializa el sistema de música una sola vez"""
-    global music_initialized
+    global music_initialized, current_music
     if not music_initialized and config.music:
         if not pygame.mixer.get_init():
             pygame.mixer.init()
@@ -22,9 +23,25 @@ def initialize_music():
             pygame.mixer.music.set_volume(config.volume_master)
             pygame.mixer.music.play(-1)
             music_initialized = True
+            current_music = "menu"
         except pygame.error as e:
             print(f"Error cargando música: {e}")
             music_initialized = False
+
+def restart_menu_music():
+    """Reinicia la música del menú principal"""
+    global music_initialized, current_music
+    if config.music:
+        try:
+            pygame.mixer.music.stop()  # Detener música actual
+            pygame.mixer.music.load('music/m4.mp3')
+            pygame.mixer.music.set_volume(config.volume_master)
+            pygame.mixer.music.play(-1)
+            music_initialized = True
+            current_music = "menu"
+            print("Música del menú reiniciada")  # Debug
+        except pygame.error as e:
+            print(f"Error cargando música del menú: {e}")
 
 def apply_current_config():
     """Aplica la configuración actual cargada sin reiniciar la música"""
@@ -37,7 +54,7 @@ def apply_current_config():
     # Manejar estado de música (play/stop)
     if config.music:
         if not pygame.mixer.music.get_busy():
-            initialize_music()
+            restart_menu_music()
     else:
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
@@ -74,6 +91,9 @@ config_button = Button(
 
 def menu():
     run = True
+    # Asegurar que la música del menú esté sonando al entrar
+    restart_menu_music()
+    
     while run:
         # ACTUALIZAR CONFIGURACIÓN EN CADA ITERACIÓN
         config.update_global_config()
@@ -132,6 +152,8 @@ def menu():
 
             if event.type == config.OPEN_MENU_EVENT:
                 # Este evento nos trae de vuelta al menú principal
+                print("Evento OPEN_MENU_EVENT recibido - Reiniciando música del menú")
+                restart_menu_music()  # REINICIAR MÚSICA DEL MENÚ
                 apply_current_config()  # Actualizar configuración
                 continue
 
