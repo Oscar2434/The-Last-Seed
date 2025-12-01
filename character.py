@@ -3,6 +3,7 @@ import constants
 import os
 import config
 from constants import *
+import desarrollador  # Nuevo import
 
 class Character:
     def __init__(self, x, y):
@@ -93,6 +94,11 @@ class Character:
 
         current_image = self.animations[row][col]
         screen.blit(current_image, (self.x, self.y))
+        
+        # Dibujar hitbox de colisión si está activado el modo desarrollador
+        if desarrollador.MOSTRAR_HITBOX:
+            colision_rect = self.get_collision_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_PERSONAJE, colision_rect, 1)
 
     def move(self, dx, dy, world):
         if self.is_throwing:
@@ -136,9 +142,30 @@ class Character:
 
         self.update_animation()
 
+    def get_collision_rect(self):
+        """Devuelve el rectángulo de colisión del personaje"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_COLISION_PERSONAJE['offset_x'],
+            self.y + desarrollador.HITBOX_COLISION_PERSONAJE['offset_y'],
+            desarrollador.HITBOX_COLISION_PERSONAJE['width'],
+            desarrollador.HITBOX_COLISION_PERSONAJE['height']
+        )
+
     def check_collision(self, x, y, obj):
-        return (x < obj.x + obj.size*.65 and x + constants.PERSONAJE*.65 > obj.x and 
-                y < obj.y + obj.size*.65 and y + constants.PERSONAJE*.65 > obj.y)
+        # Crear un rectángulo de prueba para el personaje en la nueva posición
+        test_rect = pygame.Rect(
+            x + desarrollador.HITBOX_COLISION_PERSONAJE['offset_x'],
+            y + desarrollador.HITBOX_COLISION_PERSONAJE['offset_y'],
+            desarrollador.HITBOX_COLISION_PERSONAJE['width'],
+            desarrollador.HITBOX_COLISION_PERSONAJE['height']
+        )
+
+        # Verificar colisión con la hitbox de colisión del objeto
+        if hasattr(obj, 'get_collision_rect'):
+            return test_rect.colliderect(obj.get_collision_rect())
+        else:
+            # Fallback: usar un rectángulo por defecto (por ejemplo, el rectángulo completo del objeto)
+            return test_rect.colliderect(pygame.Rect(obj.x, obj.y, obj.size, obj.size))
 
     def check_collect_resource(self, resources):
         for resource in resources:

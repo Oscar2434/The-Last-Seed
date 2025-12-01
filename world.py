@@ -24,8 +24,8 @@ class World:
     def generate_trees(self):
         positions = [
             (200, 120),
-            (200, 300),
-            (500, 150),
+            (100, 300),
+            (500, 130),
             (600, 350),
             (300, 400)
         ]
@@ -105,4 +105,3 @@ class World:
             tree.draw(screen)
         for rock in self.rocks:
             rock.draw(screen)
-

@@ -3,6 +3,7 @@ import pygame
 import os
 import math
 from fire import Fire
+import desarrollador
 
 class Tree:
     def __init__(self, x, y):
@@ -21,20 +22,22 @@ class Tree:
         self.glow_start = 0
 
     def get_collision_rect(self):
-        """Hitbox de colisión (más pequeña, para evitar bloquearse)"""
-        scale = constants.TREE_COLLISION_HITBOX_SCALE
-        collision_size = self.size * scale
-        x_offset = (self.size - collision_size) / 2
-        y_offset = (self.size - collision_size) / 2
-        return pygame.Rect(self.x + x_offset, self.y + y_offset, collision_size, collision_size)
+        """Hitbox de colisión usando el sistema centralizado"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_COLISION_ARBOL['offset_x'],
+            self.y + desarrollador.HITBOX_COLISION_ARBOL['offset_y'],
+            desarrollador.HITBOX_COLISION_ARBOL['width'],
+            desarrollador.HITBOX_COLISION_ARBOL['height']
+        )
 
     def get_attack_rect(self):
-        """Hitbox de ataque (aún más pequeña, en el centro)"""
-        scale = constants.TREE_ATTACK_HITBOX_SCALE
-        attack_size = self.size * scale
-        x_offset = (self.size - attack_size) / 2
-        y_offset = (self.size - attack_size) / 2
-        return pygame.Rect(self.x + x_offset, self.y + y_offset, attack_size, attack_size)
+        """Hitbox de ataque usando el sistema centralizado"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_ATAQUE_ARBOL['offset_x'],
+            self.y + desarrollador.HITBOX_ATAQUE_ARBOL['offset_y'],
+            desarrollador.HITBOX_ATAQUE_ARBOL['width'],
+            desarrollador.HITBOX_ATAQUE_ARBOL['height']
+        )
 
     def start_glow(self):
         self.glow = True
@@ -104,11 +107,20 @@ class Tree:
             surface = pygame.transform.scale(surface, (self.size, self.size))
             screen.blit(surface, (self.x, self.y))
 
-        # NOTA: Se eliminó el código de dibujo de hitboxes de debug
+        # Dibujar hitboxes si está activado el modo desarrollador
+        if desarrollador.MOSTRAR_HITBOX:
+            # Hitbox de colisión
+            colision_rect = self.get_collision_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_COLISION, colision_rect, 1)
+            
+            # Hitbox de ataque
+            ataque_rect = self.get_attack_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ATAQUE, ataque_rect, 1)
 
         for fire in self.fires:
             fire.draw(screen)
 
+# En ambient.py, modifica la clase CentralTree:
 class CentralTree(Tree):
     def __init__(self, x, y):
         super().__init__(x, y)
@@ -117,6 +129,24 @@ class CentralTree(Tree):
         self.size = constants.TREE_SIZE
         self.sprite = pygame.image.load(os.path.join('assets', 'images', 'objects', 'arbolquemado.png')).convert_alpha()
 
+    def get_collision_rect(self):
+        """Hitbox de colisión del árbol central (configuración personalizada)"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['offset_x'],
+            self.y + desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['offset_y'],
+            desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['width'],
+            desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['height']
+        )
+
+    def get_attack_rect(self):
+        """Hitbox de ataque del árbol central (configuración personalizada)"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['offset_x'],
+            self.y + desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['offset_y'],
+            desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['width'],
+            desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['height']
+        )
+
 class Rock:
     def __init__(self, x, y):
         self.x = x
@@ -124,6 +154,21 @@ class Rock:
         rock_path = os.path.join('assets', 'images', 'objects', 'rock.png')
         self.image = pygame.image.load(rock_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (constants.ROCK, constants.ROCK))
+        self.size = constants.ROCK
+
+    def get_collision_rect(self):
+        """Hitbox de colisión de la roca usando el sistema centralizado"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_COLISION_ROCA['offset_x'],
+            self.y + desarrollador.HITBOX_COLISION_ROCA['offset_y'],
+            desarrollador.HITBOX_COLISION_ROCA['width'],
+            desarrollador.HITBOX_COLISION_ROCA['height']
+        )
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
+        
+        # Dibujar hitbox si está activado el modo desarrollador
+        if desarrollador.MOSTRAR_HITBOX:
+            colision_rect = self.get_collision_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ROCA, colision_rect, 1)

@@ -2,6 +2,7 @@ import pygame
 import constants
 import os
 from fire import Fire
+import desarrollador
 
 class CentralTree:
     def __init__(self, x, y):
@@ -17,6 +18,24 @@ class CentralTree:
 
         self.glow = False
         self.glow_start = 0
+
+    def get_collision_rect(self):
+        """Hitbox de colisión del árbol central (usa configuración personalizada)"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['offset_x'],
+            self.y + desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['offset_y'],
+            desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['width'],
+            desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['height']
+        )
+
+    def get_attack_rect(self):
+        """Hitbox de ataque del árbol central (usa configuración personalizada)"""
+        return pygame.Rect(
+            self.x + desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['offset_x'],
+            self.y + desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['offset_y'],
+            desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['width'],
+            desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['height']
+        )
 
     def start_glow(self):
         self.glow = True
@@ -61,3 +80,13 @@ class CentralTree:
 
         for fire in self.fires:
             fire.draw(screen)
+
+        # Dibujar hitboxes si está activado el modo desarrollador
+        if desarrollador.MOSTRAR_HITBOX:
+            # Hitbox de colisión (usando configuración de árbol central)
+            colision_rect = self.get_collision_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_COLISION, colision_rect, 1)
+            
+            # Hitbox de ataque (usando configuración de árbol central)
+            ataque_rect = self.get_attack_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ATAQUE, ataque_rect, 1)
