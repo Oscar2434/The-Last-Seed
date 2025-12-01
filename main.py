@@ -10,6 +10,7 @@ import random
 import os
 import config
 import pause_menu
+import desarrollador
 
 pygame.init()
 screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
@@ -160,6 +161,7 @@ def main():
         resource_timer = 0
         start_ticks = pygame.time.get_ticks()
         restart_requested = False
+        player_resource = None  # NUEVA VARIABLE: recurso que lleva el jugador
 
         while True:
             for event in pygame.event.get(pump=False):
@@ -193,12 +195,26 @@ def main():
                             start_level_music()
 
                     if event.key == pygame.K_e:
-                        all_trees = [central_tree] + game_world.trees
-                        closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
-                        distance = ((closest_tree.x - game_character.x) ** 2 + (closest_tree.y - game_character.y) ** 2) ** 0.5
-                        if distance <= 70:
-                            game_character.start_throw_animation()
-                            game_character.deliver_resource(closest_tree)
+                        if player_resource is not None:  # SI TIENE RECURSO
+                            all_trees = [central_tree] + game_world.trees
+                            
+                            # Crear hitbox de interacción del personaje
+                            player_interact_rect = pygame.Rect(
+                                game_character.x + desarrollador.HITBOX_ENTREGA_RECURSO['offset_x'],
+                                game_character.y + desarrollador.HITBOX_ENTREGA_RECURSO['offset_y'],
+                                desarrollador.HITBOX_ENTREGA_RECURSO['width'],
+                                desarrollador.HITBOX_ENTREGA_RECURSO['height']
+                            )
+                            
+                            closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
+                            
+                            # Verificar colisión con la hitbox de ataque del árbol
+                            if player_interact_rect.colliderect(closest_tree.get_attack_rect()):
+                                game_character.start_throw_animation()
+                                game_character.deliver_resource(closest_tree)
+                                closest_tree.activate_protection()  # ACTIVAR PROTECCIÓN
+                                player_resource = None  # CONSUME EL RECURSO SOLO SI COLISIONA
+                            # Si NO colisiona, el recurso NO se consume
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pause_rect.collidepoint(event.pos):
@@ -253,6 +269,15 @@ def main():
                 enemy.attack()
 
             game_character.check_collect_resource(resources)
+            
+            # RECOGER RECURSO SI NO TIENE UNO
+            if player_resource is None:
+                for resource in resources[:]:
+                    distance = ((resource.x - game_character.x) ** 2 + (resource.y - game_character.y) ** 2) ** 0.5
+                    if distance <= 30:
+                        player_resource = resource
+                        resources.remove(resource)
+                        break
 
             game_world.draw(screen)
             for resource in resources:
@@ -262,7 +287,17 @@ def main():
             game_character.draw(screen)
             central_tree.draw(screen)
             for tree in game_world.trees:
-                tree.draw(screen)
+                tree.draw(screen)  # COMPLETAR ESTA LÍNEA
+            
+            # DIBUJAR HITBOX DE ENTREGA DE RECURSO (DEBUG)
+            if desarrollador.MOSTRAR_HITBOX:
+                interact_rect = pygame.Rect(
+                    game_character.x + desarrollador.HITBOX_ENTREGA_RECURSO['offset_x'],
+                    game_character.y + desarrollador.HITBOX_ENTREGA_RECURSO['offset_y'],
+                    desarrollador.HITBOX_ENTREGA_RECURSO['width'],
+                    desarrollador.HITBOX_ENTREGA_RECURSO['height']
+                )
+                pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ENTREGA, interact_rect, 2)
 
             seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
             remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)

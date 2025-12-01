@@ -20,6 +20,7 @@ class Tree:
         self.sprite = pygame.image.load(os.path.join('assets', 'images', 'objects', 'arbolquemado.png')).convert_alpha()
         self.glow = False
         self.glow_start = 0
+        self.protected_until = 0  # NUEVA VARIABLE: tiempo hasta que termina protección
 
     def get_collision_rect(self):
         """Hitbox de colisión usando el sistema centralizado"""
@@ -43,12 +44,22 @@ class Tree:
         self.glow = True
         self.glow_start = pygame.time.get_ticks()
 
+    def is_protected(self):
+        """Verifica si el árbol está protegido"""
+        return pygame.time.get_ticks() < self.protected_until
+
+    def activate_protection(self):
+        """Activa la protección por 5 segundos después de riego"""
+        self.protected_until = pygame.time.get_ticks() + desarrollador.TREE_PROTECTION_TIME
+
     def take_damage(self, amount):
-        self.health -= amount
-        if self.health < 0:
-            self.health = 0
-        if self.health == 0:
-            self.add_fire(big=True)
+        """Solo recibe daño si NO está protegido"""
+        if not self.is_protected():
+            self.health -= amount
+            if self.health < 0:
+                self.health = 0
+            if self.health == 0:
+                self.add_fire(big=True)
 
     def heal(self, amount):
         self.health += amount
@@ -58,9 +69,14 @@ class Tree:
         self.start_glow()
 
     def add_fire(self, big=False):
-        fx = self.x + self.size // 2 - constants.FIRE_SIZE // 2 - 3
-        fy = self.y + self.size - int(constants.FIRE_SIZE * 0.75)
-        self.fires.append(Fire(fx, fy, big))
+        """Agrega fuego solo si el árbol NO está protegido"""
+        if not self.is_protected():
+            fire = Fire(
+                self.x + self.size // 2 + desarrollador.FIRE_OFFSET_X,
+                self.y + self.size // 2 + desarrollador.FIRE_OFFSET_Y,
+                big
+            )
+            self.fires.append(fire)
 
     def draw(self, screen):
         if self.glow:
@@ -107,18 +123,17 @@ class Tree:
             surface = pygame.transform.scale(surface, (self.size, self.size))
             screen.blit(surface, (self.x, self.y))
 
-        # Dibujar hitboxes si está activado el modo desarrollador
-        if desarrollador.MOSTRAR_HITBOX:
-            # Hitbox de colisión
-            colision_rect = self.get_collision_rect()
-            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_COLISION, colision_rect, 1)
-            
-            # Hitbox de ataque
-            ataque_rect = self.get_attack_rect()
-            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ATAQUE, ataque_rect, 1)
-
         for fire in self.fires:
             fire.draw(screen)
+
+        # DIBUJAR HITBOXES DEL ÁRBOL (modo desarrollador)
+        if desarrollador.MOSTRAR_HITBOX:
+            # Hitbox de colisión
+            col_rect = self.get_collision_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_COLISION, col_rect, 1)
+            # Hitbox de ataque
+            atk_rect = self.get_attack_rect()
+            pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ATAQUE, atk_rect, 1)
 
 # En ambient.py, modifica la clase CentralTree:
 class CentralTree(Tree):

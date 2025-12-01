@@ -65,9 +65,26 @@ HITBOX_COLISION_PERSONAJE = {
     'offset_y': 15
 }
 
-# COLORES PARA DEBUG (puedes modificarlos)
+# CONFIGURACIÓN DE HITBOX DE INTERACCIÓN (ENTREGA DE RECURSOS)
+HITBOX_ENTREGA_RECURSO = {
+    'width': 100,       # Radio de interacción para entregar
+    'height': 100,
+    'offset_x': -20,    # Centrado en el personaje
+    'offset_y': -20
+}
+
+# COLORES PARA DEBUG
 COLOR_HITBOX_COLISION = (255, 0, 0)      # Rojo para colisión
 COLOR_HITBOX_ATAQUE = (0, 255, 0)        # Verde para ataque
 COLOR_HITBOX_CENTRAL = (0, 0, 255)       # Azul para central
 COLOR_HITBOX_ROCA = (255, 165, 0)        # Naranja para rocas
 COLOR_HITBOX_PERSONAJE = (255, 255, 0)   # Amarillo para personaje
+COLOR_HITBOX_ENTREGA = (0, 255, 255)     # Cian para interacción
+
+# CONFIGURACIÓN DE PROTECCIÓN POR RIEGO
+TREE_PROTECTION_TIME = 5000  # Milisegundos (5 segundos)
+COLOR_TREE_PROTECTED = (100, 200, 255)  # Azul claro para árbol protegido
+
+# CONFIGURACIÓN DE POSICIÓN DE FUEGO
+FIRE_OFFSET_X = -35  # Desplazamiento X del fuego respecto al árbol
+FIRE_OFFSET_Y = -10  # Desplazamiento Y del fuego respecto al árbol
