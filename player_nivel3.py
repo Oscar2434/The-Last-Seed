@@ -35,7 +35,21 @@ class SnakePlayer:
         self.anim_row = 0
 
     def get_head_rect(self):
-        return pygame.Rect(self.x, self.y, constants.PERSONAJE, constants.PERSONAJE)
+        w = constants.PERSONAJE
+        h = constants.PERSONAJE
+
+        nuevo_w = int(w * 0.55)
+        nuevo_h = int(h * 0.45)
+
+        offset_x = (w - nuevo_w) // 2
+        offset_y = int(h * 0.40)
+
+        return pygame.Rect(
+            self.x + offset_x,
+            self.y + offset_y,
+            nuevo_w,
+            nuevo_h
+        )
 
     def _set_direction_from_keys(self, keys):
         if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -102,3 +116,7 @@ class SnakePlayer:
                 rect = bolsa_img.get_rect(center=(cx, cy))
                 screen.blit(bolsa_img, rect)
                 self.cola.append(rect)
+
+    def draw_hitbox(self, screen):
+        rect = self.get_head_rect()
+        pygame.draw.rect(screen, (255, 0, 0), rect, 2)

@@ -2,56 +2,63 @@
 WIDTH, HEIGHT = 780, 480
 
 # Tamaños (Anchos y altos)
-PERSONAJE = 60 
+PERSONAJE = 60
 TREE_SIZE = 100
 LUMBERJACK_SIZE = 50
-GRASS = 64 
-TREES = 64 
-ROCK = 23 
+GRASS = 64
+TREES = 64
+ROCK = 23
 
 # Tamaños adicionales de árboles
-TREE_SMALL = 48    
-TREE_MEDIUM = 64       
-TREE_LARGE = 80     
-TREE_HUGE = 120        
+TREE_SMALL = 48
+TREE_MEDIUM = 64
+TREE_LARGE = 80
+TREE_HUGE = 120
 
 # Animaciones Personaje
+SPRITES1 = 4
 SPRITES = 3
-DOWN = 0 
-RIGHT = 2 
+DOWN = 0
+RIGHT = 2
 UP = 3
-MOVE_DOWN = 3 
-MOVE_RIGHT = 4 
+MOVE_DOWN = 3
+MOVE_RIGHT = 4
 MOVE_UP = 3
 F_SIZE = 64
-DELAY_FPS = 100 
+DELAY_FPS = 100
+
+# Nuevas animaciones de lanzar agua
+THROW_LEFT_ROW = 4
+THROW_RIGHT_ROW = 5
+THROW_FRAMES = 4
+THROW_ANIM_TIME = 600
 
 # Animaciones Incendiario (antes leñador)
 LUMBERJACK_DOWN = 0
 LUMBERJACK_LEFT = 1
 LUMBERJACK_RIGHT = 2
 LUMBERJACK_UP = 3
-LUMBERJACK_F_SIZE = 32   
+LUMBERJACK_F_SIZE = 32
 LUMBERJACK_DELAY_FPS = 130
 LUMBERJACK_ATTACK_LEFT = 4
 LUMBERJACK_ATTACK_RIGHT = 5
 
 # Recurso - Agua (cubeta)
-WATER_SIZE = 40   
-WATER_F_SIZE = 64     
-WATER_FRAMES = 10      
+WATER_SIZE = 40
+WATER_F_SIZE = 64
+WATER_FRAMES = 10
 WATER_ANIM_DELAY = 120
 
 # Fuego
-FIRE_SIZE = 60    
-FIRE_F_SIZE = 64       
-FIRE_FRAMES = 5       
+FIRE_SIZE = 60
+FIRE_F_SIZE = 64
+FIRE_FRAMES = 5
 FIRE_ANIM_DELAY = 120
 
-# Colores 
-WHITE = (255, 255, 255) 
-BLUE = (0, 0, 255) 
-GREEN = (0, 255, 0) 
+# Colores
+WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
 BROWN = (139, 69, 19)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
@@ -61,20 +68,24 @@ TREE_HEALTH = 280
 ENEMY_DAMAGE = 2
 ENEMY_SPEED = 1
 RESOURCE_HEAL = 20
-LEVEL_TIME = 60  
+LEVEL_TIME = 60
+
+# Hitboxes de árboles
+TREE_COLLISION_HITBOX_SCALE = 0.7  # 70% del tamaño para colisión
+TREE_ATTACK_HITBOX_SCALE = 0.4     # 40% del tamaño para ataque
 
 # Configuraciones de niveles
 DIFFICULTY_SETTINGS = {
     "normal": {
-        "ENEMY_SPEED": 1,
-        "ENEMY_DAMAGE": 2,
+        "ENEMY_SPEED": 1.5,
+        "ENEMY_DAMAGE": 7,
         "LEVEL_TIME": 90,
         "max_enemies": 5,
         "spawn_delay": 300
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
-        "ENEMY_DAMAGE": 6,
+        "ENEMY_DAMAGE": 7,
         "LEVEL_TIME": 60,
         "max_enemies": 8,
         "spawn_delay": 240
@@ -83,28 +94,27 @@ DIFFICULTY_SETTINGS = {
 
 LEVEL_2_SETTINGS = {
     "normal": {
-        "max_enemies": 2,  
+        "max_enemies": 1,
         "enemy_positions": [
-            (700, 400),  
-            (50, 50),    
+            (700, 400)
         ]
     },
     "avanzado": {
-        "max_enemies": 3,  
+        "max_enemies": 2,
         "enemy_positions": [
-            (700, 400),  
-            (50, 50),    
-            (400, 200),  
+            (700, 400),
+            (50, 50)
         ]
     }
 }
-# Árbol central 
-CENTRAL_TREE_HITBOX_X = 0.3  
-CENTRAL_TREE_HITBOX_Y = 0.6 
-CENTRAL_TREE_HITBOX_WIDTH = 0.4 
+
+# Árbol central
+CENTRAL_TREE_HITBOX_X = 0.3
+CENTRAL_TREE_HITBOX_Y = 0.6
+CENTRAL_TREE_HITBOX_WIDTH = 0.4
 CENTRAL_TREE_HITBOX_HEIGHT = 0.4
 
-# Escala de los muros 
+# Escala de los muros
 WALL_SCALE = 0.7
 
 # Margen para hitbox de interacción
