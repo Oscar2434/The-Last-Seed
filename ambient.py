@@ -51,6 +51,8 @@ class Tree:
     def activate_protection(self):
         """Activa la protección por 5 segundos después de riego"""
         self.protected_until = pygame.time.get_ticks() + desarrollador.TREE_PROTECTION_TIME
+        # eliminar fuegos actuales inmediatamente para que no vuelvan a mostrarse
+        self.fires.clear()
 
     def take_damage(self, amount):
         """Solo recibe daño si NO está protegido"""
@@ -70,15 +72,23 @@ class Tree:
 
     def add_fire(self, big=False):
         """Agrega fuego solo si el árbol NO está protegido"""
-        if not self.is_protected():
-            fire = Fire(
-                self.x + self.size // 2 + desarrollador.FIRE_OFFSET_X,
-                self.y + self.size // 2 + desarrollador.FIRE_OFFSET_Y,
-                big
-            )
-            self.fires.append(fire)
+        # Mantener protección fuerte: si está protegido no agregar fuego
+        if self.is_protected():
+            return
+        fire = Fire(
+            self.x + self.size // 2 + desarrollador.FIRE_OFFSET_X,
+            self.y + self.size // 2 + desarrollador.FIRE_OFFSET_Y,
+            big
+        )
+        self.fires.append(fire)
 
     def draw(self, screen):
+        # Si está protegido, asegurarse de que no haya fuegos visibles
+        if self.is_protected():
+            # limpiar la lista cada frame para evitar que un enemy reañada fuegos
+            if self.fires:
+                self.fires.clear()
+        # Dibujo del árbol
         if self.glow:
             elapsed = pygame.time.get_ticks() - self.glow_start
             alpha = 150 + 80 * math.sin(elapsed / 100)
@@ -123,6 +133,7 @@ class Tree:
             surface = pygame.transform.scale(surface, (self.size, self.size))
             screen.blit(surface, (self.x, self.y))
 
+        # Dibujar fuegos (si quedan)
         for fire in self.fires:
             fire.draw(screen)
 
@@ -134,6 +145,15 @@ class Tree:
             # Hitbox de ataque
             atk_rect = self.get_attack_rect()
             pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ATAQUE, atk_rect, 1)
+
+            # DIBUJAR BARRA DE VIDA (solo en modo desarrollador)
+            bar_width = self.size
+            bar_height = 8
+            fill = (self.health / self.max_health) * bar_width if self.max_health > 0 else 0
+            outline_rect = pygame.Rect(self.x, self.y - 12, bar_width, bar_height)
+            fill_rect = pygame.Rect(self.x, self.y - 12, fill, bar_height)
+            pygame.draw.rect(screen, constants.RED, outline_rect)
+            pygame.draw.rect(screen, constants.GREEN, fill_rect)
 
 # En ambient.py, modifica la clase CentralTree:
 class CentralTree(Tree):

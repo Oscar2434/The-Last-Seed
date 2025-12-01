@@ -2,7 +2,7 @@
 import pygame
 
 # CONFIGURACIÓN DE HITBOXES - MODIFICABLE
-MOSTRAR_HITBOX = True  # Cambiar a False para ocultar las hitboxes
+MOSTRAR_HITBOX = False  # Cambiar a False para ocultar las hitboxes
 
 # CONFIGURACIÓN DE HITBOXES DE ENEMIGOS
 HITBOX_COLISION_ENEMIGO = {

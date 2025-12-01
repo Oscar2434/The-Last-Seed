@@ -10,6 +10,7 @@ class CentralTree:
         self.y = y
         self.size = constants.TREE_SIZE
         self.health = constants.TREE_HEALTH
+        self.max_health = constants.TREE_HEALTH  # Agregado para la barra de salud
         self.fires = []
 
         image_path = os.path.join('assets', 'images', 'objects', 'treeC.png')
@@ -70,13 +71,14 @@ class CentralTree:
         else:
             screen.blit(self.image, (self.x, self.y))
 
-        bar_width = self.size
-        bar_height = 8
-        fill = (self.health / constants.TREE_HEALTH) * bar_width
-        outline_rect = pygame.Rect(self.x, self.y - 12, bar_width, bar_height)
-        fill_rect = pygame.Rect(self.x, self.y - 12, fill, bar_height)
-        pygame.draw.rect(screen, constants.RED, outline_rect)
-        pygame.draw.rect(screen, constants.GREEN, fill_rect)
+        if desarrollador.MOSTRAR_HITBOX:
+            bar_width = self.size
+            bar_height = 8
+            fill = (self.health / self.max_health) * bar_width if self.max_health > 0 else 0
+            outline_rect = pygame.Rect(self.x, self.y - 12, bar_width, bar_height)
+            fill_rect = pygame.Rect(self.x, self.y - 12, fill, bar_height)
+            pygame.draw.rect(screen, constants.RED, outline_rect)
+            pygame.draw.rect(screen, constants.GREEN, fill_rect)
 
         for fire in self.fires:
             fire.draw(screen)
