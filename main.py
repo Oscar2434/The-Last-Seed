@@ -25,7 +25,6 @@ game_paused = False
 def get_localized_texts():
     if config.lenguaje:
         return {
-            "time": "Tiempo: {}",
             "objectives_title": "OBJETIVOS:",
             "objective1": "- Salvar el árbol central",
             "objective2": "- Mantener con vida al menos 3 árboles",
@@ -33,12 +32,48 @@ def get_localized_texts():
         }
     else:
         return {
-            "time": "Time: {}",
             "objectives_title": "OBJECTIVES:",
             "objective1": "- Save the central tree",
             "objective2": "- Keep at least 3 trees alive", 
             "objective3": "- Survive until time runs out"
         }
+
+def draw_timer(screen, remaining_time, total_time, x, y):
+    minutes = remaining_time // 60
+    seconds = remaining_time % 60
+    time_text = f"{minutes:02d}:{seconds:02d}"
+    
+    font = pygame.font.Font(None, 40)
+    
+    if remaining_time > total_time * 0.6:
+        color = constants.GREEN
+    elif remaining_time > total_time * 0.3:
+        color = constants.YELLOW
+    else:
+        color = constants.RED
+    
+    text_surface = font.render(time_text, True, color)
+    
+    bg_rect = text_surface.get_rect()
+    bg_rect.x = x - 10
+    bg_rect.y = y - 5
+    bg_rect.width += 20
+    bg_rect.height += 10
+    
+    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect, border_radius=8)
+    pygame.draw.rect(screen, (255, 255, 255, 100), bg_rect, 2, border_radius=8)
+    
+    screen.blit(text_surface, (x, y))
+    
+    if remaining_time < 10:
+        pulse = (pygame.time.get_ticks() // 200) % 2
+        if pulse == 0:
+            glow_rect = bg_rect.copy()
+            glow_rect.x -= 2
+            glow_rect.y -= 2
+            glow_rect.width += 4
+            glow_rect.height += 4
+            pygame.draw.rect(screen, (255, 50, 50, 100), glow_rect, 3, border_radius=10)
 
 def show_tutorial_screens(screen, level_number):
     if config.lenguaje:
@@ -154,6 +189,7 @@ def main():
         constants.LEVEL_TIME = ajustes["LEVEL_TIME"]
         max_enemies = ajustes["max_enemies"]
         spawn_delay = ajustes["spawn_delay"]
+        total_time = ajustes["LEVEL_TIME"]
 
         lumberjacks = []
         resources = []
@@ -161,7 +197,7 @@ def main():
         resource_timer = 0
         start_ticks = pygame.time.get_ticks()
         restart_requested = False
-        player_resource = None  # NUEVA VARIABLE: recurso que lleva el jugador
+        player_resource = None
 
         while True:
             for event in pygame.event.get(pump=False):
@@ -195,10 +231,9 @@ def main():
                             start_level_music()
 
                     if event.key == pygame.K_e:
-                        if player_resource is not None:  # SI TIENE RECURSO
+                        if player_resource is not None:
                             all_trees = [central_tree] + game_world.trees
                             
-                            # Crear hitbox de interacción del personaje
                             player_interact_rect = pygame.Rect(
                                 game_character.x + desarrollador.HITBOX_ENTREGA_RECURSO['offset_x'],
                                 game_character.y + desarrollador.HITBOX_ENTREGA_RECURSO['offset_y'],
@@ -208,13 +243,11 @@ def main():
                             
                             closest_tree = min(all_trees, key=lambda t: ((t.x - game_character.x) ** 2 + (t.y - game_character.y) ** 2))
                             
-                            # Verificar colisión con la hitbox de ataque del árbol
                             if player_interact_rect.colliderect(closest_tree.get_attack_rect()):
                                 game_character.start_throw_animation()
                                 game_character.deliver_resource(closest_tree)
-                                closest_tree.activate_protection()  # ACTIVAR PROTECCIÓN
-                                player_resource = None  # CONSUME EL RECURSO SOLO SI COLISIONA
-                            # Si NO colisiona, el recurso NO se consume
+                                closest_tree.activate_protection()
+                                player_resource = None
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pause_rect.collidepoint(event.pos):
@@ -270,7 +303,6 @@ def main():
 
             game_character.check_collect_resource(resources)
             
-            # RECOGER RECURSO SI NO TIENE UNO
             if player_resource is None:
                 for resource in resources[:]:
                     distance = ((resource.x - game_character.x) ** 2 + (resource.y - game_character.y) ** 2) ** 0.5
@@ -287,9 +319,8 @@ def main():
             game_character.draw(screen)
             central_tree.draw(screen)
             for tree in game_world.trees:
-                tree.draw(screen)  # COMPLETAR ESTA LÍNEA
+                tree.draw(screen)
             
-            # DIBUJAR HITBOX DE ENTREGA DE RECURSO (DEBUG)
             if desarrollador.MOSTRAR_HITBOX:
                 interact_rect = pygame.Rect(
                     game_character.x + desarrollador.HITBOX_ENTREGA_RECURSO['offset_x'],
@@ -300,14 +331,12 @@ def main():
                 pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ENTREGA, interact_rect, 2)
 
             seconds_passed = (pygame.time.get_ticks() - start_ticks) // 1000
-            remaining_time = max(0, constants.LEVEL_TIME - seconds_passed)
+            remaining_time = max(0, total_time - seconds_passed)
             
+            draw_timer(screen, remaining_time, total_time, 10, 10)
+
             texts = get_localized_texts()
             
-            font = pygame.font.SysFont(None, 26)
-            text = font.render(texts["time"].format(remaining_time), True, constants.BLACK)
-            screen.blit(text, (10, 10))
-
             fade_duration = 1000
             elapsed_time = pygame.time.get_ticks() - start_ticks
             alpha_value = min(120, int((elapsed_time / fade_duration) * 120))
@@ -352,6 +381,19 @@ def main():
                     show_victory_screen(screen)
                 else:
                     show_defeat_screen(screen)
+                game_paused = True
+                result = pause_menu.show_pause_menu(screen, "level1")
+                game_paused = False
+                if result == "restart":
+                    restart_requested = True
+                elif result == "menu":
+                    stop_level_music()
+                    return
+                else:
+                    restart_requested = True
+
+            if vivos < 3 and central_tree.health > 0:
+                show_defeat_screen(screen)
                 game_paused = True
                 result = pause_menu.show_pause_menu(screen, "level1")
                 game_paused = False

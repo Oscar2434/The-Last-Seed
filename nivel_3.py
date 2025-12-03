@@ -73,21 +73,95 @@ def show_tutorial_screens(screen, level_number):
     
     return True
 
-def dibujar_hud_traducido(screen, tiempo, recogidas, objetivo):
+def draw_timer_transparent(screen, remaining_time, total_time, x, y, cabeza_rect):
+    minutes = remaining_time // 60
+    seconds = remaining_time % 60
+    time_text = f"{minutes:02d}:{seconds:02d}"
+    
+    font = pygame.font.Font(None, 40)
+    
+    if remaining_time > total_time * 0.6:
+        color = constants.GREEN
+    elif remaining_time > total_time * 0.3:
+        color = constants.YELLOW
+    else:
+        color = constants.RED
+    
+    text_surface = font.render(time_text, True, color)
+    
+    bg_rect = text_surface.get_rect()
+    bg_rect.x = x - 10
+    bg_rect.y = y - 5
+    bg_rect.width += 20
+    bg_rect.height += 10
+    
+    if cabeza_rect and cabeza_rect.colliderect(bg_rect):
+        alpha_bg = 100
+        alpha_text = 180
+    else:
+        alpha_bg = 180
+        alpha_text = 255
+    
+    bg_surface = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
+    pygame.draw.rect(bg_surface, (0, 0, 0, alpha_bg), bg_surface.get_rect(), border_radius=8)
+    pygame.draw.rect(bg_surface, (255, 255, 255, 100), bg_surface.get_rect(), 2, border_radius=8)
+    
+    screen.blit(bg_surface, (bg_rect.x, bg_rect.y))
+    
+    text_with_alpha = text_surface.copy()
+    text_with_alpha.set_alpha(alpha_text)
+    screen.blit(text_with_alpha, (x, y))
+    
+    if remaining_time < 10:
+        pulse = (pygame.time.get_ticks() // 200) % 2
+        if pulse == 0:
+            glow_rect = bg_rect.copy()
+            glow_rect.x -= 2
+            glow_rect.y -= 2
+            glow_rect.width += 4
+            glow_rect.height += 4
+            glow_surface = pygame.Surface((glow_rect.width, glow_rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(glow_surface, (255, 50, 50, 100), glow_surface.get_rect(), 3, border_radius=10)
+            screen.blit(glow_surface, (glow_rect.x, glow_rect.y))
+
+def dibujar_hud_traducido(screen, tiempo, recogidas, objetivo, tiempo_total, cabeza_rect):
+    draw_timer_transparent(screen, tiempo, tiempo_total, 10, 10, cabeza_rect)
+    
     if config.lenguaje:
-        texto_tiempo = f"Tiempo: {tiempo}s"
         texto_basura = f"Basura: {recogidas}/{objetivo}"
     else:
-        texto_tiempo = f"Time: {tiempo}s"
         texto_basura = f"Trash: {recogidas}/{objetivo}"
     
-    font = pygame.font.SysFont(None, 36)
+    font = pygame.font.SysFont(None, constants.TRASH_HUD_FONT_SIZE)
     
-    texto1 = font.render(texto_tiempo, True, constants.BLACK)
-    texto2 = font.render(texto_basura, True, constants.BLACK)
+    texto2 = font.render(texto_basura, True, (255, 255, 220))
     
-    screen.blit(texto1, (10, 10))
-    screen.blit(texto2, (10, 50))
+    bg_rect = texto2.get_rect()
+    bg_width = max(texto2.get_width() + constants.TRASH_HUD_BG_PADDING * 2, constants.TRASH_HUD_MIN_WIDTH)
+    bg_rect.width = bg_width
+    bg_rect.height = texto2.get_height() + constants.TRASH_HUD_BG_PADDING
+    bg_rect.x = constants.TRASH_HUD_PADDING_LEFT
+    bg_rect.y = constants.TRASH_HUD_PADDING_TOP
+    
+    if cabeza_rect and cabeza_rect.colliderect(bg_rect):
+        alpha_bg = 100
+        alpha_text = 180
+    else:
+        alpha_bg = 180
+        alpha_text = 255
+    
+    bg_surface = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
+    pygame.draw.rect(bg_surface, (0, 0, 0, alpha_bg), bg_surface.get_rect(), border_radius=8)
+    pygame.draw.rect(bg_surface, (255, 255, 255, 100), bg_surface.get_rect(), 2, border_radius=8)
+    
+    screen.blit(bg_surface, (bg_rect.x, bg_rect.y))
+    
+    text_x = bg_rect.x + (bg_rect.width - texto2.get_width()) // 2
+    text_y = bg_rect.y + constants.TRASH_HUD_BG_PADDING // 2
+    
+    text_with_alpha = texto2.copy()
+    text_with_alpha.set_alpha(alpha_text)
+    screen.blit(text_with_alpha, (text_x, text_y))
 
 def main():
     try:
@@ -158,6 +232,7 @@ def main():
 
         while True:
             current_time = pygame.time.get_ticks()
+            cabeza = jugador.get_head_rect()
             
             for event in pygame.event.get(pump=False):
                 if event.type == config.OPEN_MENU_EVENT:
@@ -216,8 +291,6 @@ def main():
 
             keys = pygame.key.get_pressed()
             jugador.mover_perpetuo(keys)
-
-            cabeza = jugador.get_head_rect()
 
             nuevas_basuras = []
             for b in basura:
@@ -348,7 +421,7 @@ def main():
                 b.dibujar(screen)
             jugador.dibujar(screen, bolsa_img)
             
-            dibujar_hud_traducido(screen, tiempo_restante, recogidas, objetivo)
+            dibujar_hud_traducido(screen, tiempo_restante, recogidas, objetivo, tiempo_total, cabeza)
             
             screen.blit(pause_icon, pause_rect)
 

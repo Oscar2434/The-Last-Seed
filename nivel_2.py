@@ -24,6 +24,43 @@ pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_al
 pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
 pause_rect = pause_icon.get_rect(center=(constants.WIDTH // 2, 20))
 
+def draw_timer(screen, remaining_time, total_time, x, y):
+    minutes = remaining_time // 60
+    seconds = remaining_time % 60
+    time_text = f"{minutes:02d}:{seconds:02d}"
+    
+    font = pygame.font.Font(None, 40)
+    
+    if remaining_time > total_time * 0.6:
+        color = constants.GREEN
+    elif remaining_time > total_time * 0.3:
+        color = constants.YELLOW
+    else:
+        color = constants.RED
+    
+    text_surface = font.render(time_text, True, color)
+    
+    bg_rect = text_surface.get_rect()
+    bg_rect.x = x - 10
+    bg_rect.y = y - 5
+    bg_rect.width += 20
+    bg_rect.height += 10
+    
+    pygame.draw.rect(screen, (0, 0, 0, 180), bg_rect, border_radius=8)
+    pygame.draw.rect(screen, (255, 255, 255, 100), bg_rect, 2, border_radius=8)
+    
+    screen.blit(text_surface, (x, y))
+    
+    if remaining_time < 10:
+        pulse = (pygame.time.get_ticks() // 200) % 2
+        if pulse == 0:
+            glow_rect = bg_rect.copy()
+            glow_rect.x -= 2
+            glow_rect.y -= 2
+            glow_rect.width += 4
+            glow_rect.height += 4
+            pygame.draw.rect(screen, (255, 50, 50, 100), glow_rect, 3, border_radius=10)
+
 def show_tutorial_screens(screen, level_number):
     if config.lenguaje:
         tutorial_path = "assets/images/turorial en español"
@@ -399,15 +436,7 @@ def run_level():
         seconds_passed = effective_time // 1000
         remaining_time = max(0, level_time - seconds_passed)
         
-        font = pygame.font.SysFont(None, 36)
-        
-        if config.lenguaje:
-            time_text = f"Tiempo: {remaining_time}s"
-        else:
-            time_text = f"Time: {remaining_time}s"
-            
-        text = font.render(time_text, True, constants.BLACK)
-        screen.blit(text, (10, 10))
+        draw_timer(screen, remaining_time, level_time, 10, 10)
 
         draw_inventory(screen, collected_resources)
         
