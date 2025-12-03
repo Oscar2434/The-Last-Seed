@@ -116,11 +116,19 @@ def show_tutorial_screens(screen, level_number):
 def draw_dialog(screen, text):
     dialog_rect = pygame.Rect(40, constants.HEIGHT - 180, constants.WIDTH - 80, 160)
     
-    pygame.draw.rect(screen, (255, 255, 255), dialog_rect)
-    pygame.draw.rect(screen, (0, 100, 0), dialog_rect, 3)
+    # Fondo color madera (café)
+    wood_color = (101, 67, 33)  # Color madera oscura
+    pygame.draw.rect(screen, wood_color, dialog_rect)
+    
+    # Borde más oscuro para simular madera
+    border_color = (76, 47, 19)
+    pygame.draw.rect(screen, border_color, dialog_rect, 4)
+    
+    # Texto color piel
+    skin_color = (255, 218, 185)  # Color piel
     
     font = pygame.font.SysFont(None, 22)
-    y_offset = dialog_rect.y + 15
+    y_offset = dialog_rect.y + 20
     
     lines = []
     for paragraph in text.split('\n'):
@@ -138,11 +146,11 @@ def draw_dialog(screen, text):
             lines.append(current_line.strip())
     
     for line in lines:
-        if y_offset + 20 > dialog_rect.y + dialog_rect.height - 30:
+        if y_offset + 20 > dialog_rect.y + dialog_rect.height - 40:
             break
-        text_surface = font.render(line, True, (0, 0, 0))
+        text_surface = font.render(line, True, skin_color)
         screen.blit(text_surface, (dialog_rect.x + 20, y_offset))
-        y_offset += 22
+        y_offset += 24
     
     continue_font = pygame.font.SysFont(None, 20)
     
@@ -150,9 +158,14 @@ def draw_dialog(screen, text):
         continue_text = "Presiona ESPACIO para continuar..."
     else:
         continue_text = "Press SPACE to continue..."
-        
-    continue_surface = continue_font.render(continue_text, True, (100, 100, 100))
-    screen.blit(continue_surface, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
+    
+    # Texto de continuar en color piel claro
+    continue_color = (255, 228, 196)
+    continue_surface = continue_font.render(continue_text, True, continue_color)
+    continue_rect = continue_surface.get_rect()
+    continue_rect.x = dialog_rect.x + 20
+    continue_rect.y = dialog_rect.y + dialog_rect.height - 35
+    screen.blit(continue_surface, continue_rect)
 
 def draw_inventory(screen, collected_resources):
     font = pygame.font.SysFont(None, 20)
@@ -191,15 +204,15 @@ def draw_inventory(screen, collected_resources):
     
     bg_rect = pygame.Rect(bg_x, bg_y, bg_width, bg_height)
     
-    # Crear superficie con canal alpha para transparencia real (esquinas transparentes)
+    # Crear superficie con canal alpha para transparencia real (fondo totalmente transparente)
     panel_surf = pygame.Surface((bg_width, bg_height), pygame.SRCALPHA)
-    panel_surf.fill((0, 0, 0, 0))  # totalmente transparente inicialmente
+    panel_surf.fill((0, 0, 0, 0))  # transparente total inicialmente
 
-    # Dibujar un rectángulo redondeado semitransparente (solo el área negra), dejando las esquinas transparentes
+    # Dibujar un rectángulo redondeado semitransparente (solo el negro) para que las esquinas queden transparentes
     pygame.draw.rect(panel_surf, (0, 0, 0, 110), panel_surf.get_rect(), border_radius=8)
     # Borde semitransparente
     pygame.draw.rect(panel_surf, (255, 255, 255, 100), panel_surf.get_rect(), 2, border_radius=8)
-    # Dibujar la superficie en la pantalla
+    # Dibujar la superficie transparente en la pantalla
     screen.blit(panel_surf, (bg_x, bg_y))
     
     title = font.render(title_text, True, (255, 255, 255))
@@ -475,7 +488,14 @@ def run_level():
                     time_display = f"Disappears in: {time_left}s"
                     
                 time_text = time_font.render(time_display, True, (255, 220, 0))
-                screen.blit(time_text, (constants.WIDTH - 150, constants.HEIGHT - 190))
+                # Posicionar el texto dentro del cuadro de diálogo (alineado a la derecha, encima de la línea de "continuar")
+                dialog_x = 40
+                dialog_y = constants.HEIGHT - 180
+                dialog_width = constants.WIDTH - 80
+                dialog_height = 160
+                time_x = dialog_x + dialog_width - time_text.get_width() - 20
+                time_y = dialog_y + dialog_height - 35
+                screen.blit(time_text, (time_x, time_y))
 
         if remaining_time == 0 and not game_paused_total:
             show_defeat_screen(screen)
