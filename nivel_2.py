@@ -155,49 +155,65 @@ def draw_dialog(screen, text):
     screen.blit(continue_surface, (dialog_rect.x + 20, dialog_rect.y + dialog_rect.height - 30))
 
 def draw_inventory(screen, collected_resources):
-    inventory_bg = pygame.Rect(constants.WIDTH - 150, 10, 140, 80)
-    
-    transparent_bg = pygame.Surface((inventory_bg.width, inventory_bg.height), pygame.SRCALPHA)
-    pygame.draw.rect(transparent_bg, (0, 0, 0, 80), transparent_bg.get_rect())
-    pygame.draw.rect(transparent_bg, (100, 100, 100, 100), transparent_bg.get_rect(), 1)
-    
-    screen.blit(transparent_bg, inventory_bg)
-    
     font = pygame.font.SysFont(None, 20)
     
     if config.lenguaje:
         title_text = "Inventario:"
-    else:
-        title_text = "Inventory:"
-    
-    title_shadow = font.render(title_text, True, (0, 0, 0, 100))
-    screen.blit(title_shadow, (constants.WIDTH - 139, 16))
-    
-    title = font.render(title_text, True, (255, 255, 255))
-    screen.blit(title, (constants.WIDTH - 140, 15))
-    
-    if config.lenguaje:
         resource_display_names = {
             "composta": "Cáscara Plátano",
             "agua": "Agua",
             "semillas": "Cáscara Huevo"
         }
     else:
+        title_text = "Inventory:"
         resource_display_names = {
             "composta": "Banana Peel",
             "agua": "Water",
             "semillas": "Egg Shell"
         }
     
-    y_offset = 35
+    resource_texts = []
     for resource_type in ["composta", "agua", "semillas"]:
         count = collected_resources.count(resource_type)
         display_name = resource_display_names.get(resource_type, resource_type)
-        status = f"{display_name}: {count}" if count > 0 else f"{display_name}: 0"
-        color = (200, 250, 200) if count > 0 else (180, 0, 0)
+        status = f"{display_name}: {count}"
+        resource_texts.append(status)
+    
+    title_size = font.size(title_text)
+    max_width = max(title_size[0], max(font.size(text)[0] for text in resource_texts))
+    
+    padding = 15
+    bg_width = max_width + padding * 2
+    bg_height = padding * 2 + title_size[1] + len(resource_texts) * (font.get_height() + 2)
+    
+    bg_x = constants.WIDTH - bg_width - 20
+    bg_y = 15
+    
+    bg_rect = pygame.Rect(bg_x, bg_y, bg_width, bg_height)
+    
+    # Crear superficie con canal alpha para transparencia real (esquinas transparentes)
+    panel_surf = pygame.Surface((bg_width, bg_height), pygame.SRCALPHA)
+    panel_surf.fill((0, 0, 0, 0))  # totalmente transparente inicialmente
+
+    # Dibujar un rectángulo redondeado semitransparente (solo el área negra), dejando las esquinas transparentes
+    pygame.draw.rect(panel_surf, (0, 0, 0, 110), panel_surf.get_rect(), border_radius=8)
+    # Borde semitransparente
+    pygame.draw.rect(panel_surf, (255, 255, 255, 100), panel_surf.get_rect(), 2, border_radius=8)
+    # Dibujar la superficie en la pantalla
+    screen.blit(panel_surf, (bg_x, bg_y))
+    
+    title = font.render(title_text, True, (255, 255, 255))
+    screen.blit(title, (bg_x + padding, bg_y + padding))
+    
+    y_offset = bg_y + padding + title_size[1] + 4
+    for i, resource_type in enumerate(["composta", "agua", "semillas"]):
+        count = collected_resources.count(resource_type)
+        display_name = resource_display_names.get(resource_type, resource_type)
+        status = f"{display_name}: {count}"
+        color = (200, 250, 200) if count > 0 else (255, 150, 150)
         text = font.render(status, True, color)
-        screen.blit(text, (constants.WIDTH - 140, y_offset))
-        y_offset += 20
+        screen.blit(text, (bg_x + padding, y_offset))
+        y_offset += font.get_height() + 2
 
 def get_interaction_rect(central_tree):
     if hasattr(central_tree, 'image'):

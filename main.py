@@ -75,6 +75,45 @@ def draw_timer(screen, remaining_time, total_time, x, y):
             glow_rect.height += 4
             pygame.draw.rect(screen, (255, 50, 50, 100), glow_rect, 3, border_radius=10)
 
+def draw_objectives_panel(screen, texts, x, y):
+    font = pygame.font.SysFont(None, 18)
+    objetivos = [
+        texts["objectives_title"],
+        texts["objective1"],
+        texts["objective2"],
+        texts["objective3"]
+    ]
+    
+    max_width = 0
+    total_height = 0
+    for line in objetivos:
+        text_size = font.size(line)
+        max_width = max(max_width, text_size[0])
+        total_height += text_size[1] + 4
+    
+    padding = 15
+    bg_width = max_width + padding * 2
+    bg_height = total_height + padding - 4
+    
+    bg_rect = pygame.Rect(x, y, bg_width, bg_height)
+    
+    # Crear una superficie con canal alpha para transparencia real
+    panel_surf = pygame.Surface((bg_width, bg_height), pygame.SRCALPHA)
+    panel_surf.fill((0, 0, 0, 0))  # transparente total inicialmente
+
+    # Dibujar un rectángulo redondeado semitransparente (solo el negro) para que las esquinas queden transparentes
+    pygame.draw.rect(panel_surf, (0, 0, 0, 110), panel_surf.get_rect(), border_radius=8)
+    # Borde semitransparente
+    pygame.draw.rect(panel_surf, (255, 255, 255, 80), panel_surf.get_rect(), 2, border_radius=8)
+    # Dibujar la superficie transparente en la pantalla
+    screen.blit(panel_surf, (x, y))
+    
+    y_offset = y + padding // 2
+    for line in objetivos:
+        text = font.render(line, True, (255, 255, 255))
+        screen.blit(text, (x + padding, y_offset))
+        y_offset += font.get_height() + 4
+
 def show_tutorial_screens(screen, level_number):
     if config.lenguaje:
         tutorial_path = "assets/images/turorial en español"
@@ -336,30 +375,7 @@ def main():
             draw_timer(screen, remaining_time, total_time, 10, 10)
 
             texts = get_localized_texts()
-            
-            fade_duration = 1000
-            elapsed_time = pygame.time.get_ticks() - start_ticks
-            alpha_value = min(120, int((elapsed_time / fade_duration) * 120))
-
-            panel_surface = pygame.Surface((250, 85), pygame.SRCALPHA)
-            panel_surface.fill((255, 255, 255, alpha_value))
-            panel_x = constants.WIDTH - 265
-            panel_y = 15
-            screen.blit(panel_surface, (panel_x, panel_y))
-
-            font2 = pygame.font.SysFont(None, 18)
-            objetivos = [
-                texts["objectives_title"],
-                texts["objective1"],
-                texts["objective2"],
-                texts["objective3"]
-            ]
-
-            y_offset = panel_y + 20
-            for line in objetivos:
-                t = font2.render(line, True, constants.BLACK)
-                screen.blit(t, (panel_x + 15, y_offset))
-                y_offset += 16
+            draw_objectives_panel(screen, texts, constants.WIDTH - 270, 15)
 
             vivos = sum(1 for t in game_world.trees if t.health > 0)
 
