@@ -363,19 +363,6 @@ def main():
                 else:
                     restart_requested = True
 
-            if vivos < 3 and central_tree.health > 0:
-                show_defeat_screen(screen)
-                game_paused = True
-                result = pause_menu.show_pause_menu(screen, "level1")
-                game_paused = False
-                if result == "restart":
-                    restart_requested = True
-                elif result == "menu":
-                    stop_level_music()
-                    return
-                else:
-                    restart_requested = True
-
             screen.blit(pause_icon, pause_rect)
 
             if pause_rect.collidepoint(pygame.mouse.get_pos()):

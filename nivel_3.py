@@ -169,8 +169,13 @@ def main():
         recogidas = 0
         game_paused = False
         restart_requested = False
+        # --- VARIABLES PARA MANEJO DE TIEMPO DE PAUSA ---
+        pause_start_time = 0
+        total_pause_time = 0
 
         while True:
+            current_time = pygame.time.get_ticks()
+            
             # VERIFICAR EVENTOS DE NAVEGACIÓN
             for event in pygame.event.get(pump=False):
                 if event.type == config.OPEN_MENU_EVENT:
@@ -192,8 +197,10 @@ def main():
                     # TECLA ESC → ABRE MENÚ DE PAUSA
                     if event.key == pygame.K_ESCAPE:
                         game_paused = True
+                        pause_start_time = current_time
                         result = pause_menu.show_pause_menu(screen, "level3")
                         game_paused = False
+                        total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                         
                         # Manejar resultado del menú de pausa
                         if result == "restart":
@@ -210,8 +217,10 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pause_rect.collidepoint(event.pos):
                         game_paused = True
+                        pause_start_time = current_time
                         result = pause_menu.show_pause_menu(screen, "level3")
                         game_paused = False
+                        total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                         
                         # Manejar resultado del menú de pausa
                         if result == "restart":
@@ -259,8 +268,10 @@ def main():
                 
                 # Mostrar menú de pausa después de derrota
                 game_paused = True
+                pause_start_time = pygame.time.get_ticks()
                 result = pause_menu.show_pause_menu(screen, "level3")
                 game_paused = False
+                total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                 
                 if result == "restart":
                     restart_requested = True
@@ -287,8 +298,10 @@ def main():
                 
                 # Mostrar menú de pausa después de derrota
                 game_paused = True
+                pause_start_time = pygame.time.get_ticks()
                 result = pause_menu.show_pause_menu(screen, "level3")
                 game_paused = False
+                total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                 
                 if result == "restart":
                     restart_requested = True
@@ -317,8 +330,10 @@ def main():
                     
                     # Mostrar menú de pausa después de victoria
                     game_paused = True
+                    pause_start_time = pygame.time.get_ticks()
                     result = pause_menu.show_pause_menu(screen, "level3")
                     game_paused = False
+                    total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                     
                     if result == "restart":
                         restart_requested = True
@@ -332,7 +347,13 @@ def main():
                     # Continuar al siguiente ciclo
                     continue
 
-            tiempo = (pygame.time.get_ticks() - inicio) // 1000
+            # --- CÁLCULO CORREGIDO DEL TIEMPO CON PAUSA ---
+            current_time = pygame.time.get_ticks()
+            if game_paused:
+                effective_time = (pause_start_time - inicio) - total_pause_time
+            else:
+                effective_time = (current_time - inicio) - total_pause_time
+            tiempo = effective_time // 1000
 
             world.draw(screen)
             for b in basura:

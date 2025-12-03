@@ -77,15 +77,15 @@ TREE_ATTACK_HITBOX_SCALE = 0.4     # 40% del tamaño para ataque
 # Configuraciones de niveles
 DIFFICULTY_SETTINGS = {
     "normal": {
-        "ENEMY_SPEED": 1.5,
-        "ENEMY_DAMAGE": 7,
+        "ENEMY_SPEED": 1.4,
+        "ENEMY_DAMAGE": 5,
         "LEVEL_TIME": 90,
         "max_enemies": 5,
         "spawn_delay": 300
     },
     "avanzado": {
         "ENEMY_SPEED": 2,
-        "ENEMY_DAMAGE": 7,
+        "ENEMY_DAMAGE": 5,
         "LEVEL_TIME": 60,
         "max_enemies": 8,
         "spawn_delay": 240
