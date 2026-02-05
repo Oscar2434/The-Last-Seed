@@ -2,7 +2,7 @@ import constants
 import pygame
 import os
 import math
-from fire import Fire
+from fire import Fire, FireCentral
 import desarrollador
 
 class Tree:
@@ -20,10 +20,9 @@ class Tree:
         self.sprite = pygame.image.load(os.path.join('assets', 'images', 'objects', 'arbolquemado.png')).convert_alpha()
         self.glow = False
         self.glow_start = 0
-        self.protected_until = 0  # NUEVA VARIABLE: tiempo hasta que termina protección
+        self.protected_until = 0
 
     def get_collision_rect(self):
-        """Hitbox de colisión usando el sistema centralizado"""
         return pygame.Rect(
             self.x + desarrollador.HITBOX_COLISION_ARBOL['offset_x'],
             self.y + desarrollador.HITBOX_COLISION_ARBOL['offset_y'],
@@ -32,7 +31,6 @@ class Tree:
         )
 
     def get_attack_rect(self):
-        """Hitbox de ataque usando el sistema centralizado"""
         return pygame.Rect(
             self.x + desarrollador.HITBOX_ATAQUE_ARBOL['offset_x'],
             self.y + desarrollador.HITBOX_ATAQUE_ARBOL['offset_y'],
@@ -45,22 +43,18 @@ class Tree:
         self.glow_start = pygame.time.get_ticks()
 
     def is_protected(self):
-        """Verifica si el árbol está protegido"""
         return pygame.time.get_ticks() < self.protected_until
 
     def activate_protection(self):
-        """Activa la protección por 5 segundos después de riego"""
         self.protected_until = pygame.time.get_ticks() + desarrollador.TREE_PROTECTION_TIME
-        # eliminar fuegos actuales inmediatamente para que no vuelvan a mostrarse
         self.fires.clear()
 
     def take_damage(self, amount):
-        """Solo recibe daño si NO está protegido"""
         if not self.is_protected():
             self.health -= amount
             if self.health < 0:
                 self.health = 0
-            if self.health == 0:
+            if self.health < self.max_health:
                 self.add_fire(big=True)
 
     def heal(self, amount):
@@ -71,8 +65,6 @@ class Tree:
         self.start_glow()
 
     def add_fire(self, big=False):
-        """Agrega fuego solo si el árbol NO está protegido"""
-        # Mantener protección fuerte: si está protegido no agregar fuego
         if self.is_protected():
             return
         fire = Fire(
@@ -83,12 +75,9 @@ class Tree:
         self.fires.append(fire)
 
     def draw(self, screen):
-        # Si está protegido, asegurarse de que no haya fuegos visibles
         if self.is_protected():
-            # limpiar la lista cada frame para evitar que un enemy reañada fuegos
             if self.fires:
                 self.fires.clear()
-        # Dibujo del árbol
         if self.glow:
             elapsed = pygame.time.get_ticks() - self.glow_start
             alpha = 150 + 80 * math.sin(elapsed / 100)
@@ -133,20 +122,15 @@ class Tree:
             surface = pygame.transform.scale(surface, (self.size, self.size))
             screen.blit(surface, (self.x, self.y))
 
-        # Dibujar fuegos (si quedan)
         for fire in self.fires:
             fire.draw(screen)
 
-        # DIBUJAR HITBOXES DEL ÁRBOL (modo desarrollador)
         if desarrollador.MOSTRAR_HITBOX:
-            # Hitbox de colisión
             col_rect = self.get_collision_rect()
             pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_COLISION, col_rect, 1)
-            # Hitbox de ataque
             atk_rect = self.get_attack_rect()
             pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ATAQUE, atk_rect, 1)
 
-            # DIBUJAR BARRA DE VIDA (solo en modo desarrollador)
             bar_width = self.size
             bar_height = 8
             fill = (self.health / self.max_health) * bar_width if self.max_health > 0 else 0
@@ -155,7 +139,6 @@ class Tree:
             pygame.draw.rect(screen, constants.RED, outline_rect)
             pygame.draw.rect(screen, constants.GREEN, fill_rect)
 
-# En ambient.py, modifica la clase CentralTree:
 class CentralTree(Tree):
     def __init__(self, x, y):
         super().__init__(x, y)
@@ -163,9 +146,10 @@ class CentralTree(Tree):
         self.max_health = constants.TREE_HEALTH
         self.size = constants.TREE_SIZE
         self.sprite = pygame.image.load(os.path.join('assets', 'images', 'objects', 'arbolquemado.png')).convert_alpha()
+        self.central_fire = None
+        self.has_fire = False
 
     def get_collision_rect(self):
-        """Hitbox de colisión del árbol central (configuración personalizada)"""
         return pygame.Rect(
             self.x + desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['offset_x'],
             self.y + desarrollador.HITBOX_COLISION_ARBOL_CENTRAL['offset_y'],
@@ -174,7 +158,6 @@ class CentralTree(Tree):
         )
 
     def get_attack_rect(self):
-        """Hitbox de ataque del árbol central (configuración personalizada)"""
         return pygame.Rect(
             self.x + desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['offset_x'],
             self.y + desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['offset_y'],
@@ -182,6 +165,41 @@ class CentralTree(Tree):
             desarrollador.HITBOX_ATAQUE_ARBOL_CENTRAL['height']
         )
 
+    def take_damage(self, amount):
+        if not self.is_protected():
+            self.health -= amount
+            if self.health < 0:
+                self.health = 0
+            if self.health < self.max_health and not self.has_fire:
+                self.add_fire()
+
+    def heal(self, amount):
+        self.health += amount
+        if self.health > self.max_health:
+            self.health = self.max_health
+        self.remove_fire()
+        self.start_glow()
+
+    def add_fire(self, big=False):  # ¡AGREGA EL PARÁMETRO!
+        if self.is_protected():
+            return
+        self.central_fire = FireCentral(self.x, self.y)
+        self.has_fire = True
+
+    def remove_fire(self):
+        self.central_fire = None
+        self.has_fire = False
+
+    def activate_protection(self):
+        super().activate_protection()
+        self.remove_fire()
+
+    def draw(self, screen):
+        super().draw(screen)
+        
+        if self.has_fire and self.central_fire and not self.is_protected():
+            self.central_fire.draw(screen)
+            
 class Rock:
     def __init__(self, x, y):
         self.x = x
@@ -192,7 +210,6 @@ class Rock:
         self.size = constants.ROCK
 
     def get_collision_rect(self):
-        """Hitbox de colisión de la roca usando el sistema centralizado"""
         return pygame.Rect(
             self.x + desarrollador.HITBOX_COLISION_ROCA['offset_x'],
             self.y + desarrollador.HITBOX_COLISION_ROCA['offset_y'],
@@ -203,7 +220,6 @@ class Rock:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
         
-        # Dibujar hitbox si está activado el modo desarrollador
         if desarrollador.MOSTRAR_HITBOX:
             colision_rect = self.get_collision_rect()
             pygame.draw.rect(screen, desarrollador.COLOR_HITBOX_ROCA, colision_rect, 1)

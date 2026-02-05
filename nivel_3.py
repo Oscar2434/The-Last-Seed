@@ -9,7 +9,7 @@ import player_nivel3
 import objects_nivel3
 import snake_logic
 import ui_nivel3
-import pause_menu  # IMPORTAR MENÚ DE PAUSA
+import pause_menu
 
 pygame.init()
 
@@ -22,14 +22,11 @@ def cargar_imagen_bolsa():
     return img
 
 def show_tutorial_screens(screen, level_number):
-    """Muestra las pantallas de tutorial para el nivel especificado"""
-    # Cargar imágenes según idioma
-    if config.lenguaje:  # Español
+    if config.lenguaje:
         tutorial_path = "assets/images/turorial en español"
-    else:  # Inglés
+    else:
         tutorial_path = "assets/images/tutorial en ingles"
     
-    # Cargar imágenes
     try:
         universal_img = pygame.image.load(os.path.join(tutorial_path, "universal.png")).convert_alpha()
         level_img = pygame.image.load(os.path.join(tutorial_path, f"N{level_number}.png")).convert_alpha()
@@ -40,15 +37,12 @@ def show_tutorial_screens(screen, level_number):
         print(f"Error cargando imágenes de tutorial: {e}")
         return False
     
-    # Escalar imágenes al tamaño de la pantalla
     universal_img = pygame.transform.scale(universal_img, (constants.WIDTH, constants.HEIGHT))
     level_img = pygame.transform.scale(level_img, (constants.WIDTH, constants.HEIGHT))
     
-    # Posición del botón continuar
     continue_rect = continue_img.get_rect(center=(750, 450))
     
-    # Mostrar pantalla universal primero
-    current_screen = 0  # 0 = universal, 1 = nivel específico
+    current_screen = 0
     screens = [universal_img, level_img]
     
     clock = pygame.time.Clock()
@@ -71,7 +65,6 @@ def show_tutorial_screens(screen, level_number):
                     if current_screen >= len(screens):
                         return True
         
-        # Dibujar pantalla actual
         screen.blit(screens[current_screen], (0, 0))
         screen.blit(continue_img, continue_rect)
         
@@ -80,34 +73,102 @@ def show_tutorial_screens(screen, level_number):
     
     return True
 
-def dibujar_hud_traducido(screen, tiempo, recogidas, objetivo):
-    """Versión traducida del HUD para nivel 3"""
-    # Obtener textos según idioma
-    if config.lenguaje:  # Español
-        texto_tiempo = f"Tiempo: {tiempo}"
+def draw_timer_transparent(screen, remaining_time, total_time, x, y, cabeza_rect):
+    minutes = remaining_time // 60
+    seconds = remaining_time % 60
+    time_text = f"{minutes:02d}:{seconds:02d}"
+    
+    font = pygame.font.Font(None, 40)
+    
+    if remaining_time > total_time * 0.6:
+        color = constants.GREEN
+    elif remaining_time > total_time * 0.3:
+        color = constants.YELLOW
+    else:
+        color = constants.RED
+    
+    text_surface = font.render(time_text, True, color)
+    
+    bg_rect = text_surface.get_rect()
+    bg_rect.x = x - 10
+    bg_rect.y = y - 5
+    bg_rect.width += 20
+    bg_rect.height += 10
+    
+    if cabeza_rect and cabeza_rect.colliderect(bg_rect):
+        alpha_bg = 100
+        alpha_text = 180
+    else:
+        alpha_bg = 180
+        alpha_text = 255
+    
+    bg_surface = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
+    pygame.draw.rect(bg_surface, (0, 0, 0, alpha_bg), bg_surface.get_rect(), border_radius=8)
+    pygame.draw.rect(bg_surface, (255, 255, 255, 100), bg_surface.get_rect(), 2, border_radius=8)
+    
+    screen.blit(bg_surface, (bg_rect.x, bg_rect.y))
+    
+    text_with_alpha = text_surface.copy()
+    text_with_alpha.set_alpha(alpha_text)
+    screen.blit(text_with_alpha, (x, y))
+    
+    if remaining_time < 10:
+        pulse = (pygame.time.get_ticks() // 200) % 2
+        if pulse == 0:
+            glow_rect = bg_rect.copy()
+            glow_rect.x -= 2
+            glow_rect.y -= 2
+            glow_rect.width += 4
+            glow_rect.height += 4
+            glow_surface = pygame.Surface((glow_rect.width, glow_rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(glow_surface, (255, 50, 50, 100), glow_surface.get_rect(), 3, border_radius=10)
+            screen.blit(glow_surface, (glow_rect.x, glow_rect.y))
+
+def dibujar_hud_traducido(screen, tiempo, recogidas, objetivo, tiempo_total, cabeza_rect):
+    draw_timer_transparent(screen, tiempo, tiempo_total, 10, 10, cabeza_rect)
+    
+    if config.lenguaje:
         texto_basura = f"Basura: {recogidas}/{objetivo}"
-    else:  # Inglés
-        texto_tiempo = f"Time: {tiempo}"
+    else:
         texto_basura = f"Trash: {recogidas}/{objetivo}"
     
-    font = pygame.font.SysFont(None, 36)
+    font = pygame.font.SysFont(None, constants.TRASH_HUD_FONT_SIZE)
     
-    # Renderizar textos
-    texto1 = font.render(texto_tiempo, True, constants.BLACK)
-    texto2 = font.render(texto_basura, True, constants.BLACK)
+    texto2 = font.render(texto_basura, True, (255, 255, 220))
     
-    # Dibujar textos en la pantalla
-    screen.blit(texto1, (10, 10))
-    screen.blit(texto2, (10, 50))
+    bg_rect = texto2.get_rect()
+    bg_width = max(texto2.get_width() + constants.TRASH_HUD_BG_PADDING * 2, constants.TRASH_HUD_MIN_WIDTH)
+    bg_rect.width = bg_width
+    bg_rect.height = texto2.get_height() + constants.TRASH_HUD_BG_PADDING
+    bg_rect.x = constants.TRASH_HUD_PADDING_LEFT
+    bg_rect.y = constants.TRASH_HUD_PADDING_TOP
+    
+    if cabeza_rect and cabeza_rect.colliderect(bg_rect):
+        alpha_bg = 100
+        alpha_text = 180
+    else:
+        alpha_bg = 180
+        alpha_text = 255
+    
+    bg_surface = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
+    pygame.draw.rect(bg_surface, (0, 0, 0, alpha_bg), bg_surface.get_rect(), border_radius=8)
+    pygame.draw.rect(bg_surface, (255, 255, 255, 100), bg_surface.get_rect(), 2, border_radius=8)
+    
+    screen.blit(bg_surface, (bg_rect.x, bg_rect.y))
+    
+    text_x = bg_rect.x + (bg_rect.width - texto2.get_width()) // 2
+    text_y = bg_rect.y + constants.TRASH_HUD_BG_PADDING // 2
+    
+    text_with_alpha = texto2.copy()
+    text_with_alpha.set_alpha(alpha_text)
+    screen.blit(text_with_alpha, (text_x, text_y))
 
 def main():
-    # --- DETENER MÚSICA DEL MENÚ ---
     try:
         pygame.mixer.music.fadeout(800)
     except:
         pass
 
-    # --- INICIAR MÚSICA DEL NIVEL 3 ---
     def start_level_music():
         try:
             if not pygame.mixer.get_init():
@@ -125,24 +186,19 @@ def main():
         except:
             pass
     
-    # Bucle principal para reinicios
     while True:
-        # Actualizar configuración al inicio
         config.update_global_config()
         
         screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
         clock = pygame.time.Clock()
 
-        # === BOTÓN DE PAUSA ===
         pause_icon_raw = pygame.image.load("assets/images/effects/pausa.png").convert_alpha()
         pause_icon = pygame.transform.scale(pause_icon_raw, (35, 35))
         pause_rect = pause_icon.get_rect(center=(constants.WIDTH // 2, 20))
 
-        # MOSTRAR TUTORIALES ANTES DE INICIAR EL NIVEL
         if not show_tutorial_screens(screen, 3):
-            return "menu"  # Salir al menú si se cierra durante tutorial
+            return "menu"
 
-        # Iniciar música del nivel
         start_level_music()
 
         world = world_nivel3.World(constants.WIDTH, constants.HEIGHT)
@@ -150,9 +206,11 @@ def main():
         if getattr(config, "difficulty", "normal") == "avanzado":
             velocidad = 5
             objetivo = 20
+            tiempo_total = 40
         else:
             velocidad = 4
             objetivo = 12
+            tiempo_total = 60
 
         start_x = constants.WIDTH // 2 - constants.PERSONAJE // 2
         start_y = constants.HEIGHT - constants.PERSONAJE - 20
@@ -169,15 +227,18 @@ def main():
         recogidas = 0
         game_paused = False
         restart_requested = False
+        pause_start_time = 0
+        total_pause_time = 0
 
         while True:
-            # VERIFICAR EVENTOS DE NAVEGACIÓN
+            current_time = pygame.time.get_ticks()
+            cabeza = jugador.get_head_rect()
+            
             for event in pygame.event.get(pump=False):
                 if event.type == config.OPEN_MENU_EVENT:
                     stop_level_music()
-                    return  # Salir al menú principal
+                    return
 
-            # === EVENTOS ORIGINALES DEL NIVEL ===
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     stop_level_music()
@@ -186,56 +247,50 @@ def main():
 
                 if event.type == config.OPEN_MENU_EVENT:
                     stop_level_music()
-                    return  # Salir al menú principal
+                    return
 
                 if event.type == pygame.KEYDOWN:
-                    # TECLA ESC → ABRE MENÚ DE PAUSA
                     if event.key == pygame.K_ESCAPE:
                         game_paused = True
+                        pause_start_time = current_time
                         result = pause_menu.show_pause_menu(screen, "level3")
                         game_paused = False
+                        total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                         
-                        # Manejar resultado del menú de pausa
                         if result == "restart":
                             restart_requested = True
                         elif result == "menu":
                             stop_level_music()
                             return
                         
-                        # Reanudar música si se detuvo por configuración
                         if config.music and not pygame.mixer.music.get_busy():
                             start_level_music()
 
-                # CLICK EN BOTÓN DE PAUSA
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pause_rect.collidepoint(event.pos):
                         game_paused = True
+                        pause_start_time = current_time
                         result = pause_menu.show_pause_menu(screen, "level3")
                         game_paused = False
+                        total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                         
-                        # Manejar resultado del menú de pausa
                         if result == "restart":
                             restart_requested = True
                         elif result == "menu":
                             stop_level_music()
                             return
                         
-                        # Reanudar música si se detuvo por configuración
                         if config.music and not pygame.mixer.music.get_busy():
                             start_level_music()
 
-            # Verificar si se solicitó reinicio
             if restart_requested:
-                break  # Romper el bucle interno y reiniciar
+                break
 
-            # Si el juego está en pausa, saltar el resto de la lógica
             if game_paused:
                 continue
 
             keys = pygame.key.get_pressed()
             jugador.mover_perpetuo(keys)
-
-            cabeza = jugador.get_head_rect()
 
             nuevas_basuras = []
             for b in basura:
@@ -247,20 +302,20 @@ def main():
             basura = nuevas_basuras
 
             if snake_logic.fuera_de_limites(jugador, constants.WIDTH, constants.HEIGHT):
-                # Cargar imagen de derrota según idioma actual
-                if config.lenguaje:  # Español
+                if config.lenguaje:
                     lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perder.png")).convert_alpha()
-                else:  # Inglés
+                else:
                     lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perderI.png")).convert_alpha()
                 lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
                 screen.blit(lose_img, (0, 0))
                 pygame.display.update()
                 pygame.time.delay(2000)
                 
-                # Mostrar menú de pausa después de derrota
                 game_paused = True
+                pause_start_time = pygame.time.get_ticks()
                 result = pause_menu.show_pause_menu(screen, "level3")
                 game_paused = False
+                total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                 
                 if result == "restart":
                     restart_requested = True
@@ -268,27 +323,25 @@ def main():
                     stop_level_music()
                     return
                 else:
-                    # Por defecto, reiniciar si no se elige menú
                     restart_requested = True
                 
-                # Continuar al siguiente ciclo
                 continue
 
             if snake_logic.colision_obstaculos(jugador, world.obstacles):
-                # Cargar imagen de derrota según idioma actual
-                if config.lenguaje:  # Español
+                if config.lenguaje:
                     lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perder.png")).convert_alpha()
-                else:  # Inglés
+                else:
                     lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perderI.png")).convert_alpha()
                 lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
                 screen.blit(lose_img, (0, 0))
                 pygame.display.update()
                 pygame.time.delay(2000)
                 
-                # Mostrar menú de pausa después de derrota
                 game_paused = True
+                pause_start_time = pygame.time.get_ticks()
                 result = pause_menu.show_pause_menu(screen, "level3")
                 game_paused = False
+                total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                 
                 if result == "restart":
                     restart_requested = True
@@ -296,29 +349,27 @@ def main():
                     stop_level_music()
                     return
                 else:
-                    # Por defecto, reiniciar si no se elige menú
                     restart_requested = True
                 
-                # Continuar al siguiente ciclo
                 continue
 
             if recogidas >= objetivo and len(jugador.cola) > 0:
                 cola_rect = jugador.cola[-1]
                 if cola_rect.colliderect(world.bote.rect):
-                    # Cargar imagen de victoria según idioma actual
-                    if config.lenguaje:  # Español
+                    if config.lenguaje:
                         victory_img = pygame.image.load(os.path.join("assets", "images", "effects", "ganar.png")).convert_alpha()
-                    else:  # Inglés
+                    else:
                         victory_img = pygame.image.load(os.path.join("assets", "images", "effects", "ganarI.png")).convert_alpha()
                     victory_img = pygame.transform.scale(victory_img, (constants.WIDTH, constants.HEIGHT))
                     screen.blit(victory_img, (0, 0))
                     pygame.display.update()
                     pygame.time.delay(2000)
                     
-                    # Mostrar menú de pausa después de victoria
                     game_paused = True
+                    pause_start_time = pygame.time.get_ticks()
                     result = pause_menu.show_pause_menu(screen, "level3")
                     game_paused = False
+                    total_pause_time += (pygame.time.get_ticks() - pause_start_time)
                     
                     if result == "restart":
                         restart_requested = True
@@ -326,33 +377,60 @@ def main():
                         stop_level_music()
                         return
                     else:
-                        # Por defecto, reiniciar si no se elige menú
                         restart_requested = True
                     
-                    # Continuar al siguiente ciclo
                     continue
 
-            tiempo = (pygame.time.get_ticks() - inicio) // 1000
+            current_time = pygame.time.get_ticks()
+            if game_paused:
+                effective_time = (pause_start_time - inicio) - total_pause_time
+            else:
+                effective_time = (current_time - inicio) - total_pause_time
+            
+            tiempo_transcurrido = effective_time // 1000
+            tiempo_restante = max(0, tiempo_total - tiempo_transcurrido)
+            
+            if tiempo_restante == 0:
+                if config.lenguaje:
+                    lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perder.png")).convert_alpha()
+                else:
+                    lose_img = pygame.image.load(os.path.join("assets", "images", "effects", "perderI.png")).convert_alpha()
+                lose_img = pygame.transform.scale(lose_img, (constants.WIDTH, constants.HEIGHT))
+                screen.blit(lose_img, (0, 0))
+                pygame.display.update()
+                pygame.time.delay(2000)
+                
+                game_paused = True
+                pause_start_time = pygame.time.get_ticks()
+                result = pause_menu.show_pause_menu(screen, "level3")
+                game_paused = False
+                total_pause_time += (pygame.time.get_ticks() - pause_start_time)
+                
+                if result == "restart":
+                    restart_requested = True
+                elif result == "menu":
+                    stop_level_music()
+                    return
+                else:
+                    restart_requested = True
+                
+                continue
 
             world.draw(screen)
             for b in basura:
                 b.dibujar(screen)
             jugador.dibujar(screen, bolsa_img)
             
-            # USAR HUD TRADUCIDO EN LUGAR DE ui_nivel3.dibujar_hud
-            dibujar_hud_traducido(screen, tiempo, recogidas, objetivo)
+            dibujar_hud_traducido(screen, tiempo_restante, recogidas, objetivo, tiempo_total, cabeza)
             
-            # === MOSTRAR BOTÓN DE PAUSA ===
             screen.blit(pause_icon, pause_rect)
 
-            # HOVER amarillo del botón de pausa
             if pause_rect.collidepoint(pygame.mouse.get_pos()):
                 pygame.draw.rect(screen, (255, 255, 0), pause_rect, 2)
 
             pygame.display.update()
             clock.tick(60)
 
-        # Si salimos del bucle interno por reinicio, continuamos el bucle externo
         if restart_requested:
             continue
 
