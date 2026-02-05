@@ -1,7 +1,7 @@
 # desarrollador.py
 import pygame
 
-MOSTRAR_HITBOX = True
+MOSTRAR_HITBOX = False
 
 HITBOX_COLISION_ENEMIGO = {
     'width': 20,

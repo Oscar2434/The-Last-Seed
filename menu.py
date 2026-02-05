@@ -8,7 +8,6 @@ import nivels
 
 pygame.init()  
 
-# Variables globales para control de música
 music_initialized = False
 current_music = None  # Track de la música actual
 
@@ -91,14 +90,11 @@ config_button = Button(
 
 def menu():
     run = True
-    # Asegurar que la música del menú esté sonando al entrar
     restart_menu_music()
     
     while run:
-        # ACTUALIZAR CONFIGURACIÓN EN CADA ITERACIÓN
         config.update_global_config()
         
-        # Cargar imágenes según idioma ACTUAL
         if config.lenguaje:  # Español
             play_normal = pygame.image.load("imagenes/Jugar.png")
             play_hover  = pygame.image.load("imagenes/JugarR.png")
@@ -151,10 +147,9 @@ def menu():
                 sys.exit()
 
             if event.type == config.OPEN_MENU_EVENT:
-                # Este evento nos trae de vuelta al menú principal
                 print("Evento OPEN_MENU_EVENT recibido - Reiniciando música del menú")
-                restart_menu_music()  # REINICIAR MÚSICA DEL MENÚ
-                apply_current_config()  # Actualizar configuración
+                restart_menu_music()  
+                apply_current_config()
                 continue
 
         pygame.display.update()
